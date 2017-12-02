@@ -2,6 +2,14 @@ const storage = require('node-persist');
 const utils = require('./utils');
 
 module.exports = spotifyApi => ({
+  on: false,
+  noAuth: [
+    'listusers',
+    'whichuser',
+    'setuser',
+    'pdj'
+  ],
+
   addplaylist(req, res) {
     const splitText = req.body.text.split(' ');
     if (splitText.length !== 2) {
@@ -262,6 +270,7 @@ you're hearing, you'll have to select it from Spotify yourself.`,
 
       spotifyApi.play({ context_uri: playlistURI }).then(
         () => {
+          this.on = true;
           res.send(utils.directed('It begins', req));
         },
         err => {
@@ -283,12 +292,14 @@ you're hearing, you'll have to select it from Spotify yourself.`,
       );
     } else if (command === 'off') {
       spotifyApi.pause().then(
-        () =>
+        () => {
+          this.on = false;
           res.send(
             utils.inChannel(
               '_If music be the food of love, play on._\nShakespeare'
             )
-          ),
+          );
+        },
         err => {
           console.log(err);
           res.send(utils.directed('Couldn\'t stop playing!', req));

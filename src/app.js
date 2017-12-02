@@ -44,7 +44,7 @@ const authenticated = (function () {
 
 const commands = require('./commands')(spotifyApi);
 
-function authWrapper(req, res, callback) {
+function authWrapper(req, res, commandName) {
   if (!authenticated) {
     res.send(
       utils.directed('Spotify authentication failed. Try `/spotifyauth`.', req)
@@ -52,7 +52,14 @@ function authWrapper(req, res, callback) {
     return;
   }
 
-  callback(req, res);
+  if (!commands.noAuth.includes(commandName)  && !commands.on) {
+    res.send(
+      utils.directed('The jukebox is off!', req)
+    );
+    return;
+  }
+
+  commands[commandName](req, res);
 }
 
 app.post('/spotifyauth', urlencodedParser, function (req, res) {
@@ -107,9 +114,9 @@ app.get('/callback', function (req, res) {
 
 require('./slack_auth')(app);
 
-Object.keys(commands).forEach(command =>
-  app.post(`/${command}`, urlencodedParser, (req, res) =>
-    authWrapper(req, res, commands[command])
+Object.keys(commands).forEach(commandName =>
+  app.post(`/${commandName}`, urlencodedParser, (req, res) =>
+    authWrapper(req, res, commandName)
   )
 );
 
