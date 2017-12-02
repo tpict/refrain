@@ -245,7 +245,13 @@ app.post('/setplaylist', urlencodedParser, function (req, res) {
           }
         })
         .then(
-          () => res.send(directed(`Now playing from *${playlist.name}*!`)),
+          () =>
+            res.send(
+              directed(
+                `Now playing from *${playlist.name}*! Commands will now act on this playlist.`,
+                req
+              )
+            ),
           err => console.log(err)
         );
     },
@@ -334,7 +340,7 @@ app.post('/queue', urlencodedParser, function (req, res) {
 app.post('/next', urlencodedParser, function (req, res) {
   console.log(req.body);
 
-  const callback = skipped => {
+  const callback = (skippedName, skippedArtist) => {
     spotifyApi.skipToNext().then(
       () => {
         setTimeout(
@@ -343,10 +349,14 @@ app.post('/next', urlencodedParser, function (req, res) {
               data => {
                 const name = data.body.item.name;
                 const artist = data.body.item.artists[0].name;
+                const skipText =
+                  skippedName == 'Rattlesnake'
+                    ? 'You are weak.'
+                    : `Skipping *${skippedName}* by *${skippedArtist}*...`;
 
                 res.send(
                   directed(
-                    `Skipping ${skipped}...\nNow playing *${name}* by *${artist}*`,
+                    `${skipText}\nNow playing *${name}* by *${artist}*`,
                     req
                   )
                 );
@@ -374,7 +384,7 @@ app.post('/next', urlencodedParser, function (req, res) {
     data => {
       const skippedName = data.body.item.name;
       const skippedArtist = data.body.item.artists[0].name;
-      callback(`*${skippedName}* by *${skippedArtist}*`);
+      callback(skippedName, skippedArtist);
     },
     err => {
       console.log(err);
@@ -413,13 +423,52 @@ app.post('/pdj', urlencodedParser, function (req, res) {
     );
   } else if (command === 'off') {
     spotifyApi.pause().then(
-      () => res.send(directed('No more music', req)),
+      () =>
+        res.send(
+          inChannel('_If music be the food of love, play on._\nShakespeare')
+        ),
       err => {
         console.log(err);
         res.send(directed('Couldn\'t stop playing!', req));
       }
     );
   }
+});
+
+app.post('/whomst', urlencodedParser, function (req, res) {
+  spotifyApi.getMyCurrentPlayingTrack().then(
+    data => {
+      const track = data.body.item;
+      const name = track.name;
+      const artist = track.artists[0].name;
+      const playlist = getActivePlaylist();
+
+      console.log(track.id);
+      console.log(playlist);
+      const storedTrack = playlist.tracks[track.id];
+
+      if (storedTrack) {
+        const requester = storedTrack.requester;
+        res.send(
+          directed(
+            `*${name}* by *${artist}* was requested by <@${requester}>`,
+            req
+          )
+        );
+      } else {
+        res.send(
+          directed(
+            `*${name}* by *${artist}* was added directly through Spotify :thumbsdown:`,
+            req
+          )
+        );
+      }
+    },
+    err => {
+      console.log(err);
+      res.send('Couldn\'t read the currently playing track');
+    }
+  );
 });
 
 // app.post('/loudness', urlencodedParser, function (req, res) {
