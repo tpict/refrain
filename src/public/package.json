@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "node-persist": "^2.1.0"
+  }
+}
