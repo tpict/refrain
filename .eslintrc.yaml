@@ -1,13 +1,12 @@
 extends:
   - eslint:recommended
 parserOptions:
-  ecmaVersion: 6
+  ecmaVersion: 8
   sourceType: module
   ecmaFeatures:
     impliedStrict: yes
 env:
   node: yes
-  es6: yes
 rules:
   arrow-parens:
     - 0

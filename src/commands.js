@@ -3,12 +3,7 @@ const utils = require('./utils');
 
 module.exports = spotifyApi => ({
   on: false,
-  noAuth: [
-    'listusers',
-    'whichuser',
-    'setuser',
-    'pdj'
-  ],
+  noAuth: ['listusers', 'whichuser', 'setuser', 'pdj'],
 
   addplaylist(req, res) {
     const splitText = req.body.text.split(' ');
@@ -91,42 +86,41 @@ module.exports = spotifyApi => ({
       return;
     }
 
-    spotifyApi.getPlaylist(utils.getUserID(), playlist.id).then(
-      data => {
+    spotifyApi
+      .getPlaylist(utils.getUserID(), playlist.id)
+      .then(data => {
         storage.setItemSync('active_playlist', text);
 
         const firstTrack = data.body.tracks.items[0];
         if (!firstTrack) {
           res.send(
             utils.directed(
-              `Commands will now act on the *${text}* playlist. You'll have to play it\
- from Spotify yourself. Sorry!`,
+              `Commands will now act on the *${text}* playlist. You'll have to play it from Spotify yourself. Sorry!`,
               req
             )
           );
           return;
         }
 
-        spotifyApi
-          .play({
-            context_uri: playlist.uri,
-            offset: {
-              uri: firstTrack.track.uri
-            }
-          })
-          .then(
-            () =>
-              res.send(
-                utils.directed(
-                  `Now playing from *${playlist.name}*! Commands will now act on this playlist.`,
-                  req
-                )
-              ),
-            err => console.log(err)
-          );
-      },
-      () => res.send(utils.directed('Looks like a misconfigured playlist'))
-    );
+        return spotifyApi.play({
+          context_uri: playlist.uri,
+          offset: {
+            uri: firstTrack.track.uri
+          }
+        });
+      })
+      .then(() =>
+        res.send(
+          utils.directed(
+            `Now playing from *${playlist.name}*! Commands will now act on this playlist.`,
+            req
+          )
+        )
+      )
+      .catch(err => {
+        console.log(err);
+        res.send(utils.directed('Looks like a misconfigured playlist'));
+      });
   },
 
   whichplaylist(req, res) {
@@ -147,53 +141,27 @@ you're hearing, you'll have to select it from Spotify yourself.`,
     }
   },
 
-  queue(req, res) {
-    spotifyApi.searchTracks(req.body.text).then(
-      data => {
+  async queue(req, res) {
+    const playlists = utils.getPlaylists();
+    const playlistAlias = utils.getActivePlaylistID();
+    const playlist = utils.getActivePlaylist();
+
+    const { firstHit, firstArtist } = await spotifyApi
+      .searchTracks(req.body.text)
+      .then(data => {
         const results = data.body.tracks.items;
 
         if (results.length === 0) {
           res.send(utils.directed('Couldn\'t find that track.', req));
           return;
-        } else {
-          const firstHit = results[0];
-          const firstArtist = firstHit.artists[0];
-          const playlistAlias = utils.getActivePlaylistID();
-          const playlists = utils.getPlaylists();
-          const playlist = playlists[playlistAlias];
-
-          spotifyApi
-            .addTracksToPlaylist(utils.getUserID(), playlist.id, [firstHit.uri])
-            .then(
-              () => {
-                playlist.tracks[firstHit.id] = {
-                  requester: req.body.user_name,
-                  artist: firstArtist.name,
-                  name: firstHit.name
-                };
-                playlists[playlistAlias] = playlist;
-                storage.setItemSync('playlists', playlists);
-
-                res.send(
-                  utils.directed(
-                    `Added *${firstHit.name}* by *${firstArtist.name}* to *${playlist.name}*`,
-                    req
-                  )
-                );
-              },
-              err => {
-                console.log(err);
-                res.send(
-                  utils.directed(
-                    `There was an error adding *${firstHit.name}* to *${playlist.name}*.`,
-                    req
-                  )
-                );
-              }
-            );
         }
-      },
-      err => {
+
+        const firstHit = results[0];
+        const firstArtist = firstHit.artists[0];
+
+        return { firstHit, firstArtist };
+      })
+      .catch(err => {
         console.log(err);
         res.send(
           utils.directed(
@@ -201,8 +169,35 @@ you're hearing, you'll have to select it from Spotify yourself.`,
             req
           )
         );
-      }
-    );
+      });
+
+    spotifyApi
+      .addTracksToPlaylist(utils.getUserID(), playlist.id, [firstHit.uri])
+      .then(() => {
+        playlist.tracks[firstHit.id] = {
+          requester: req.body.user_name,
+          artist: firstArtist.name,
+          name: firstHit.name
+        };
+        playlists[playlistAlias] = playlist;
+        storage.setItemSync('playlists', playlists);
+
+        res.send(
+          utils.directed(
+            `Added *${firstHit.name}* by *${firstArtist.name}* to *${playlist.name}*`,
+            req
+          )
+        );
+      })
+      .catch(err => {
+        console.log(err);
+        res.send(
+          utils.directed(
+            `There was an error adding *${firstHit.name}* to *${playlist.name}*.`,
+            req
+          )
+        );
+      });
   },
 
   next(req, res) {
@@ -363,7 +358,12 @@ you're hearing, you'll have to select it from Spotify yourself.`,
     const text = req.body.text;
     const user = utils.getUsers()[text];
     if (!user) {
-      res.send(utils.directed('That user isn\'t authenticated with Spotify. Try `/listusers` to see who is.', req));
+      res.send(
+        utils.directed(
+          'That user isn\'t authenticated with Spotify. Try `/listusers` to see who is.',
+          req
+        )
+      );
       return;
     }
 
