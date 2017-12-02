@@ -1,6 +1,10 @@
 const storage = require('node-persist');
 
 module.exports = {
+  sleep(duration) {
+    return new Promise(resolve => setTimeout(resolve, duration));
+  },
+
   inChannel(data) {
     if (typeof data === 'string') {
       data = { text: data };

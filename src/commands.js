@@ -202,43 +202,43 @@ you're hearing, you'll have to select it from Spotify yourself.`,
 
   next(req, res) {
     const callback = (skippedName, skippedArtist) => {
-      spotifyApi.skipToNext().then(
-        () => {
-          setTimeout(
-            () =>
-              spotifyApi.getMyCurrentPlayingTrack().then(
-                data => {
-                  const name = data.body.item.name;
-                  const artist = data.body.item.artists[0].name;
-                  const skipText =
-                    skippedName == 'Rattlesnake'
-                      ? 'You are weak.'
-                      : `Skipping *${skippedName}* by *${skippedArtist}*...`;
+      spotifyApi
+        .skipToNext()
+        .then(
+          async () => {
+            await utils.sleep(500);
+            return spotifyApi.getMyCurrentPlayingTrack();
+          },
+          err => {
+            console.log(err);
+            res.send(utils.directed('Spotify couldn\'t skip this track!'));
+          }
+        )
+        .then(
+          data => {
+            const name = data.body.item.name;
+            const artist = data.body.item.artists[0].name;
+            const skipText =
+              skippedName == 'Rattlesnake'
+                ? 'You are weak.'
+                : `Skipping *${skippedName}* by *${skippedArtist}*...`;
 
-                  res.send(
-                    utils.directed(
-                      `${skipText}\nNow playing *${name}* by *${artist}*`,
-                      req
-                    )
-                  );
-                },
-                err => {
-                  console.log(err);
-                  res.send(
-                    utils.directed(
-                      'Managed to skip, but Spotify wouldn\'t say what\'s playing now!'
-                    )
-                  );
-                }
-              ),
-            500
-          );
-        },
-        err => {
-          console.log(err);
-          res.send(utils.directed('Spotify couldn\'t skip this track!'));
-        }
-      );
+            res.send(
+              utils.directed(
+                `${skipText}\nNow playing *${name}* by *${artist}*`,
+                req
+              )
+            );
+          },
+          err => {
+            console.log(err);
+            res.send(
+              utils.directed(
+                'Managed to skip, but Spotify wouldn\'t say what\'s playing now!'
+              )
+            );
+          }
+        );
     };
 
     spotifyApi.getMyCurrentPlayingTrack().then(
