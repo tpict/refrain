@@ -15,21 +15,37 @@ const spotifyApi = new SpotifyWebApi({
   redirectUri: require('./credentials').spotifyRedirectURI
 });
 
-const accessToken = storage.getItemSync('access_token');
-const refreshToken = storage.getItemSync('refresh_token');
+const authenticated = (function () {
+  const activeUser = storage.getItemSync('active_user');
+  if (!activeUser) {
+    return false;
+  }
 
-let authenticated = false;
-if (accessToken && refreshToken) {
-  spotifyApi.setAccessToken(accessToken);
-  spotifyApi.setRefreshToken(refreshToken);
-  authenticated = true;
+  const accessToken = activeUser.access_token;
+  const refreshToken = activeUser.refresh_token;
 
-  spotifyApi
-    .refreshAccessToken()
-    .then(
-      data => spotifyApi.setAccessToken(data.body['access_token']),
-      err => console.log(err)
-    );
+  if (accessToken && refreshToken) {
+    spotifyApi.setAccessToken(accessToken);
+    spotifyApi.setRefreshToken(refreshToken);
+
+    spotifyApi
+      .refreshAccessToken()
+      .then(
+        data => spotifyApi.setAccessToken(data.body['access_token']),
+        err => console.log(err)
+      );
+
+    return true;
+  }
+})();
+
+function authWrapper(req, res, callback) {
+  if (!authenticated) {
+    res.send(directed('Spotify authentication failed. Try `/spotifyauth`.', req));
+    return;
+  }
+
+  callback(req, res);
 }
 
 function inChannel(data) {
@@ -63,7 +79,7 @@ const scope = [
   'user-read-currently-playing'
 ];
 
-const generateRandomString = function (length) {
+function generateRandomString(length) {
   var text = '';
   var possible =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -72,26 +88,36 @@ const generateRandomString = function (length) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
   return text;
-};
+}
 
 app.post('/spotifyauth', urlencodedParser, function (req, res) {
-  res.send(
-    directed(
-      spotifyApi.createAuthorizeURL(scope, generateRandomString(16)),
-      req
-    )
-  );
+  const state = generateRandomString(16);
+  const states = getStates();
+  states[state] = req.body.user_name;
+  storage.setItemSync('states', states);
+
+  res.send(directed(spotifyApi.createAuthorizeURL(scope, state), req));
 });
 
 app.get('/callback', function (req, res) {
   const code = req.query.code;
+  const state = req.query.state;
+
   spotifyApi.authorizationCodeGrant(code).then(
     data => {
       const accessToken = data.body['access_token'];
       const refreshToken = data.body['refresh_token'];
 
-      storage.setItemSync('access_token', accessToken);
-      storage.setItemSync('refresh_token', refreshToken);
+      const states = getStates();
+      const user = states[state];
+      const users = getUsers();
+      users[user] = {
+        access_token: accessToken,
+        refresh_token: refreshToken
+      };
+
+      storage.setItemSync('users', users);
+      storage.setItemSync('active_user', user);
 
       spotifyApi.setAccessToken(accessToken);
       spotifyApi.setRefreshToken(refreshToken);
@@ -114,6 +140,14 @@ function getPlaylists() {
   return storage.getItemSync('playlists') || {};
 }
 
+function getUsers() {
+  return storage.getItemSync('users') || {};
+}
+
+function getStates() {
+  return storage.getItemSync('states') || {};
+}
+
 function getActivePlaylistID() {
   return storage.getItemSync('active_playlist');
 }
@@ -121,22 +155,6 @@ function getActivePlaylistID() {
 function getActivePlaylist() {
   return getPlaylists()[getActivePlaylistID()];
 }
-
-app.post('/test', urlencodedParser, function (req, res) {
-  console.log(req.body);
-
-  let message;
-  const spotifyUserID = getUserID();
-
-  if (!spotifyUserID) {
-    message =
-      'Looks like you haven\'t set up Spotify yet. Ask your MC for ' +
-      'assistance.';
-  } else {
-    message = `Hi! Your Spotify ID is ${spotifyUserID}`;
-  }
-  res.send(message);
-});
 
 app.post('/addplaylist', urlencodedParser, function (req, res) {
   console.log(req.body);
@@ -209,7 +227,7 @@ app.post('/listplaylists', urlencodedParser, function (req, res) {
   );
 });
 
-app.post('/setplaylist', urlencodedParser, function (req, res) {
+app.post('/playplaylist', urlencodedParser, function (req, res) {
   console.log(req.body);
 
   const playlists = getPlaylists();
@@ -469,6 +487,18 @@ app.post('/whomst', urlencodedParser, function (req, res) {
       res.send('Couldn\'t read the currently playing track');
     }
   );
+});
+
+app.post('/listusers', urlencodedParser, function (req, res) {
+  const users = getUsers();
+  const userNames = Object.keys(users).join('\n');
+  let message = `Authenticated users:\n${userNames}`;
+  if (users.length === 0) {
+    message =
+      'No users have been authenticated yet! Try `/spotifyauth` to register yourself.';
+  }
+
+  res.send(directed(message, req));
 });
 
 // app.post('/loudness', urlencodedParser, function (req, res) {
