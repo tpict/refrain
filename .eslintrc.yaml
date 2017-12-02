@@ -1,0 +1,44 @@
+extends:
+  - eslint:recommended
+parserOptions:
+  ecmaVersion: 6
+  sourceType: module
+  ecmaFeatures:
+    impliedStrict: yes
+env:
+  node: yes
+  es6: yes
+rules:
+  arrow-parens:
+    - 0
+    - as-needed
+    - requireForBlockBody: no
+  eol-last:
+    - 2
+    - always
+  quotes:
+    - 2
+    - single
+  no-console:
+    - 2
+    - allow:
+      - warn
+      - error
+  semi:
+    - 2
+    - always
+  object-shorthand:
+    - error
+    - always
+    - avoidQuotes: true
+  quote-props:
+    - error
+    - consistent-as-needed
+  object-curly-spacing:
+    - 1
+    - always
+  space-before-function-paren:
+    - error
+    - anonymous: always
+      named: never
+  valid-jsdoc: 1
