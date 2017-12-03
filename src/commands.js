@@ -1,8 +1,11 @@
 const storage = require('node-persist');
 const utils = require('./utils');
 
+// Slash commands for Slack.
 module.exports = spotifyApi => ({
   on: false,
+
+  // Commands which don't require authentication.
   noAuth: ['listusers', 'whichuser', 'setuser', 'pdj'],
 
   addplaylist(req, res) {
@@ -201,7 +204,7 @@ you're hearing, you'll have to select it from Spotify yourself.`,
   },
 
   next(req, res) {
-    const callback = (skippedName, skippedArtist) => {
+    const callback = (skippedName, skippedArtist, errorText) => {
       spotifyApi
         .skipToNext()
         .then(
@@ -216,12 +219,26 @@ you're hearing, you'll have to select it from Spotify yourself.`,
         )
         .then(
           data => {
-            const name = data.body.item.name;
-            const artist = data.body.item.artists[0].name;
-            const skipText =
-              skippedName == 'Rattlesnake'
-                ? 'You are weak.'
-                : `Skipping *${skippedName}* by *${skippedArtist}*...`;
+            const track = data.body.item;
+            if (!track) {
+              res.send(
+                utils.directed(
+                  'Out of music! You might need to use `/playplaylist`.'
+                )
+              );
+              return;
+            }
+
+            const name = track.name;
+            const artist = track.artists[0].name;
+
+            let skipText = errorText;
+            if (!skipText) {
+              skipText =
+                skippedName == 'Rattlesnake'
+                  ? 'You are weak. :snake:'
+                  : `Skipping *${skippedName}* by *${skippedArtist}*...`;
+            }
 
             res.send(
               utils.directed(
@@ -249,9 +266,61 @@ you're hearing, you'll have to select it from Spotify yourself.`,
       },
       err => {
         console.log(err);
-        callback('whatever\'s playing');
+        callback(null, null, 'whatever\'s playing');
       }
     );
+  },
+
+  async eradicate(req, res) {
+    const data = await spotifyApi
+      .getMyCurrentPlayingTrack()
+      .then(data => data)
+      .catch(err => {
+        console.log(err);
+        res.send(
+          utils.directed('Is something playing? Spotify doesn\'t think so!', req)
+        );
+      });
+
+    const track = data.body.item;
+    if (!track) {
+      res.send(
+        utils.directed(
+          'Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.',
+          res
+        )
+      );
+    }
+
+    const name = track.name;
+    const artist = track.artists[0].name;
+
+    spotifyApi
+      .removeTracksFromPlaylist(
+        utils.getUserID(),
+        utils.getActivePlaylist().id,
+        [{ uri: track.uri }]
+      )
+      .then(() => {
+        res.send(
+          utils.directed(
+            `That bad? Let's not listen to *${name}* by *${artist}* again.`,
+            req
+          )
+        );
+
+        return spotifyApi.skipToNext();
+      },
+      err => {
+        console.log(err);
+        res.send(
+          utils.directed(
+            `Spotify doesn\'t want to delete *${name}* by *${artist}*. Godspeed.`,
+            req
+          )
+        );
+      })
+    .then(() => {}, err => console.log(err));
   },
 
   pdj(req, res) {
@@ -266,7 +335,7 @@ you're hearing, you'll have to select it from Spotify yourself.`,
       spotifyApi.play({ context_uri: playlistURI }).then(
         () => {
           this.on = true;
-          res.send(utils.directed('It begins', req));
+          res.send(utils.directed('It begins...', req));
         },
         err => {
           console.log(err);
@@ -291,7 +360,7 @@ you're hearing, you'll have to select it from Spotify yourself.`,
           this.on = false;
           res.send(
             utils.inChannel(
-              '_If music be the food of love, play on._\nShakespeare'
+              '_If music be the food of love, play on._ - Shakespeare\nSwitching off.'
             )
           );
         },
@@ -307,6 +376,15 @@ you're hearing, you'll have to select it from Spotify yourself.`,
     spotifyApi.getMyCurrentPlayingTrack().then(
       data => {
         const track = data.body.item;
+        if (!track) {
+          res.send(
+            utils.directed(
+              'Are you hearing things? If so, check that `/activeuser` matches the user signed in to Spotify.',
+              req
+            )
+          );
+        }
+
         const name = track.name;
         const artist = track.artists[0].name;
         const playlist = utils.getActivePlaylist();
@@ -317,7 +395,7 @@ you're hearing, you'll have to select it from Spotify yourself.`,
           const requester = storedTrack.requester;
           res.send(
             utils.directed(
-              `*${name}* by *${artist}* was requested by <@${requester}>`,
+              `*${name}* by *${artist}* was last requested by <@${requester}>`,
               req
             )
           );
