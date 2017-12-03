@@ -16,13 +16,18 @@ module.exports = {
 
   directed(rawData, req) {
     if (!req) {
-      console.error('app#directed should be supplied a request from Spotify');
+      console.error('app#directed should be supplied either a request from Spotify or a username');
       return;
     }
 
     const data = this.inChannel(rawData);
     const text = data.text;
-    data.text = `<@${req.body.user_name}>: ${text}`;
+
+    const userName = typeof req == 'string'
+      ? req
+      : req.body.user_name;
+
+    data.text = `<@${userName}>: ${text}`;
     return data;
   },
 

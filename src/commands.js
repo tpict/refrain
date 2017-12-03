@@ -290,37 +290,47 @@ you're hearing, you'll have to select it from Spotify yourself.`,
           res
         )
       );
+      return;
     }
 
     const name = track.name;
     const artist = track.artists[0].name;
 
-    spotifyApi
-      .removeTracksFromPlaylist(
-        utils.getUserID(),
-        utils.getActivePlaylist().id,
-        [{ uri: track.uri }]
+    res.send(
+      utils.directed(
+        {
+          text: `Whoa! Are you absolutely positive that you want to delete *${name}* by *${artist}*?`,
+          attachments: [
+            {
+              fallback: 'Your device doesn\'t support this.',
+              callback_id: 'delete_track',
+              color: 'danger',
+              actions: [
+                {
+                  name: 'delete',
+                  text: 'Do it.',
+                  type: 'button',
+                  style: 'danger',
+                  value: JSON.stringify({
+                    user_name: req.body.user_name,
+                    uri: track.uri,
+                    name,
+                    artist
+                  })
+                },
+                {
+                  name: 'cancel',
+                  text: 'Cancel',
+                  type: 'button',
+                  value: {}
+                }
+              ]
+            }
+          ]
+        },
+        req
       )
-      .then(() => {
-        res.send(
-          utils.directed(
-            `That bad? Let's not listen to *${name}* by *${artist}* again.`,
-            req
-          )
-        );
-
-        return spotifyApi.skipToNext();
-      },
-      err => {
-        console.log(err);
-        res.send(
-          utils.directed(
-            `Spotify doesn\'t want to delete *${name}* by *${artist}*. Godspeed.`,
-            req
-          )
-        );
-      })
-    .then(() => {}, err => console.log(err));
+    );
   },
 
   pdj(req, res) {
@@ -335,7 +345,7 @@ you're hearing, you'll have to select it from Spotify yourself.`,
       spotifyApi.play({ context_uri: playlistURI }).then(
         () => {
           this.on = true;
-          res.send(utils.directed('It begins...', req));
+          res.send(utils.directed('It begins...\nIf you can\'t hear anything, play any track in the Spotify client and try again.', req));
         },
         err => {
           console.log(err);
