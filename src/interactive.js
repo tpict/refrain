@@ -15,12 +15,11 @@ module.exports = (app, spotifyApi) => {
     }
 
     const track = JSON.parse(action.value);
-    const name = track.name;
-    const artist = track.artist;
+    const formattedSong = utils.formatSong(track.name, track.artist);
 
     spotifyApi
       .removeTracksFromPlaylist(
-        utils.getUserID(),
+        utils.getActiveUserID(),
         utils.getActivePlaylist().id,
         [{ uri: track.uri }]
       )
@@ -28,7 +27,7 @@ module.exports = (app, spotifyApi) => {
         () => {
           res.send(
             utils.directed(
-              `That bad? Let's not listen to *${name}* by *${artist}* again. :bomb:`,
+              `That bad? Let's not listen to ${formattedSong} again. :bomb:`,
               track.user_name
             )
           );
@@ -38,7 +37,7 @@ module.exports = (app, spotifyApi) => {
           console.log(err);
           res.send(
             utils.directed(
-              `Spotify doesn\'t want to delete *${name}* by *${artist}*. Godspeed.`,
+              `Spotify doesn\'t want to delete ${formattedSong}. Godspeed.`,
               req
             )
           );

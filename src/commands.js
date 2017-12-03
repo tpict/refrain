@@ -1,57 +1,35 @@
 const storage = require('node-persist');
 const utils = require('./utils');
 
-const queue = async function (spotifyApi, req, res, callback) {
+const queue = async function (spotifyApi, req, res, track, callback) {
   const playlists = utils.getPlaylists();
   const playlistAlias = utils.getActivePlaylistAlias();
   const playlist = utils.getActivePlaylist();
-
-  const { firstHit, firstArtist } = await spotifyApi
-    .searchTracks(req.body.text)
-    .then(
-      data => {
-        const results = data.body.tracks.items;
-
-        if (results.length === 0) {
-          res.send(utils.directed('Couldn\'t find that track.', req));
-          return;
-        }
-
-        const firstHit = results[0];
-        const firstArtist = firstHit.artists[0];
-
-        return { firstHit, firstArtist };
-      },
-      err =>
-        utils.errorWrapper(err, req, res, () =>
-          utils.respond(
-            req,
-            res,
-            'There was an error while searching for that track.'
-          )
-        )
-    );
+  const artist = track.artists[0];
 
   spotifyApi
-    .addTracksToPlaylist(utils.getActiveUserID(), playlist.id, [firstHit.uri])
+    .addTracksToPlaylist(utils.getActiveUserID(), playlist.id, [track.uri])
     .then(
       () => {
-        playlist.tracks[firstHit.id] = {
+        playlist.tracks[track.id] = {
           requester: req.body.user_name,
-          artist: firstArtist.name,
-          name: firstHit.name
+          artist: artist.name,
+          name: track.name
         };
         playlists[playlistAlias] = playlist;
         storage.setItemSync('playlists', playlists);
 
-        callback(firstHit, firstArtist, playlist);
+        callback(artist, playlist);
       },
       err =>
         utils.errorWrapper(err, req, res, () =>
           utils.respond(
             req,
             res,
-            `There was an error adding *${firstHit.name}* by *${firstArtist.name}* to *${playlist.name}*.`
+            `There was an error adding ${utils.formatSong(
+              track.name,
+              artist.name
+            )} to *${playlist.name}*.`
           )
         )
     );
@@ -207,34 +185,96 @@ you're hearing, you'll have to select it from Spotify yourself.`,
     }
   },
 
-  queue(req, res) {
-    queue(spotifyApi, req, res, (track, artist, playlist) =>
+  async queue(req, res) {
+    const track = await spotifyApi.searchTracks(req.body.text).then(
+      data => {
+        const results = data.body.tracks.items;
+
+        if (results.length === 0) {
+          res.send(utils.directed('Couldn\'t find that track.', req));
+          return;
+        }
+
+        return results[0];
+      },
+      err =>
+        utils.errorWrapper(err, req, res, () =>
+          utils.respond(
+            req,
+            res,
+            'There was an error while searching for that track.'
+          )
+        )
+    );
+
+    queue(spotifyApi, req, res, track, (artist, playlist) =>
       res.send(
         utils.directed(
-          `Added *${track.name}* by *${artist.name}* to *${playlist.name}*`,
+          `Added ${utils.formatSong(
+            track.name,
+            artist.name
+          )} to *${playlist.name}*`,
           req
         )
       )
     );
   },
 
-  playme(req, res) {
-    queue(spotifyApi, req, res, (track, artist, playlist) => {
-      spotifyApi
+  async playme(req, res) {
+    const playlist = utils.getActivePlaylist();
+    const track = await spotifyApi.searchTracks(req.body.text).then(
+      data => {
+        const results = data.body.tracks.items;
+
+        if (results.length === 0) {
+          res.send(utils.directed('Couldn\'t find that track.', req));
+          return;
+        }
+
+        return results[0];
+      },
+      err =>
+        utils.errorWrapper(err, req, res, () =>
+          utils.respond(
+            req,
+            res,
+            'There was an error while searching for that track.'
+          )
+        )
+    );
+
+    const formattedSong = utils.formatSong(track.name, track.artists[0].name);
+    if (playlist.tracks[track.id]) {
+      await spotifyApi
         .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
         .then(
-          () =>
-            utils.respond(
-              req,
-              res,
-              `Now playing *${track.name}* by *${artist.name}*`
-            ),
+          () => utils.respond(req, res, `Now playing ${formattedSong}`),
           err =>
             utils.errorWrapper(err, req, res, () =>
               utils.respond(
                 req,
                 res,
-                `Added *${track.name}* by *${artist.name}* to *${playlist.name}*, but couldn't start playing it.`
+                `${formattedSong} is already in *${playlist.name}*, but couldn't start playing it.`
+              )
+            )
+        );
+
+      return;
+    }
+
+    queue(spotifyApi, req, res, track, async (artist, playlist) => {
+      const formattedSong = utils.formatSong(track.name, artist.name);
+
+      spotifyApi
+        .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
+        .then(
+          () => utils.respond(req, res, `Now playing ${formattedSong}`),
+          err =>
+            utils.errorWrapper(err, req, res, () =>
+              utils.respond(
+                req,
+                res,
+                `Added ${formattedSong} to *${playlist.name}*, but couldn't start playing it.`
               )
             )
         );
@@ -276,12 +316,15 @@ you're hearing, you'll have to select it from Spotify yourself.`,
               skipText =
                 skippedName == 'Rattlesnake'
                   ? 'You are weak. :snake:'
-                  : `Skipping *${skippedName}* by *${skippedArtist}*...`;
+                  : `Skipping ${utils.formatSong(
+                      skippedName,
+                      skippedArtist
+                    )}...`;
             }
 
             res.send(
               utils.directed(
-                `${skipText}\nNow playing *${name}* by *${artist}*`,
+                `${skipText}\nNow playing ${utils.formatSong(name, artist)}`,
                 req
               )
             );
@@ -341,7 +384,10 @@ you're hearing, you'll have to select it from Spotify yourself.`,
     res.send(
       utils.directed(
         {
-          text: `Whoa! Are you absolutely positive that you want to delete *${name}* by *${artist}*?`,
+          text: `Whoa! Are you absolutely positive that you want to delete ${utils.formatSong(
+            name,
+            artist
+          )}?`,
           attachments: [
             {
               fallback: 'Your device doesn\'t support this.',
@@ -461,14 +507,20 @@ you're hearing, you'll have to select it from Spotify yourself.`,
           const requester = storedTrack.requester;
           res.send(
             utils.directed(
-              `*${name}* by *${artist}* was last requested by <@${requester}>`,
+              `${utils.formatSong(
+                name,
+                artist
+              )} was last requested by <@${requester}>`,
               req
             )
           );
         } else {
           res.send(
             utils.directed(
-              `*${name}* by *${artist}* was added directly through Spotify :thumbsdown:`,
+              `${utils.formatSong(
+                name,
+                artist
+              )} was added directly through Spotify :thumbsdown:`,
               req
             )
           );
@@ -527,5 +579,29 @@ you're hearing, you'll have to select it from Spotify yourself.`,
           )
         )
     );
+  },
+
+  shuffle(req, res) {
+    const text = req.body.text;
+    if (!text) {
+      utils.respond(req, res, 'Please specify `on` or `off`.');
+      return;
+    }
+
+    const state = text.toLowerCase() === 'on';
+    spotifyApi
+      .setShuffle({ state })
+      .then(
+        () =>
+          utils.respond(req, res, `Shuffle is now ${state ? 'on' : 'off'}.`),
+        err =>
+          utils.errorWrapper(err, req, res, () =>
+            utils.respond(
+              req,
+              res,
+              'An error occurred while setting shuffle state.'
+            )
+          )
+      );
   }
 });

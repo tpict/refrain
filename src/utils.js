@@ -58,6 +58,10 @@ module.exports = {
     res.send(this.directed(message, req));
   },
 
+  formatSong(trackName, artistName) {
+    return `*${trackName}* by *${artistName}*`;
+  },
+
   generateRandomString(length) {
     var text = '';
     var possible =
