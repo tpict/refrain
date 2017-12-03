@@ -21,9 +21,7 @@ const states = {};
 // Try to authenticate as the stored active user. The authenticated variable
 // is used to drop out of commands early if authentication fails.
 let authenticated = (function () {
-  const users = utils.getUsers();
-  const activeUserName = utils.getActiveUser();
-  const activeUser = users[activeUserName];
+  const activeUser = utils.getActiveUser();
   if (!activeUser) {
     return false;
   }
@@ -85,42 +83,52 @@ app.post('/spotifyauth', urlencodedParser, function (req, res) {
     'user-read-currently-playing'
   ];
 
-  res.send(spotifyApi.createAuthorizeURL(scope, state));
+  const authURL = spotifyApi.createAuthorizeURL(scope, state);
+  res.send(`Click this link to authenticate with Spotify: ${authURL}`);
 });
 
 // Redirect endpoint for Spotify authentication.
-app.get('/callback', function (req, res) {
+app.get('/callback', async function (req, res) {
   const code = req.query.code;
   const state = req.query.state;
 
-  spotifyApi.authorizationCodeGrant(code).then(
-    data => {
-      const accessToken = data.body['access_token'];
-      const refreshToken = data.body['refresh_token'];
+  const userName = states[state];
+  const users = utils.getUsers();
 
-      const user = states[state];
-      const users = utils.getUsers();
-      users[user] = {
+  const { accessToken, refreshToken } = await spotifyApi
+    .authorizationCodeGrant(code)
+    .then(
+      data => {
+        const accessToken = data.body['access_token'];
+        const refreshToken = data.body['refresh_token'];
+
+        return { accessToken, refreshToken };
+      },
+      err => {
+        res.send(err);
+      }
+    );
+
+  spotifyApi.getMe().then(
+    data => {
+      spotifyApi.setAccessToken(accessToken);
+      spotifyApi.setRefreshToken(refreshToken);
+
+      users[userName] = {
+        id: data.body.id,
         access_token: accessToken,
         refresh_token: refreshToken
       };
 
       storage.setItemSync('users', users);
-
-      if (!utils.getActiveUser()) {
-        storage.setItemSync('active_user', user);
-        spotifyApi.setAccessToken(accessToken);
-        spotifyApi.setRefreshToken(refreshToken);
-        authenticated = true;
-      }
+      utils.setActiveUser(userName);
+      authenticated = true;
 
       res.send(
-        `${user} is now authenticated with Spotify! You can close this tab now.`
+        `${userName} is now authenticated with Spotify! They are now the active user. You can close this tab now.`
       );
     },
-    err => {
-      res.send(err);
-    }
+    err => res.send(err)
   );
 });
 

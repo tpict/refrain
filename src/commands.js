@@ -79,7 +79,8 @@ module.exports = spotifyApi => ({
 
     const [alias, playlistID] = splitText;
 
-    spotifyApi.getPlaylist(utils.getUserID(), playlistID).then(
+    console.log(utils.getActiveUser().id, playlistID);
+    spotifyApi.getPlaylist(utils.getActiveUser().id, playlistID).then(
       data => {
         const name = data.body.name;
 
@@ -255,7 +256,6 @@ you're hearing, you'll have to select it from Spotify yourself.`,
         )
         .then(
           data => {
-            console.log(data);
             const track = data.body.item;
             if (!track) {
               res.send(
@@ -381,6 +381,17 @@ you're hearing, you'll have to select it from Spotify yourself.`,
       const playlistID = utils.getActivePlaylistAlias();
       const playlists = utils.getPlaylists();
       const playlist = playlists[playlistID];
+
+      if (!playlist) {
+        this.on = true;
+        utils.respond(
+          req,
+          res,
+          'Switched on. Add a playlist with `/addplaylist` to get started.'
+        );
+        return;
+      }
+
       const playlistURI = playlist.uri;
 
       spotifyApi.play({ context_uri: playlistURI }).then(
@@ -482,7 +493,7 @@ you're hearing, you'll have to select it from Spotify yourself.`,
   },
 
   whichuser(req, res) {
-    const activeUser = utils.getActiveUser();
+    const activeUser = utils.getActiveUserName();
     res.send(utils.directed(`The active user is <@${activeUser}>`, req));
   },
 
@@ -500,6 +511,20 @@ you're hearing, you'll have to select it from Spotify yourself.`,
     }
 
     utils.setActiveUser(text);
-    res.send(utils.directed(`Changed the active user to <@${text}>!`, req));
+    spotifyApi.setAccessToken(user.access_token);
+    spotifyApi.setRefreshToken(user.refresh_token);
+
+    spotifyApi.refreshAccessToken().then(
+      data => {
+        spotifyApi.setAccessToken(data.body['access_token']);
+        utils.respond(req, res, `Changed the active user to <@${text}>!`);
+      },
+      err =>
+        utils.errorWrapper(err, req, res, () =>
+          utils.respond(
+            'There was an authentication failure. Please try again!'
+          )
+        )
+    );
   }
 });

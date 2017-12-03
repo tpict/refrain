@@ -69,16 +69,8 @@ module.exports = {
     return text;
   },
 
-  getUserID() {
-    return storage.getItemSync('user_id');
-  },
-
   getPlaylists() {
     return storage.getItemSync('playlists') || {};
-  },
-
-  getUsers() {
-    return storage.getItemSync('users') || {};
   },
 
   getStates() {
@@ -93,11 +85,19 @@ module.exports = {
     return this.getPlaylists()[this.getActivePlaylistAlias()];
   },
 
-  getActiveUser() {
+  getUsers() {
+    return storage.getItemSync('users') || {};
+  },
+
+  getActiveUserName() {
     return storage.getItemSync('active_user');
   },
 
-  setActiveUser(user) {
-    storage.setItemSync('user', user);
+  getActiveUser() {
+    return this.getUsers()[this.getActiveUserName()];
+  },
+
+  setActiveUser(userName) {
+    storage.setItemSync('active_user', userName);
   }
 };
