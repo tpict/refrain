@@ -92,6 +92,10 @@ module.exports = spotifyApi => ({
         };
         storage.setItemSync('playlists', playlists);
 
+        if (!utils.getActivePlaylist()) {
+          utils.setActivePlaylist(alias);
+        }
+
         res.send(
           utils.directed(
             `Added your playlist *${name}* under the alias *${alias}*.`,
@@ -216,13 +220,11 @@ you're hearing, you'll have to select it from Spotify yourself.`,
 
   playme(req, res) {
     queue(spotifyApi, req, res, (track, artist, playlist) => {
-      const options = { context_uri: playlist.uri, offset: { uri: track.uri } };
-      console.log(options);
       spotifyApi
-        .play()
+        .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
         .then(
           () =>
-            utils.response(
+            utils.respond(
               req,
               res,
               `Now playing *${track.name}* by *${artist.name}*`

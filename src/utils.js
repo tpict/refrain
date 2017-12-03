@@ -81,6 +81,10 @@ module.exports = {
     return storage.getItemSync('active_playlist');
   },
 
+  setActivePlaylist(playlistAlias) {
+    storage.setItemSync('active_playlist', playlistAlias);
+  },
+
   getActivePlaylist() {
     return this.getPlaylists()[this.getActivePlaylistAlias()];
   },
