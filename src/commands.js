@@ -1,6 +1,62 @@
 const storage = require('node-persist');
 const utils = require('./utils');
 
+const queue = async function (spotifyApi, req, res, callback) {
+  const playlists = utils.getPlaylists();
+  const playlistAlias = utils.getActivePlaylistAlias();
+  const playlist = utils.getActivePlaylist();
+
+  const { firstHit, firstArtist } = await spotifyApi
+    .searchTracks(req.body.text)
+    .then(
+      data => {
+        const results = data.body.tracks.items;
+
+        if (results.length === 0) {
+          res.send(utils.directed('Couldn\'t find that track.', req));
+          return;
+        }
+
+        const firstHit = results[0];
+        const firstArtist = firstHit.artists[0];
+
+        return { firstHit, firstArtist };
+      },
+      err =>
+        utils.errorWrapper(err, req, res, () =>
+          utils.respond(
+            req,
+            res,
+            'There was an error while searching for that track.'
+          )
+        )
+    );
+
+  spotifyApi
+    .addTracksToPlaylist(utils.getUserID(), playlist.id, [firstHit.uri])
+    .then(
+      () => {
+        playlist.tracks[firstHit.id] = {
+          requester: req.body.user_name,
+          artist: firstArtist.name,
+          name: firstHit.name
+        };
+        playlists[playlistAlias] = playlist;
+        storage.setItemSync('playlists', playlists);
+
+        callback(firstHit, firstArtist, playlist);
+      },
+      err =>
+        utils.errorWrapper(err, req, res, () =>
+          utils.respond(
+            req,
+            res,
+            `There was an error adding *${firstHit.name}* by *${firstArtist.name}* to *${playlist.name}*.`
+          )
+        )
+    );
+};
+
 // Slash commands for Slack.
 module.exports = spotifyApi => ({
   on: false,
@@ -24,7 +80,7 @@ module.exports = spotifyApi => ({
     const [alias, playlistID] = splitText;
 
     spotifyApi.getPlaylist(utils.getUserID(), playlistID).then(
-      function (data) {
+      data => {
         const name = data.body.name;
 
         const playlists = utils.getPlaylists();
@@ -43,10 +99,10 @@ module.exports = spotifyApi => ({
           )
         );
       },
-      function (err) {
-        console.log(err);
-        res.send(utils.directed('Couldn\'t add that playlist!', req));
-      }
+      err =>
+        utils.errorWrapper(err, req, res, () =>
+          utils.respond(req, res, 'Couldn\'t add that playlist!')
+        )
     );
   },
 
@@ -65,15 +121,17 @@ module.exports = spotifyApi => ({
         );
         res.send(utils.utils.directed(lines.join('\n'), req));
       },
-      err => {
-        console.log(err);
-        res.send(
-          utils.utils.directed(
-            'Looks like you have a misconfigured playlist.',
-            req
+      err =>
+        utils.errorWrapper(
+          err,
+          req,
+          res,
+          utils.respond(
+            req,
+            res,
+            'Looks like you have a misconfigured playlist.'
           )
-        );
-      }
+        )
     );
   },
 
@@ -120,10 +178,11 @@ module.exports = spotifyApi => ({
           )
         )
       )
-      .catch(err => {
-        console.log(err);
-        res.send(utils.directed('Looks like a misconfigured playlist'));
-      });
+      .catch(err =>
+        utils.errorWrapper(err, req, res, () =>
+          utils.respond(req, res, 'Looks like a misconfigured playlist')
+        )
+      );
   },
 
   whichplaylist(req, res) {
@@ -144,63 +203,40 @@ you're hearing, you'll have to select it from Spotify yourself.`,
     }
   },
 
-  async queue(req, res) {
-    const playlists = utils.getPlaylists();
-    const playlistAlias = utils.getActivePlaylistID();
-    const playlist = utils.getActivePlaylist();
+  queue(req, res) {
+    queue(spotifyApi, req, res, (track, artist, playlist) =>
+      res.send(
+        utils.directed(
+          `Added *${track.name}* by *${artist.name}* to *${playlist.name}*`,
+          req
+        )
+      )
+    );
+  },
 
-    const { firstHit, firstArtist } = await spotifyApi
-      .searchTracks(req.body.text)
-      .then(data => {
-        const results = data.body.tracks.items;
-
-        if (results.length === 0) {
-          res.send(utils.directed('Couldn\'t find that track.', req));
-          return;
-        }
-
-        const firstHit = results[0];
-        const firstArtist = firstHit.artists[0];
-
-        return { firstHit, firstArtist };
-      })
-      .catch(err => {
-        console.log(err);
-        res.send(
-          utils.directed(
-            'There was an error while searching for that track.',
-            req
-          )
+  playme(req, res) {
+    queue(spotifyApi, req, res, (track, artist, playlist) => {
+      const options = { context_uri: playlist.uri, offset: { uri: track.uri } };
+      console.log(options);
+      spotifyApi
+        .play()
+        .then(
+          () =>
+            utils.response(
+              req,
+              res,
+              `Now playing *${track.name}* by *${artist.name}*`
+            ),
+          err =>
+            utils.errorWrapper(err, req, res, () =>
+              utils.respond(
+                req,
+                res,
+                `Added *${track.name}* by *${artist.name}* to *${playlist.name}*, but couldn't start playing it.`
+              )
+            )
         );
-      });
-
-    spotifyApi
-      .addTracksToPlaylist(utils.getUserID(), playlist.id, [firstHit.uri])
-      .then(() => {
-        playlist.tracks[firstHit.id] = {
-          requester: req.body.user_name,
-          artist: firstArtist.name,
-          name: firstHit.name
-        };
-        playlists[playlistAlias] = playlist;
-        storage.setItemSync('playlists', playlists);
-
-        res.send(
-          utils.directed(
-            `Added *${firstHit.name}* by *${firstArtist.name}* to *${playlist.name}*`,
-            req
-          )
-        );
-      })
-      .catch(err => {
-        console.log(err);
-        res.send(
-          utils.directed(
-            `There was an error adding *${firstHit.name}* to *${playlist.name}*.`,
-            req
-          )
-        );
-      });
+    });
   },
 
   next(req, res) {
@@ -212,18 +248,20 @@ you're hearing, you'll have to select it from Spotify yourself.`,
             await utils.sleep(500);
             return spotifyApi.getMyCurrentPlayingTrack();
           },
-          err => {
-            console.log(err);
-            res.send(utils.directed('Spotify couldn\'t skip this track!'));
-          }
+          err =>
+            utils.errorWrapper(err, req, res, () =>
+              utils.respond(req, res, 'Spotify couldn\'t skip this track!')
+            )
         )
         .then(
           data => {
+            console.log(data);
             const track = data.body.item;
             if (!track) {
               res.send(
                 utils.directed(
-                  'Out of music! You might need to use `/playplaylist`.'
+                  'Out of music! You might need to use `/playplaylist`.',
+                  req
                 )
               );
               return;
@@ -247,14 +285,14 @@ you're hearing, you'll have to select it from Spotify yourself.`,
               )
             );
           },
-          err => {
-            console.log(err);
-            res.send(
-              utils.directed(
+          err =>
+            utils.errorWrapper(err, req, res, () =>
+              utils.respond(
+                req,
+                res,
                 'Managed to skip, but Spotify wouldn\'t say what\'s playing now!'
               )
-            );
-          }
+            )
         );
     };
 
@@ -264,10 +302,10 @@ you're hearing, you'll have to select it from Spotify yourself.`,
         const skippedArtist = data.body.item.artists[0].name;
         callback(skippedName, skippedArtist);
       },
-      err => {
-        console.log(err);
-        callback(null, null, 'whatever\'s playing');
-      }
+      err =>
+        utils.errorWrapper(err, req, res, () =>
+          callback(null, null, 'whatever\'s playing')
+        )
     );
   },
 
@@ -275,12 +313,15 @@ you're hearing, you'll have to select it from Spotify yourself.`,
     const data = await spotifyApi
       .getMyCurrentPlayingTrack()
       .then(data => data)
-      .catch(err => {
-        console.log(err);
-        res.send(
-          utils.directed('Is something playing? Spotify doesn\'t think so!', req)
-        );
-      });
+      .catch(err =>
+        utils.errorWrapper(err, req, res, () =>
+          utils.respond(
+            req,
+            res,
+            'Is something playing? Spotify doesn\'t think so!'
+          )
+        )
+      );
 
     const track = data.body.item;
     if (!track) {
@@ -337,7 +378,7 @@ you're hearing, you'll have to select it from Spotify yourself.`,
     const command = req.body.text.toLowerCase();
 
     if (command === 'on') {
-      const playlistID = utils.getActivePlaylistID();
+      const playlistID = utils.getActivePlaylistAlias();
       const playlists = utils.getPlaylists();
       const playlist = playlists[playlistID];
       const playlistURI = playlist.uri;
@@ -345,24 +386,27 @@ you're hearing, you'll have to select it from Spotify yourself.`,
       spotifyApi.play({ context_uri: playlistURI }).then(
         () => {
           this.on = true;
-          res.send(utils.directed('It begins...\nIf you can\'t hear anything, play any track in the Spotify client and try again.', req));
+          utils.respond(
+            req,
+            res,
+            'It begins...\nIf you can\'t hear anything, play any track in the Spotify client and try again.'
+          );
         },
-        err => {
-          console.log(err);
-
-          if (err.statusCode === 403) {
-            res.send(
-              utils.directed('Spotify says you\'re not a premium user!', req)
-            );
-          } else {
-            res.send(
-              utils.directed(
-                `There was an error playing *${playlist.name}*`,
-                req
-              )
-            );
-          }
-        }
+        err =>
+          utils.errorWrapper(err, req, res, err => {
+            if (err.statusCode === 403) {
+              res.send(
+                utils.directed('Spotify says you\'re not a premium user!', req)
+              );
+            } else {
+              res.send(
+                utils.directed(
+                  `There was an error playing *${playlist.name}*`,
+                  req
+                )
+              );
+            }
+          })
       );
     } else if (command === 'off') {
       spotifyApi.pause().then(
@@ -374,10 +418,10 @@ you're hearing, you'll have to select it from Spotify yourself.`,
             )
           );
         },
-        err => {
-          console.log(err);
-          res.send(utils.directed('Couldn\'t stop playing!', req));
-        }
+        err =>
+          utils.errorWrapper(err, req, res, () =>
+            utils.respond(req, res, 'Couldn\'t stop playing!')
+          )
       );
     }
   },
@@ -418,10 +462,10 @@ you're hearing, you'll have to select it from Spotify yourself.`,
           );
         }
       },
-      err => {
-        console.log(err);
-        res.send('Couldn\'t read the currently playing track');
-      }
+      err =>
+        utils.errorWrapper(err, req, res, () =>
+          utils.respond(req, res, 'Couldn\'t read the currently playing track')
+        )
     );
   },
 
