@@ -89,12 +89,16 @@ module.exports = {
     return storage.getItemSync('users') || {};
   },
 
+  getActiveUser() {
+    return this.getUsers()[this.getActiveUserName()];
+  },
+
   getActiveUserName() {
     return storage.getItemSync('active_user');
   },
 
-  getActiveUser() {
-    return this.getUsers()[this.getActiveUserName()];
+  getActiveUserID() {
+    return this.getActiveUser().id;
   },
 
   setActiveUser(userName) {

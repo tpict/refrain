@@ -33,7 +33,7 @@ const queue = async function (spotifyApi, req, res, callback) {
     );
 
   spotifyApi
-    .addTracksToPlaylist(utils.getUserID(), playlist.id, [firstHit.uri])
+    .addTracksToPlaylist(utils.getActiveUserID(), playlist.id, [firstHit.uri])
     .then(
       () => {
         playlist.tracks[firstHit.id] = {
@@ -79,8 +79,7 @@ module.exports = spotifyApi => ({
 
     const [alias, playlistID] = splitText;
 
-    console.log(utils.getActiveUser().id, playlistID);
-    spotifyApi.getPlaylist(utils.getActiveUser().id, playlistID).then(
+    spotifyApi.getPlaylist(utils.getActiveUserID(), playlistID).then(
       data => {
         const name = data.body.name;
 
@@ -109,7 +108,7 @@ module.exports = spotifyApi => ({
 
   listplaylists(req, res) {
     const playlists = utils.getPlaylists();
-    const userID = utils.getUserID();
+    const userID = utils.getActiveUserID();
     const aliases = Object.keys(playlists);
 
     const requests = aliases.map(alias =>
@@ -120,7 +119,7 @@ module.exports = spotifyApi => ({
         const lines = values.map(
           (value, index) => `${aliases[index]}: ${value.body.name}`
         );
-        res.send(utils.utils.directed(lines.join('\n'), req));
+        utils.respond(req, res, `\n${lines.join('\n')}`);
       },
       err =>
         utils.errorWrapper(
@@ -149,7 +148,7 @@ module.exports = spotifyApi => ({
     }
 
     spotifyApi
-      .getPlaylist(utils.getUserID(), playlist.id)
+      .getPlaylist(utils.getActiveUserID(), playlist.id)
       .then(data => {
         storage.setItemSync('active_playlist', text);
 
