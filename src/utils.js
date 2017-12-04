@@ -1,5 +1,3 @@
-const storage = require('node-persist');
-
 module.exports = {
   sleep(duration) {
     return new Promise(resolve => setTimeout(resolve, duration));
@@ -37,14 +35,7 @@ module.exports = {
     return data;
   },
 
-  directed(rawData, req) {
-    if (!req) {
-      console.error(
-        'app#directed should be supplied either a request from Spotify or a username'
-      );
-      return;
-    }
-
+  respond(req, res, rawData) {
     const data = this.inChannel(rawData);
     const text = data.text;
 
@@ -54,62 +45,7 @@ module.exports = {
     return data;
   },
 
-  respond(req, res, message) {
-    res.send(this.directed(message, req));
-  },
-
   formatSong(trackName, artistName) {
     return `*${trackName}* by *${artistName}*`;
-  },
-
-  generateRandomString(length) {
-    var text = '';
-    var possible =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (var i = 0; i < length; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  },
-
-  getPlaylists() {
-    return storage.getItemSync('playlists') || {};
-  },
-
-  getStates() {
-    return storage.getItemSync('states') || {};
-  },
-
-  getActivePlaylistAlias() {
-    return storage.getItemSync('active_playlist');
-  },
-
-  setActivePlaylist(playlistAlias) {
-    storage.setItemSync('active_playlist', playlistAlias);
-  },
-
-  getActivePlaylist() {
-    return this.getPlaylists()[this.getActivePlaylistAlias()];
-  },
-
-  getUsers() {
-    return storage.getItemSync('users') || {};
-  },
-
-  getActiveUser() {
-    return this.getUsers()[this.getActiveUserName()];
-  },
-
-  getActiveUserName() {
-    return storage.getItemSync('active_user');
-  },
-
-  getActiveUserID() {
-    return this.getActiveUser().id;
-  },
-
-  setActiveUser(userName) {
-    storage.setItemSync('active_user', userName);
   }
 };

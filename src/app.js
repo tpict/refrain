@@ -1,7 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const storage = require('node-persist');
+const uuidv4 = require('uuid/v4');
+
 const utils = require('./utils');
+const store = require('./store');
 
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -21,7 +24,7 @@ const states = {};
 // Try to authenticate as the stored active user. The authenticated variable
 // is used to drop out of commands early if authentication fails.
 let authenticated = (function () {
-  const activeUser = utils.getActiveUser();
+  const activeUser = store.getActiveUser();
   if (!activeUser) {
     return false;
   }
@@ -52,14 +55,12 @@ const commands = require('./commands')(spotifyApi);
 // off.
 function authWrapper(req, res, commandName) {
   if (!authenticated) {
-    res.send(
-      utils.directed('Spotify authentication failed. Try `/spotifyauth`.', req)
-    );
+    utils.respond(req, res, 'Spotify authentication failed. Try `/spotifyauth`.');
     return;
   }
 
   if (!commands.noAuth.includes(commandName) && !commands.on) {
-    res.send(utils.directed('The jukebox is off!', req));
+    utils.respond(req, res, 'The jukebox is off!', req);
     return;
   }
 
@@ -70,7 +71,7 @@ function authWrapper(req, res, commandName) {
 // in the callback endpoint to match the tokens to the Slack user that
 // requested authentication.
 app.post('/spotifyauth', urlencodedParser, function (req, res) {
-  const state = utils.generateRandomString(16);
+  const state = uuidv4();
   states[state] = req.body.user_name;
 
   const scope = [
@@ -93,7 +94,7 @@ app.get('/callback', async function (req, res) {
   const state = req.query.state;
 
   const userName = states[state];
-  const users = utils.getUsers();
+  const users = store.getUsers();
 
   const { accessToken, refreshToken } = await spotifyApi
     .authorizationCodeGrant(code)
@@ -121,7 +122,7 @@ app.get('/callback', async function (req, res) {
       };
 
       storage.setItemSync('users', users);
-      utils.setActiveUser(userName);
+      store.setActiveUser(userName);
       authenticated = true;
 
       res.send(

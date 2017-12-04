@@ -5,7 +5,8 @@
     "node-persist": "^2.1.0",
     "querystring": "^0.2.0",
     "request": "^2.83.0",
-    "spotify-web-api-node": "^2.5.0"
+    "spotify-web-api-node": "^2.5.0",
+    "uuid": "^3.1.0"
   },
   "name": "pebbledj",
   "version": "1.0.0",
