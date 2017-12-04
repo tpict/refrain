@@ -211,8 +211,14 @@ module.exports = spotifyApi => ({
   },
 
   async playme(req, res) {
+    const text = req.body.text;
+    if (!text) {
+      await spotifyApi.play();
+      return;
+    }
+
     const playlist = store.getActivePlaylist();
-    const track = await spotifyApi.searchTracks(req.body.text).then(
+    const track = await spotifyApi.searchTracks(text).then(
       data => {
         const results = data.body.tracks.items;
 
@@ -269,6 +275,13 @@ module.exports = spotifyApi => ({
             )
         );
     });
+  },
+
+  pauseme(req, res) {
+    spotifyApi.pause().then(
+      () => utils.respond(req, res, 'Paused!'),
+      err => utils.errorWrapper(err, req, res, 'Couldn\'t pause!')
+    );
   },
 
   next(req, res) {
