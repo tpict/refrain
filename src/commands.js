@@ -41,8 +41,16 @@ const queue = async function (spotifyApi, req, res, track, callback) {
 module.exports = spotifyApi => ({
   on: false,
 
-  // Commands which don't require authentication.
-  noAuth: ['listusers', 'whichuser', 'setuser', 'pdj'],
+  // Commands which require the jukebox to be switched on.
+  requireOn: [
+    'playplaylist',
+    'playme',
+    'pauseme',
+    'shuffle',
+    'whomst',
+    'eradicate',
+    'next'
+  ],
 
   addplaylist(req, res) {
     const splitText = req.body.text.split(' ');
@@ -213,10 +221,12 @@ module.exports = spotifyApi => ({
   async playme(req, res) {
     const text = req.body.text;
     if (!text) {
-      await spotifyApi.play().then(
-        () => utils.respond(req, res, 'Now playing!'),
-        err => utils.errorWrapper(err, req, res, 'Couldn\'t resume music!')
-      );
+      await spotifyApi
+        .play()
+        .then(
+          () => utils.respond(req, res, 'Now playing!'),
+          err => utils.errorWrapper(err, req, res, 'Couldn\'t resume music!')
+        );
       return;
     }
 
@@ -281,10 +291,12 @@ module.exports = spotifyApi => ({
   },
 
   pauseme(req, res) {
-    spotifyApi.pause().then(
-      () => utils.respond(req, res, 'Paused!'),
-      err => utils.errorWrapper(err, req, res, 'Couldn\'t pause!')
-    );
+    spotifyApi
+      .pause()
+      .then(
+        () => utils.respond(req, res, 'Paused!'),
+        err => utils.errorWrapper(err, req, res, 'Couldn\'t pause!')
+      );
   },
 
   next(req, res) {

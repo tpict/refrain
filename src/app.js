@@ -63,7 +63,15 @@ function authWrapper(req, res, commandName) {
     return;
   }
 
-  if (!commands.noAuth.includes(commandName) && !commands.on) {
+  const userName = req.body.user_name;
+  const activeUserName = store.getActiveUserName();
+
+  if (commandName === 'pdj' && userName !== activeUserName) {
+    utils.respond(req, res, 'Only the active user may do that.', req);
+    return;
+  }
+
+  if (commands.requireOn.includes(commandName) && !commands.on) {
     utils.respond(req, res, 'The jukebox is off!', req);
     return;
   }
