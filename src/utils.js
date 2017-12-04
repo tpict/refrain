@@ -42,7 +42,7 @@ module.exports = {
     const userName = typeof req == 'string' ? req : req.body.user_name;
 
     data.text = `<@${userName}>: ${text}`;
-    return data;
+    res.send(data);
   },
 
   formatSong(trackName, artistName) {
