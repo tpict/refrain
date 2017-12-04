@@ -213,7 +213,10 @@ module.exports = spotifyApi => ({
   async playme(req, res) {
     const text = req.body.text;
     if (!text) {
-      await spotifyApi.play();
+      await spotifyApi.play().then(
+        () => utils.respond(req, res, 'Now playing!'),
+        err => utils.errorWrapper(err, req, res, 'Couldn\'t resume music!')
+      );
       return;
     }
 
@@ -543,27 +546,27 @@ module.exports = spotifyApi => ({
     utils.respond(req, res, `The active user is <@${activeUser}>`, req);
   },
 
-  setuser(req, res) {
-    const text = req.body.text;
-    const user = store.getUsers()[text];
+  commandeer(req, res) {
+    const userName = req.body.user_name;
+    const user = store.getUsers()[userName];
     if (!user) {
       utils.respond(
         req,
         res,
-        'That user isn\'t authenticated with Spotify. Try `/listusers` to see who is.',
+        'You\'re not authenticated with Spotify. Try `/spotifyauth` if you\'d like to get set up',
         req
       );
       return;
     }
 
-    store.setActiveUser(text);
+    store.setActiveUser(userName);
     spotifyApi.setAccessToken(user.access_token);
     spotifyApi.setRefreshToken(user.refresh_token);
 
     spotifyApi.refreshAccessToken().then(
       data => {
         spotifyApi.setAccessToken(data.body['access_token']);
-        utils.respond(req, res, `Changed the active user to <@${text}>!`);
+        utils.respond(req, res, 'You are now the active user!');
       },
       err =>
         utils.errorWrapper(err, req, res, () =>

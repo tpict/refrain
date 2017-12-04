@@ -55,7 +55,11 @@ const commands = require('./commands')(spotifyApi);
 // off.
 function authWrapper(req, res, commandName) {
   if (!authenticated) {
-    utils.respond(req, res, 'Spotify authentication failed. Try `/spotifyauth`.');
+    utils.respond(
+      req,
+      res,
+      'Spotify authentication failed. Try `/spotifyauth`.'
+    );
     return;
   }
 
@@ -85,7 +89,9 @@ app.post('/spotifyauth', urlencodedParser, function (req, res) {
   ];
 
   const authURL = spotifyApi.createAuthorizeURL(scope, state);
-  res.send(`Click this link to authenticate with Spotify: ${authURL}`);
+  res.send(
+    `Click this link to authenticate with Spotify: ${authURL}\n\n*Note*: in order to fetch your Spotify ID you will become the active user. Before clicking, you may want to check the active user with \`/whichuser\` and ask them to take over with \`/commandeer\` once you're authenticated.`
+  );
 });
 
 // Redirect endpoint for Spotify authentication.
