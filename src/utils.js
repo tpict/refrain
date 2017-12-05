@@ -7,19 +7,15 @@ module.exports = {
   errorWrapper(err, req, res, callback) {
     console.error(err);
 
-    if (err.statusCode === 500) {
-      this.respond(
-        req,
-        res,
-        'Spotify had an internal server error. Don\'t shoot the messenger!'
-      );
-      return;
-    } else if (err.statusCode === 502) {
-      this.respond(
-        req,
-        res,
-        'The Spotify API is down. Don\'t shoot the messenger!'
-      );
+    const responses = {
+      500: 'Spotify had an internal server error. Don\'t shoot the messenger!',
+      502: 'The Spotify API is down. Don\'t shoot the messenger!',
+      503: 'The Spotify API is down. Don\'t shoot the messenger!'
+    };
+
+    const response = responses[err.statusCode];
+    if (response) {
+      this.respond(req, res, response);
       return;
     }
 
@@ -47,5 +43,10 @@ module.exports = {
 
   formatSong(trackName, artistName) {
     return `*${trackName}* by *${artistName}*`;
+  },
+
+  splitPlaylistURI(uri) {
+    const splitURI = uri.split(':');
+    return [splitURI[2], splitURI[4]];
   }
 };

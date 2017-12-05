@@ -1,4 +1,5 @@
 const storage = require('node-persist');
+const { URL } = require('url');
 
 const utils = require('./utils');
 const store = require('./store');
@@ -7,7 +8,45 @@ const store = require('./store');
 // This is a work-around for a bug in the Spotify API that prevents specifying
 // a playlist offset by URI.
 // https://github.com/spotify/web-api/issues/630
-const playlistContextOffset = function (playlist, track) {}; // eslint-disable-line no-unused-vars
+const playlistContextOffset = async function (spotifyApi, req, res, playlist, track) {
+  const [userID, playlistID] = utils.splitPlaylistURI(playlist.uri);
+
+  let next = {};
+  let nextURL = true;
+  let found = false;
+
+  let id = 0;
+  let total = 0;
+
+  while (nextURL && !found) {
+    let tracks;
+    [tracks, total, nextURL] = await spotifyApi.getPlaylistTracks(userID, playlistID, next).then(
+      data => [data.body.items, data.body.total, data.body.next],
+      err => console.error(err)
+    );
+
+    if (nextURL) {
+      const searchParams = (new URL(nextURL)).searchParams;
+      next.offset = searchParams.get('offset');
+      next.limit = searchParams.get('limit');
+      console.log(next);
+    }
+
+    tracks.some(item => {
+      console.log(item.track.name, item.track.id, track.id);
+
+      if (item.track.id === track.id) {
+        found = true;
+        return true;
+      }
+
+      id++;
+      return false;
+    });
+  }
+
+  return [id, total, found];
+};
 
 const queue = async function (spotifyApi, req, res, track, callback) {
   const playlists = store.getPlaylists();
@@ -252,10 +291,14 @@ module.exports = (webClient, spotifyApi) => ({
         )
     );
 
+    const [offset, total, found] = await playlistContextOffset(spotifyApi, req, res, playlist, track);
+
     const formattedSong = utils.formatSong(track.name, track.artists[0].name);
-    if (playlist.tracks[track.id]) {
+    if (found) {
       await spotifyApi
-        .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
+        // Uncomment when https://github.com/spotify/web-api/issues/630 is fixed
+        // .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
+        .play({ context_uri: playlist.uri, offset: { position: offset } })
         .then(
           () => utils.respond(req, res, `Now playing ${formattedSong}`),
           err =>
@@ -275,7 +318,8 @@ module.exports = (webClient, spotifyApi) => ({
       const formattedSong = utils.formatSong(track.name, artist.name);
 
       spotifyApi
-        .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
+        // .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
+        .play({ context_uri: playlist.uri, offset: { position: total } })
         .then(
           () => utils.respond(req, res, `Now playing ${formattedSong}`),
           err =>
