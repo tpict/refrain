@@ -150,7 +150,11 @@ module.exports = (webClient, spotifyApi) => ({
   removeplaylist(req, res) {
     const alias = req.body.text;
     if (!alias) {
-      utils.respond(req, res, 'Please specify the alias of the playlist you wish to remove.');
+      utils.respond(
+        req,
+        res,
+        'Please specify the alias of the playlist you wish to remove.'
+      );
       return;
     }
 
@@ -158,7 +162,11 @@ module.exports = (webClient, spotifyApi) => ({
     const playlist = playlists[alias];
 
     if (!playlist) {
-      utils.respond(req, res, 'That doesn\'t look like a valid playlist alias! Try `/listplaylists`.');
+      utils.respond(
+        req,
+        res,
+        'That doesn\'t look like a valid playlist alias! Try `/listplaylists`.'
+      );
       return;
     }
 
@@ -277,6 +285,65 @@ module.exports = (webClient, spotifyApi) => ({
           artist.name
         )} to *${playlist.name}*`
       )
+    );
+  },
+
+  findme(req, res) {
+    const searchTerms = req.body.text;
+    if (!searchTerms) {
+      utils.respond(req, res, 'Please provide a search query.');
+      return;
+    }
+
+    spotifyApi.searchTracks(searchTerms, { limit: 5 }).then(
+      data => {
+        const attachments = data.body.tracks.items.map(item => ({
+          fallback: 'test',
+          callback_id: 'find_track',
+          title: `${item.name} by ${item.artists[0].name}`,
+          color: 'good',
+          actions: [
+            {
+              name: 'play',
+              text: 'Play now',
+              type: 'button',
+              value: item.id
+            },
+            {
+              name: 'queue',
+              text: 'Queue',
+              type: 'button',
+              value: item.id
+            }
+          ]
+        }));
+
+        attachments.push({
+          fallback: 'load more',
+          callback_id: 'find_track_more',
+          actions: [
+            {
+              name: 'load_more',
+              text: 'Load more',
+              type: 'button',
+              value: 'load_more'
+            }
+          ]
+        });
+
+        utils.respond(req, res, {
+          text:
+            '*WARNING!* This feature is under development and probably won\'t work!',
+          attachments
+        });
+      },
+      err =>
+        utils.errorWrapper(
+          err,
+          req,
+          res,
+          'An error occured while performing the search.'
+        )
     );
   },
 

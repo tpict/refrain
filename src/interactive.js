@@ -5,9 +5,8 @@ const bodyParser = require('body-parser');
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-module.exports = (app, spotifyApi) => {
-  app.post('/interactive', urlencodedParser, (req, res) => {
-    const payload = JSON.parse(req.body.payload);
+const callbacks = spotifyApi => ({
+  delete_track(req, res, payload) {
     const action = payload.actions[0];
 
     if (action.name === 'cancel') {
@@ -43,5 +42,20 @@ module.exports = (app, spotifyApi) => {
         }
       )
       .then(() => {}, err => console.log(err));
+  },
+
+  find_track(req, res, payload) {
+    res.send('Not implemented yet!');
+  },
+
+  find_track_more(req, res, payload) {
+    res.send('Not implemented yet!');
+  }
+});
+
+module.exports = (app, spotifyApi) => {
+  app.post('/interactive', urlencodedParser, (req, res) => {
+    const payload = JSON.parse(req.body.payload);
+    callbacks(spotifyApi)[payload.callback_id](req, res, payload);
   });
 };
