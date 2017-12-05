@@ -160,4 +160,4 @@ Object.keys(commands).forEach(commandName =>
   )
 );
 
-app.listen(4390, () => console.log('Example app listening on port 4390!'));
+app.listen(4390, () => console.log('Pebble DJ listening on port 4390!'));

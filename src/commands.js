@@ -4,48 +4,47 @@ const { URL } = require('url');
 const utils = require('./utils');
 const store = require('./store');
 
-// Play the given track in the context of the given playlist.
+// Find the index of the given track in the given playlist.
 // This is a work-around for a bug in the Spotify API that prevents specifying
 // a playlist offset by URI.
 // https://github.com/spotify/web-api/issues/630
-const playlistContextOffset = async function (spotifyApi, req, res, playlist, track) {
+const playlistContextOffset = async function (spotifyApi, playlist, track) {
   const [userID, playlistID] = utils.splitPlaylistURI(playlist.uri);
 
   let next = {};
   let nextURL = true;
   let found = false;
 
-  let id = 0;
+  let index = 0;
   let total = 0;
 
   while (nextURL && !found) {
     let tracks;
-    [tracks, total, nextURL] = await spotifyApi.getPlaylistTracks(userID, playlistID, next).then(
-      data => [data.body.items, data.body.total, data.body.next],
-      err => console.error(err)
-    );
+    [tracks, total, nextURL] = await spotifyApi
+      .getPlaylistTracks(userID, playlistID, next)
+      .then(
+        data => [data.body.items, data.body.total, data.body.next],
+        err => console.error(err)
+      );
 
     if (nextURL) {
-      const searchParams = (new URL(nextURL)).searchParams;
+      const searchParams = new URL(nextURL).searchParams;
       next.offset = searchParams.get('offset');
       next.limit = searchParams.get('limit');
-      console.log(next);
     }
 
     tracks.some(item => {
-      console.log(item.track.name, item.track.id, track.id);
-
       if (item.track.id === track.id) {
         found = true;
         return true;
       }
 
-      id++;
+      index++;
       return false;
     });
   }
 
-  return [id, total, found];
+  return [index, total, found];
 };
 
 const queue = async function (spotifyApi, req, res, track, callback) {
@@ -269,13 +268,18 @@ module.exports = (webClient, spotifyApi) => ({
       return;
     }
 
+    utils.respond(req, res, 'Give me a second...');
+
     const playlist = store.getActivePlaylist();
     const track = await spotifyApi.searchTracks(text).then(
       data => {
         const results = data.body.tracks.items;
 
         if (results.length === 0) {
-          utils.respond(req, res, 'Couldn\'t find that track.', req);
+          webClient.chat.postMessage(
+            req.body.channel_id,
+            'Couldn\'t find that track.'
+          );
           return;
         }
 
@@ -283,15 +287,18 @@ module.exports = (webClient, spotifyApi) => ({
       },
       err =>
         utils.errorWrapper(err, req, res, () =>
-          utils.respond(
-            req,
-            res,
+          webClient.chat.postMessage(
+            req.body.channel_id,
             'There was an error while searching for that track.'
           )
         )
     );
 
-    const [offset, total, found] = await playlistContextOffset(spotifyApi, req, res, playlist, track);
+    const [offset, total, found] = await playlistContextOffset(
+      spotifyApi,
+      playlist,
+      track
+    );
 
     const formattedSong = utils.formatSong(track.name, track.artists[0].name);
     if (found) {
@@ -300,12 +307,15 @@ module.exports = (webClient, spotifyApi) => ({
         // .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
         .play({ context_uri: playlist.uri, offset: { position: offset } })
         .then(
-          () => utils.respond(req, res, `Now playing ${formattedSong}`),
+          () =>
+            webClient.chat.postMessage(
+              req.body.channel_id,
+              `Now playing ${formattedSong}`
+            ),
           err =>
             utils.errorWrapper(err, req, res, () =>
-              utils.respond(
-                req,
-                res,
+              webClient.chat.postMessage(
+                req.body.channel_id,
                 `${formattedSong} is already in *${playlist.name}*, but couldn't start playing it.`
               )
             )
@@ -321,12 +331,14 @@ module.exports = (webClient, spotifyApi) => ({
         // .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
         .play({ context_uri: playlist.uri, offset: { position: total } })
         .then(
-          () => utils.respond(req, res, `Now playing ${formattedSong}`),
+          () =>
+            webClient.chat.postMessage(
+              req.body.channel_id,
+              `Now playing ${formattedSong}`
+            ),
           err =>
             utils.errorWrapper(err, req, res, () =>
-              utils.respond(
-                req,
-                res,
+              webClient.chat.postMessage(
                 `Added ${formattedSong} to *${playlist.name}*, but couldn't start playing it.`
               )
             )
