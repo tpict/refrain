@@ -47,6 +47,6 @@ module.exports = {
 
   splitPlaylistURI(uri) {
     const splitURI = uri.split(':');
-    return [splitURI[2], splitURI[4]];
+    return { userID: splitURI[2], playlistID: splitURI[4] };
   }
 };

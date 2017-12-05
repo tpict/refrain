@@ -9,7 +9,7 @@ const store = require('./store');
 // a playlist offset by URI.
 // https://github.com/spotify/web-api/issues/630
 const playlistContextOffset = async function (spotifyApi, playlist, track) {
-  const [userID, playlistID] = utils.splitPlaylistURI(playlist.uri);
+  const { userID, playlistID } = utils.splitPlaylistURI(playlist.uri);
 
   let next = {};
   let nextURL = true;
@@ -54,7 +54,7 @@ const queue = async function (spotifyApi, req, res, track, callback) {
   const artist = track.artists[0];
 
   spotifyApi
-    .addTracksToPlaylist(store.getActiveUserID(), playlist.id, [track.uri])
+    .addTracksToPlaylist(playlist.user_id, playlist.id, [track.uri])
     .then(
       () => {
         playlist.tracks[track.id] = {
@@ -119,6 +119,7 @@ module.exports = (webClient, spotifyApi) => ({
         const playlists = store.getPlaylists();
         playlists[alias] = {
           id: playlistID,
+          user_id: utils.splitPlaylistURI(data.body.uri).userID,
           tracks: {},
           uri: data.body.uri,
           name
@@ -148,17 +149,20 @@ module.exports = (webClient, spotifyApi) => ({
 
   listplaylists(req, res) {
     const playlists = store.getPlaylists();
-    const userID = store.getActiveUserID();
     const aliases = Object.keys(playlists);
 
     const requests = aliases.map(alias =>
-      spotifyApi.getPlaylist(userID, playlists[alias].id)
+      spotifyApi
+        .getPlaylist(playlists[alias].user_id, playlists[alias].id)
+        .catch(err => err)
     );
     Promise.all(requests).then(
       values => {
-        const lines = values.map(
-          (value, index) => `${aliases[index]}: ${value.body.name}`
-        );
+        const lines = values.map((value, index) => {
+          return `${aliases[index]}: ${value.body
+            ? value.body.name
+            : 'Misconfigured!'}`;
+        });
         utils.respond(req, res, `\n${lines.join('\n')}`);
       },
       err =>
@@ -420,7 +424,7 @@ module.exports = (webClient, spotifyApi) => ({
       },
       err =>
         utils.errorWrapper(err, req, res, () =>
-          callback(null, null, 'whatever\'s playing')
+          callback(null, null, 'Skipping whatever\'s playing...')
         )
     );
   },
