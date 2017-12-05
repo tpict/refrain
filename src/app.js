@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const storage = require('node-persist');
 const uuidv4 = require('uuid/v4');
+const WebClient = require('@slack/client').WebClient;
+const SpotifyWebApi = require('spotify-web-api-node');
 
 const utils = require('./utils');
 const store = require('./store');
@@ -11,13 +13,13 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 storage.initSync();
 
-const SpotifyWebApi = require('spotify-web-api-node');
-
 const spotifyApi = new SpotifyWebApi({
   clientId: require('./credentials').spotifyClientID,
   clientSecret: require('./credentials').spotifyClientSecret,
   redirectUri: require('./credentials').spotifyRedirectURI
 });
+
+const webClient = new WebClient(require('./credentials').slackAPIToken);
 
 const states = {};
 
@@ -49,7 +51,7 @@ let authenticated = (function () {
   return true;
 })();
 
-const commands = require('./commands')(spotifyApi);
+const commands = require('./commands')(webClient, spotifyApi);
 
 // Drop out of commands early if we aren't authenticated or if the jukebox is
 // off.
