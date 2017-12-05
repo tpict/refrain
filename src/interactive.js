@@ -26,21 +26,19 @@ module.exports = (app, spotifyApi) => {
       )
       .then(
         () => {
-          res.send(
-            utils.directed(
-              `That bad? Let's not listen to ${formattedSong} again. :bomb:`,
-              track.user_name
-            )
+          utils.respond(
+            track.user_name,
+            res,
+            `That bad? Let's not listen to ${formattedSong} again. :bomb:`
           );
           return spotifyApi.skipToNext();
         },
         err => {
           console.log(err);
-          res.send(
-            utils.directed(
-              `Spotify doesn\'t want to delete ${formattedSong}. Godspeed.`,
-              req
-            )
+          utils.respond(
+            track.user_name,
+            res,
+            `Spotify doesn\'t want to delete ${formattedSong}. Godspeed.`
           );
         }
       )
