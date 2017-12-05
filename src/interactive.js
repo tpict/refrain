@@ -1,4 +1,5 @@
 // Callback endpoint for interactive Slack messages.
+const store = require('./store');
 const utils = require('./utils');
 const bodyParser = require('body-parser');
 
@@ -19,8 +20,8 @@ module.exports = (app, spotifyApi) => {
 
     spotifyApi
       .removeTracksFromPlaylist(
-        utils.getActiveUserID(),
-        utils.getActivePlaylist().id,
+        store.getActiveUserID(),
+        store.getActivePlaylist().id,
         [{ uri: track.uri }]
       )
       .then(
