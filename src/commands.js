@@ -3,12 +3,6 @@ const storage = require('node-persist');
 const utils = require('./utils');
 const store = require('./store');
 
-// Play the given track in the context of the given playlist.
-// This is a work-around for a bug in the Spotify API that prevents specifying
-// a playlist offset by URI.
-// https://github.com/spotify/web-api/issues/630
-const playlistContextOffset = function (playlist, track) {}; // eslint-disable-line no-unused-vars
-
 const queue = async function (spotifyApi, req, res, track, callback) {
   const playlists = store.getPlaylists();
   const playlistAlias = store.getActivePlaylistAlias();
@@ -44,7 +38,7 @@ const queue = async function (spotifyApi, req, res, track, callback) {
 };
 
 // Slash commands for Slack.
-module.exports = (webClient, spotifyApi) => ({
+module.exports = spotifyApi => ({
   on: false,
 
   // Commands which require the jukebox to be switched on.
@@ -64,17 +58,14 @@ module.exports = (webClient, spotifyApi) => ({
       utils.respond(
         req,
         res,
-        'Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.'
+        'Didn\'t catch that. Give me an alphanumeric alias for your playlist and its ID (the bit after the last slash in the playlist URL).'
       );
       return;
     }
 
-    const [alias, playlistURI] = splitText;
-    const splitURI = playlistURI.split(':');
-    const userID = splitURI[2];
-    const playlistID = splitURI[4];
+    const [alias, playlistID] = splitText;
 
-    spotifyApi.getPlaylist(userID, playlistID).then(
+    spotifyApi.getPlaylist(store.getActiveUserID(), playlistID).then(
       data => {
         const name = data.body.name;
 
@@ -99,11 +90,7 @@ module.exports = (webClient, spotifyApi) => ({
       },
       err =>
         utils.errorWrapper(err, req, res, () =>
-          utils.respond(
-            req,
-            res,
-            'Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.'
-          )
+          utils.respond(req, res, 'Couldn\'t add that playlist!')
         )
     );
   },
@@ -148,23 +135,36 @@ module.exports = (webClient, spotifyApi) => ({
     }
 
     spotifyApi
-      .play({
-        context_uri: playlist.uri
-      })
-      .then(
-        () => {
-          storage.setItemSync('active_playlist', text);
+      .getPlaylist(store.getActiveUserID(), playlist.id)
+      .then(data => {
+        storage.setItemSync('active_playlist', text);
 
+        const firstTrack = data.body.tracks.items[0];
+        if (!firstTrack) {
           utils.respond(
-            req,
-            res,
-            `Now playing from *${playlist.name}*! Commands will now act on this playlist.`
+            `Commands will now act on the *${text}* playlist. You'll have to play it from Spotify yourself. Sorry!`
           );
-        },
-        err =>
-          utils.errorWrapper(err, req, res, () =>
-            utils.respond(req, res, 'Looks like a misconfigured playlist')
-          )
+          return;
+        }
+
+        return spotifyApi.play({
+          context_uri: playlist.uri,
+          offset: {
+            uri: firstTrack.track.uri
+          }
+        });
+      })
+      .then(() =>
+        utils.respond(
+          req,
+          res,
+          `Now playing from *${playlist.name}*! Commands will now act on this playlist.`
+        )
+      )
+      .catch(err =>
+        utils.errorWrapper(err, req, res, () =>
+          utils.respond(req, res, 'Looks like a misconfigured playlist')
+        )
       );
   },
 
@@ -301,15 +301,6 @@ module.exports = (webClient, spotifyApi) => ({
 
   next(req, res) {
     const callback = (skippedName, skippedArtist, errorText) => {
-      let skipText = errorText;
-      if (!skipText) {
-        skipText =
-          skippedName == 'Rattlesnake'
-            ? 'You are weak. :snake:'
-            : `Skipping ${utils.formatSong(skippedName, skippedArtist)}...`;
-      }
-      utils.respond(req, res, skipText);
-
       spotifyApi
         .skipToNext()
         .then(
@@ -337,10 +328,21 @@ module.exports = (webClient, spotifyApi) => ({
             const name = track.name;
             const artist = track.artists[0].name;
 
-            webClient.chat.postMessage(
-              req.body.channel_id,
-              `${skipText}\nNow playing ${utils.formatSong(name, artist)}`,
-              (err, res) => console.error(err, res)
+            let skipText = errorText;
+            if (!skipText) {
+              skipText =
+                skippedName == 'Rattlesnake'
+                  ? 'You are weak. :snake:'
+                  : `Skipping ${utils.formatSong(
+                      skippedName,
+                      skippedArtist
+                    )}...`;
+            }
+
+            utils.respond(
+              req,
+              res,
+              `${skipText}\nNow playing ${utils.formatSong(name, artist)}`
             );
           },
           err =>
