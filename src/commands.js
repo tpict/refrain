@@ -319,16 +319,19 @@ module.exports = (webClient, spotifyApi) => ({
           },
           err =>
             utils.errorWrapper(err, req, res, () =>
-              utils.respond(req, res, 'Spotify couldn\'t skip this track!')
+              webClient.chat.postMessage(
+                req.body.channel_id,
+                'Spotify couldn\'t skip this track!'
+              )
             )
         )
         .then(
           data => {
             const track = data.body.item;
+
             if (!track) {
-              utils.respond(
-                req,
-                res,
+              webClient.chat.postMessage(
+                req.body.channel_id,
                 'Out of music! You might need to use `/playplaylist`.'
               );
               return;
@@ -339,15 +342,14 @@ module.exports = (webClient, spotifyApi) => ({
 
             webClient.chat.postMessage(
               req.body.channel_id,
-              `${skipText}\nNow playing ${utils.formatSong(name, artist)}`,
+              `Now playing ${utils.formatSong(name, artist)}`,
               (err, res) => console.error(err, res)
             );
           },
           err =>
             utils.errorWrapper(err, req, res, () =>
-              utils.respond(
-                req,
-                res,
+              webClient.chat.postMessage(
+                req.body.channel_id,
                 'Managed to skip, but Spotify wouldn\'t say what\'s playing now!'
               )
             )
