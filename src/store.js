@@ -5,6 +5,10 @@ module.exports = {
     return storage.getItemSync('playlists') || {};
   },
 
+  setPlaylists(playlists) {
+    return storage.setItemSync('playlists', playlists);
+  },
+
   getActivePlaylistAlias() {
     return storage.getItemSync('active_playlist');
   },
