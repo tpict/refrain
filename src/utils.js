@@ -9,6 +9,7 @@ module.exports = {
 
     const responses = {
       403: 'Spotify says that you don\'t have permission to do that!',
+      404: 'Spotify returned 404. Either a bad request was made, or, more likely, there\'s a problem with the Spotify API.',
       500: 'Spotify had an internal server error. Don\'t shoot the messenger!',
       502: 'The Spotify API is down. Don\'t shoot the messenger!',
       503: 'The Spotify API is down. Don\'t shoot the messenger!'
