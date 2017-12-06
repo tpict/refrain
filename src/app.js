@@ -25,7 +25,8 @@ const states = {};
 
 // Try to authenticate as the stored active user. The authenticated variable
 // is used to drop out of commands early if authentication fails.
-let authenticated = (function () {
+let authenticated;
+async function authenticate() {
   const activeUser = store.getActiveUser();
   if (!activeUser) {
     return false;
@@ -41,15 +42,32 @@ let authenticated = (function () {
   spotifyApi.setAccessToken(accessToken);
   spotifyApi.setRefreshToken(refreshToken);
 
-  spotifyApi
+  const data = await spotifyApi
     .refreshAccessToken()
-    .then(
-      data => spotifyApi.setAccessToken(data.body['access_token']),
-      err => console.log(err)
-    );
+    .then(data => data, err => console.log(err));
 
+  spotifyApi.setAccessToken(data.body['access_token']);
   return true;
-})();
+}
+
+setTimeout(async () => {
+  for (;;) {
+    authenticated = authenticate();
+
+    let sleepDurationSecs;
+    if (authenticated) {
+      sleepDurationSecs = 3600;
+      console.log('Successfully refreshed Spotify access token.');
+    } else {
+      sleepDurationSecs = 10;
+      console.log(
+        'Failed to refresh Spotify access token. Trying again in 10 seconds.'
+      );
+    }
+
+    await utils.sleep(sleepDurationSecs * 1000);
+  }
+});
 
 const commands = require('./commands')(webClient, spotifyApi);
 
