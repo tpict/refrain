@@ -16,11 +16,12 @@ const callbacks = spotifyApi => ({
 
     const track = JSON.parse(action.value);
     const formattedSong = utils.formatSong(track.name, track.artist);
+    const playlist = store.getActivePlaylist();
 
     spotifyApi
       .removeTracksFromPlaylist(
-        store.getActiveUserID(),
-        store.getActivePlaylist().id,
+        playlist.user_id,
+        playlist.id,
         [{ uri: track.uri }]
       )
       .then(
