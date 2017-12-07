@@ -168,7 +168,7 @@ app.get('/callback', async function (req, res) {
 });
 
 require('./slack_auth')(app);
-require('./interactive')(app, spotifyApi);
+require('./interactive')(app, webClient, spotifyApi);
 
 // Create endpoints for each slash command. The endpoint is the same as the
 // name of the function.

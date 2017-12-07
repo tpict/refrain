@@ -1,89 +1,12 @@
-const storage = require('node-persist');
 const { URL } = require('url');
+const storage = require('node-persist');
 
 const utils = require('./utils');
 const store = require('./store');
 
-// Find the index of the given track in the given playlist.
-// This is a work-around for a bug in the Spotify API that prevents specifying
-// a playlist offset by URI.
-// https://github.com/spotify/web-api/issues/630
-const playlistContextOffset = async function (spotifyApi, playlist, track) {
-  const { userID, playlistID } = utils.splitPlaylistURI(playlist.uri);
-
-  let next = {};
-  let nextURL = true;
-  let found = false;
-
-  let index = 0;
-  let total = 0;
-
-  while (nextURL && !found) {
-    let tracks;
-    [tracks, total, nextURL] = await spotifyApi
-      .getPlaylistTracks(userID, playlistID, next)
-      .then(
-        data => [data.body.items, data.body.total, data.body.next],
-        err => console.error(err)
-      );
-
-    if (nextURL) {
-      const searchParams = new URL(nextURL).searchParams;
-      next.offset = searchParams.get('offset');
-      next.limit = searchParams.get('limit');
-    }
-
-    tracks.some(item => {
-      if (item.track.id === track.id) {
-        found = true;
-        return true;
-      }
-
-      index++;
-      return false;
-    });
-  }
-
-  return [index, total, found];
-};
-
-const queue = async function (spotifyApi, req, res, track, callback) {
-  const playlists = store.getPlaylists();
-  const playlistAlias = store.getActivePlaylistAlias();
-  const playlist = store.getActivePlaylist();
-  const artist = track.artists[0];
-
-  spotifyApi
-    .addTracksToPlaylist(playlist.user_id, playlist.id, [track.uri])
-    .then(
-      () => {
-        playlist.tracks[track.id] = {
-          requester: req.body.user_name,
-          artist: artist.name,
-          name: track.name
-        };
-        playlists[playlistAlias] = playlist;
-        storage.setItemSync('playlists', playlists);
-
-        callback(artist, playlist);
-      },
-      err =>
-        utils.errorWrapper(err, req, res, () =>
-          utils.respond(
-            req,
-            res,
-            `There was an error adding ${utils.formatSong(
-              track.name,
-              artist.name
-            )} to *${playlist.name}*.`
-          )
-        )
-    );
-};
-
 // Slash commands for Slack.
 module.exports = (webClient, spotifyApi) => ({
-  on: false,
+  on: true,
 
   // Commands which require the jukebox to be switched on.
   requireOn: [
@@ -137,11 +60,12 @@ module.exports = (webClient, spotifyApi) => ({
         );
       },
       err =>
-        utils.errorWrapper(err, req, res, () =>
+        utils.errorWrapper(err, errorMessage =>
           utils.respond(
             req,
             res,
-            'Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.'
+            errorMessage ||
+              'Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.'
           )
         )
     );
@@ -194,14 +118,11 @@ module.exports = (webClient, spotifyApi) => ({
         utils.respond(req, res, `\n${lines.join('\n')}`);
       },
       err =>
-        utils.errorWrapper(
-          err,
-          req,
-          res,
+        utils.errorWrapper(err, errorMessage =>
           utils.respond(
             req,
             res,
-            'Looks like you have a misconfigured playlist.'
+            errorMessage || 'Looks like you have a misconfigured playlist.'
           )
         )
     );
@@ -232,8 +153,12 @@ module.exports = (webClient, spotifyApi) => ({
           );
         },
         err =>
-          utils.errorWrapper(err, req, res, () =>
-            utils.respond(req, res, 'Looks like a misconfigured playlist')
+          utils.errorWrapper(err, errorMessage =>
+            utils.respond(
+              req,
+              res,
+              errorMessage || 'Looks like a misconfigured playlist'
+            )
           )
       );
   },
@@ -254,98 +179,39 @@ module.exports = (webClient, spotifyApi) => ({
     }
   },
 
-  async queue(req, res) {
-    const track = await spotifyApi.searchTracks(req.body.text).then(
-      data => {
-        const results = data.body.tracks.items;
-
-        if (results.length === 0) {
-          utils.respond(req, res, 'Couldn\'t find that track.');
-          return;
-        }
-
-        return results[0];
-      },
-      err =>
-        utils.errorWrapper(err, req, res, () =>
-          utils.respond(
-            req,
-            res,
-            'There was an error while searching for that track.'
-          )
-        )
-    );
-
-    queue(spotifyApi, req, res, track, (artist, playlist) =>
-      utils.respond(
-        req,
-        res,
-        `Added ${utils.formatSong(
-          track.name,
-          artist.name
-        )} to *${playlist.name}*`
-      )
-    );
-  },
-
   findme(req, res) {
     const searchTerms = req.body.text;
     if (!searchTerms) {
-      utils.respond(req, res, 'Please provide a search query.');
+      res.send('Please provide a search query.');
       return;
     }
 
     spotifyApi.searchTracks(searchTerms, { limit: 5 }).then(
       data => {
-        const attachments = data.body.tracks.items.map(item => ({
-          fallback: 'test',
-          callback_id: 'find_track',
-          title: `${item.name} by ${item.artists[0].name}`,
-          color: 'good',
-          actions: [
-            {
-              name: 'play',
-              text: 'Play now',
-              type: 'button',
-              value: item.id
-            },
-            {
-              name: 'queue',
-              text: 'Queue',
-              type: 'button',
-              value: item.id
-            }
-          ]
-        }));
-
-        attachments.push({
-          fallback: 'load more',
-          callback_id: 'find_track_more',
-          actions: [
-            {
-              name: 'load_more',
-              text: 'Load more',
-              type: 'button',
-              value: 'load_more'
-            }
-          ]
-        });
-
-        utils.respond(req, res, {
+        res.send({
           text:
-            '*WARNING!* This feature is under development and probably won\'t work!',
-          attachments
+          '*WARNING!* This feature is under development! The "load more" button hasn\'t been implemented yet.',
+          attachments: utils.getSearchAttachments(data)
         });
       },
       err =>
-        utils.errorWrapper(
-          err,
-          req,
-          res,
-          'An error occured while performing the search.'
+        utils.errorWrapper(err, errorMessage =>
+          res.send(
+            res,
+            errorMessage || 'An error occured while performing the search.'
+          )
         )
     );
   },
+
+  async queue(req, res) {
+    utils.respond(
+      req,
+      res,
+      'This command has been deprecated. Please use `/findme` instead.'
+    );
+  },
+
 
   async playme(req, res) {
     const text = req.body.text;
@@ -354,87 +220,19 @@ module.exports = (webClient, spotifyApi) => ({
         .play()
         .then(
           () => utils.respond(req, res, 'Now playing!'),
-          err => utils.errorWrapper(err, req, res, 'Couldn\'t resume music!')
+          err =>
+            utils.errorWrapper(err, errorMessage =>
+              utils.respond(req, res, errorMessage || 'Couldn\'t resume music!')
+            )
         );
       return;
     }
 
-    utils.respond(req, res, 'Give me a second...');
-
-    const playlist = store.getActivePlaylist();
-    const track = await spotifyApi.searchTracks(text).then(
-      data => {
-        const results = data.body.tracks.items;
-
-        if (results.length === 0) {
-          webClient.chat.postMessage(
-            req.body.channel_id,
-            'Couldn\'t find that track.'
-          );
-          return;
-        }
-
-        return results[0];
-      },
-      err =>
-        utils.errorWrapper(err, req, res, () =>
-          webClient.chat.postMessage(
-            req.body.channel_id,
-            'There was an error while searching for that track.'
-          )
-        )
+    utils.respond(
+      req,
+      res,
+      'Selecting tracks with this command has been deprecated. Please use `/findme` instead.'
     );
-
-    const [offset, total, found] = await playlistContextOffset(
-      spotifyApi,
-      playlist,
-      track
-    );
-
-    const formattedSong = utils.formatSong(track.name, track.artists[0].name);
-    if (found) {
-      await spotifyApi
-        // Uncomment when https://github.com/spotify/web-api/issues/630 is fixed
-        // .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
-        .play({ context_uri: playlist.uri, offset: { position: offset } })
-        .then(
-          () =>
-            webClient.chat.postMessage(
-              req.body.channel_id,
-              `Now playing ${formattedSong}`
-            ),
-          err =>
-            utils.errorWrapper(err, req, res, () =>
-              webClient.chat.postMessage(
-                req.body.channel_id,
-                `${formattedSong} is already in *${playlist.name}*, but couldn't start playing it.`
-              )
-            )
-        );
-
-      return;
-    }
-
-    queue(spotifyApi, req, res, track, async (artist, playlist) => {
-      const formattedSong = utils.formatSong(track.name, artist.name);
-
-      spotifyApi
-        // .play({ context_uri: playlist.uri, offset: { uri: track.uri } })
-        .play({ context_uri: playlist.uri, offset: { position: total } })
-        .then(
-          () =>
-            webClient.chat.postMessage(
-              req.body.channel_id,
-              `Now playing ${formattedSong}`
-            ),
-          err =>
-            utils.errorWrapper(err, req, res, () =>
-              webClient.chat.postMessage(
-                `Added ${formattedSong} to *${playlist.name}*, but couldn't start playing it.`
-              )
-            )
-        );
-    });
   },
 
   pauseme(req, res) {
@@ -442,7 +240,10 @@ module.exports = (webClient, spotifyApi) => ({
       .pause()
       .then(
         () => utils.respond(req, res, 'Paused!'),
-        err => utils.errorWrapper(err, req, res, 'Couldn\'t pause!')
+        err =>
+          utils.errorWrapper(err, errorMessage =>
+            utils.respond(req, res, errorMessage || 'Couldn\'t pause!')
+          )
       );
   },
 
@@ -465,10 +266,10 @@ module.exports = (webClient, spotifyApi) => ({
             return spotifyApi.getMyCurrentPlayingTrack();
           },
           err =>
-            utils.errorWrapper(err, req, res, () =>
+            utils.errorWrapper(err, errorMessage =>
               webClient.chat.postMessage(
                 req.body.channel_id,
-                'Spotify couldn\'t skip this track!'
+                errorMessage || 'Spotify couldn\'t skip this track!'
               )
             )
         )
@@ -494,10 +295,11 @@ module.exports = (webClient, spotifyApi) => ({
             );
           },
           err =>
-            utils.errorWrapper(err, req, res, () =>
+            utils.errorWrapper(err, errorMessage =>
               webClient.chat.postMessage(
                 req.body.channel_id,
-                'Managed to skip, but Spotify wouldn\'t say what\'s playing now!'
+                errorMessage ||
+                  'Managed to skip, but Spotify wouldn\'t say what\'s playing now!'
               )
             )
         );
@@ -509,10 +311,7 @@ module.exports = (webClient, spotifyApi) => ({
         const skippedArtist = data.body.item.artists[0].name;
         callback(skippedName, skippedArtist);
       },
-      err =>
-        utils.errorWrapper(err, req, res, () =>
-          callback(null, null, 'Skipping whatever\'s playing...')
-        )
+      () => callback(null, null, 'Skipping whatever\'s playing...')
     );
   },
 
@@ -521,11 +320,11 @@ module.exports = (webClient, spotifyApi) => ({
       .getMyCurrentPlayingTrack()
       .then(data => data)
       .catch(err =>
-        utils.errorWrapper(err, req, res, () =>
+        utils.errorWrapper(err, errorMessage =>
           utils.respond(
             req,
             res,
-            'Is something playing? Spotify doesn\'t think so!'
+            errorMessage || 'Is something playing? Spotify doesn\'t think so!'
           )
         )
       );
@@ -560,7 +359,6 @@ module.exports = (webClient, spotifyApi) => ({
               type: 'button',
               style: 'danger',
               value: JSON.stringify({
-                user_name: req.body.user_name,
                 uri: track.uri,
                 name,
                 artist
@@ -608,21 +406,13 @@ module.exports = (webClient, spotifyApi) => ({
           );
         },
         err =>
-          utils.errorWrapper(err, req, res, err => {
-            if (err.statusCode === 403) {
-              utils.respond(
-                req,
-                res,
-                'Spotify says you\'re not a premium user!'
-              );
-            } else {
-              utils.respond(
-                req,
-                res,
-                `There was an error playing *${playlist.name}*`
-              );
-            }
-          })
+          utils.errorWrapper(err, errMessage =>
+            utils.respond(
+              req,
+              res,
+              errMessage || `There was an error playing *${playlist.name}*`
+            )
+          )
       );
     } else if (command === 'off') {
       spotifyApi.pause().then(
@@ -635,8 +425,8 @@ module.exports = (webClient, spotifyApi) => ({
           );
         },
         err =>
-          utils.errorWrapper(err, req, res, () =>
-            utils.respond(req, res, 'Couldn\'t stop playing!')
+          utils.errorWrapper(err, errMessage =>
+            utils.respond(req, res, errMessage || 'Couldn\'t stop playing!')
           )
       );
     }
@@ -650,7 +440,7 @@ module.exports = (webClient, spotifyApi) => ({
           utils.respond(
             req,
             res,
-            'Are you hearing things? If so, check that `/activeuser` matches the user signed in to Spotify.'
+            'Are you hearing things? If so, check that `/whichuser` matches the user signed in to Spotify.'
           );
         }
 
@@ -682,8 +472,12 @@ module.exports = (webClient, spotifyApi) => ({
         }
       },
       err =>
-        utils.errorWrapper(err, req, res, () =>
-          utils.respond(req, res, 'Couldn\'t read the currently playing track')
+        utils.errorWrapper(err, errorMessage =>
+          utils.respond(
+            req,
+            res,
+            errorMessage || 'Couldn\'t read the currently playing track'
+          )
         )
     );
   },
@@ -728,9 +522,10 @@ module.exports = (webClient, spotifyApi) => ({
         utils.respond(req, res, 'You are now the active user!');
       },
       err =>
-        utils.errorWrapper(err, req, res, () =>
+        utils.errorWrapper(err, errorMessage =>
           utils.respond(
-            'There was an authentication failure. Please try again!'
+            errorMessage ||
+              'There was an authentication failure. Please try again!'
           )
         )
     );
@@ -750,11 +545,11 @@ module.exports = (webClient, spotifyApi) => ({
         () =>
           utils.respond(req, res, `Shuffle is now ${state ? 'on' : 'off'}.`),
         err =>
-          utils.errorWrapper(err, req, res, () =>
+          utils.errorWrapper(err, errorMessage =>
             utils.respond(
               req,
               res,
-              'An error occurred while setting shuffle state.'
+              errorMessage || 'An error occurred while setting shuffle state.'
             )
           )
       );
