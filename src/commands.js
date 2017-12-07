@@ -1,4 +1,3 @@
-const { URL } = require('url');
 const storage = require('node-persist');
 
 const utils = require('./utils');
@@ -190,8 +189,8 @@ module.exports = (webClient, spotifyApi) => ({
       data => {
         res.send({
           text:
-          '*WARNING!* This feature is under development! The "load more" button hasn\'t been implemented yet.',
-          attachments: utils.getSearchAttachments(data)
+          `You searched for "${searchTerms}":`,
+          attachments: utils.getSearchAttachments(searchTerms, data)
         });
       },
       err =>

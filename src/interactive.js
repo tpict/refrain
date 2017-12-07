@@ -30,7 +30,7 @@ const SpotifyInteractions = (webClient, spotifyApi) => ({
               webClient.chat.postMessage(
                 channelID,
                 errorMessage ||
-                `<@{userName}> added ${formattedSong} to *${playlist.name}*, but there was an error playing it.`
+                  `<@{userName}> added ${formattedSong} to *${playlist.name}*, but there was an error playing it.`
               )
             )
         );
@@ -63,10 +63,7 @@ const SpotifyInteractions = (webClient, spotifyApi) => ({
           )} to *${playlist.name}*`;
 
           if (chat) {
-            webClient.chat.postMessage(
-              channelID,
-              message
-            );
+            webClient.chat.postMessage(channelID, message);
           }
         },
         err =>
@@ -189,36 +186,36 @@ const callbacks = (webClient, spotifyApi) => ({
       .play({ context_uri: playlist.uri, offset: { position: total } })
       .then(
         () =>
-        webClient.chat.postMessage(
-          channelID,
-          `Now playing ${formattedSong}, as requested by <@${userName}>`
-        ),
-        err =>
-        utils.errorWrapper(err, errorMessage =>
           webClient.chat.postMessage(
             channelID,
-            errorMessage ||
-            `<@{userName}> added ${formattedSong} to *${playlist.name}*, but there was an error playing it.`
+            `Now playing ${formattedSong}, as requested by <@${userName}>`
+          ),
+        err =>
+          utils.errorWrapper(err, errorMessage =>
+            webClient.chat.postMessage(
+              channelID,
+              errorMessage ||
+                `<@{userName}> added ${formattedSong} to *${playlist.name}*, but there was an error playing it.`
+            )
           )
-        )
       );
   },
 
   find_track_more(payload, res) {
     const action = payload.actions[0];
     const data = JSON.parse(action.value);
-    console.log(data);
+
+    const query = data.query;
     const options = {
       offset: data.offset,
       limit: data.limit
     };
 
-    spotifyApi.searchTracks(data.query, options).then(
+    spotifyApi.searchTracks(query, options).then(
       data => {
         res.send({
-          text:
-            '*WARNING!* This feature is under development! The "load more" button hasn\'t been implemented yet.',
-          attachments: utils.getSearchAttachments(data)
+          text: `You searched for "${query}":`,
+          attachments: utils.getSearchAttachments(query, data)
         });
       },
       err =>

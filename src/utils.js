@@ -1,11 +1,12 @@
 const { URL } = require('url');
 
 module.exports = {
-  getSearchAttachments(data) {
+  getSearchAttachments(query, data) {
     const attachments = data.body.tracks.items.map(item => ({
       fallback: 'test',
       callback_id: 'find_track',
-      title: `${item.name} by ${item.artists[0].name}`,
+      title: item.name,
+      text: `Artist: ${item.artists[0].name}\nAlbum: ${item.album.name}`,
       color: 'good',
       actions: [
         {
@@ -48,7 +49,7 @@ module.exports = {
             value: JSON.stringify({
               offset: searchParams.get('offset'),
               limit: searchParams.get('limit'),
-              query: searchParams.get('query')
+              query
             })
           }
         ]
