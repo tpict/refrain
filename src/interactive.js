@@ -153,7 +153,7 @@ const callbacks = (webClient, spotifyApi) => ({
     let found = false;
     let total;
 
-    utils.respond(userName, res, 'Just a moment...');
+    res.send('Just a moment...');
 
     if (play) {
       [found, total] = await spotifyInteractions.playTrackInPlaylistContext(

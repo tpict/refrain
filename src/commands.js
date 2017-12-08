@@ -185,7 +185,7 @@ module.exports = (webClient, spotifyApi) => ({
       return;
     }
 
-    spotifyApi.searchTracks(searchTerms, { limit: 5 }).then(
+    spotifyApi.searchTracks(searchTerms, { limit: 3 }).then(
       data => {
         res.send({
           text:

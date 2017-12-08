@@ -7,6 +7,7 @@ module.exports = {
       callback_id: 'find_track',
       title: item.name,
       text: `Artist: ${item.artists[0].name}\nAlbum: ${item.album.name}`,
+      thumb_url: item.album.images[1].url,
       color: 'good',
       actions: [
         {
