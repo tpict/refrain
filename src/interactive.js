@@ -117,7 +117,7 @@ const callbacks = (webClient, spotifyApi) => ({
           utils.respond(
             track.user_name,
             res,
-            `Spotify doesn\'t want to delete ${formattedSong}. Godspeed.`
+            `Spotify doesn't want to delete ${formattedSong}. Godspeed.`
           );
         }
       )
@@ -139,7 +139,6 @@ const callbacks = (webClient, spotifyApi) => ({
 
     const userName = payload.user.name;
     const channelID = payload.channel.id;
-    console.log(userName);
 
     const action = payload.actions[0];
     const track = JSON.parse(action.value);

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const storage = require('node-persist');
@@ -15,12 +16,12 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 storage.initSync();
 
 const spotifyApi = new SpotifyWebApi({
-  clientId: require('./credentials').spotifyClientID,
-  clientSecret: require('./credentials').spotifyClientSecret,
-  redirectUri: require('./credentials').spotifyRedirectURI
+  clientId: process.env.SPOTIFY_CLIENT_ID,
+  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+  redirectUri: process.env.SPOTIFY_REDIRECT_URI
 });
 
-const webClient = new WebClient(require('./credentials').slackAPIToken);
+const webClient = new WebClient(process.env.SLACK_API_TOKEN);
 
 const states = {};
 
@@ -46,6 +47,10 @@ async function authenticate() {
   const data = await spotifyApi
     .refreshAccessToken()
     .then(data => data, err => console.log(err));
+
+  if (!data) {
+    return false;
+  }
 
   spotifyApi.setAccessToken(data.body['access_token']);
   return true;

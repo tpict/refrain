@@ -1,8 +1,5 @@
 const request = require('request');
 
-const clientId = require('./credentials').slackClientID;
-const clientSecret = require('./credentials').slackClientSecret;
-
 module.exports = function (app) {
   app.get('/oauth', function (req, res) {
     // When a user authorizes an app, a code query parameter is passed on the oAuth endpoint. If that code is not there, we respond with an error message
@@ -22,8 +19,8 @@ module.exports = function (app) {
         url: 'https://slack.com/api/oauth.access', //URL to hit
         qs: {
           code: req.query.code,
-          client_id: clientId,
-          client_secret: clientSecret
+          client_id: process.env.SLACK_CLIENT_ID,
+          client_secret: process.env.SLACK_CLIENT_SECRET
         }, //Query string data
         method: 'GET' //Specify the method
       },
