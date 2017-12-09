@@ -1,8 +1,8 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const sinon = require('sinon');
-const should = chai.should();
 const nock = require('nock');
+const storage = require('node-persist');
 
 process.env.NODE_ENV = 'test';
 process.env.STORAGE_DIR = 'test-storage';
@@ -36,6 +36,7 @@ describe('Slack slash command endpoints', function () {
 
   afterEach(function () {
     sandbox.restore();
+    storage.clearSync();
   });
 
   describe('/shuffle endpoint', function () {
@@ -194,6 +195,53 @@ describe('Slack slash command endpoints', function () {
           chai.assert.isTrue(spotifyApi.setRefreshToken.calledOnce);
           chai.assert.isTrue(spotifyApi.setAccessToken.calledTwice);
           scope.done();
+          done();
+        });
+    });
+  });
+
+  describe('/whichuser endpoint', function () {
+    it('prompts new users to use /spotifyauth', function (done) {
+      const body = baseSlackRequest({
+        command: '/whichuser'
+      });
+
+      chai
+        .request(app)
+        .post('/whichuser')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: No authenticated users yet. Use `/spotifyauth` to get started.'
+          );
+          done();
+        });
+    });
+
+    it('returns the active user', function (done) {
+      store.setUsers({
+        'bing.bong': {
+          id: 'myID',
+          access_token: 'myAccessToken',
+          refresh_token: 'myRefreshToken'
+        }
+      });
+      store.setActiveUser('bing.bong');
+
+      const body = baseSlackRequest({
+        command: '/whichuser'
+      });
+
+      chai
+        .request(app)
+        .post('/whichuser')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: The active user is <@bing.bong>'
+          );
           done();
         });
     });

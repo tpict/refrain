@@ -188,8 +188,7 @@ module.exports = (webClient, spotifyApi) => ({
     spotifyApi.searchTracks(searchTerms, { limit: 3 }).then(
       data => {
         res.send({
-          text:
-          `You searched for "${searchTerms}":`,
+          text: `You searched for "${searchTerms}":`,
           attachments: utils.getSearchAttachments(searchTerms, data)
         });
       },
@@ -210,7 +209,6 @@ module.exports = (webClient, spotifyApi) => ({
       'This command has been deprecated. Please use `/findme` instead.'
     );
   },
-
 
   async playme(req, res) {
     const text = req.body.text;
@@ -495,7 +493,10 @@ module.exports = (webClient, spotifyApi) => ({
 
   whichuser(req, res) {
     const activeUser = store.getActiveUserName();
-    utils.respond(req, res, `The active user is <@${activeUser}>`, req);
+    const message = activeUser
+      ? `The active user is <@${activeUser}>`
+      : 'No authenticated users yet. Use `/spotifyauth` to get started.';
+    utils.respond(req, res, message);
   },
 
   commandeer(req, res) {
