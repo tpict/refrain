@@ -8,6 +8,7 @@ parserOptions:
 env:
   node: yes
   es6: yes
+  mocha: yes
 rules:
   arrow-parens:
     - 0

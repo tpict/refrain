@@ -9,6 +9,7 @@ const utils = require('./utils');
 const store = require('./store');
 
 const app = express();
+app.use(bodyParser.json());
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 storage.initSync();
@@ -179,3 +180,4 @@ Object.keys(commands).forEach(commandName =>
 );
 
 app.listen(4390, () => console.log('Pebble DJ listening on port 4390!'));
+module.exports = app;

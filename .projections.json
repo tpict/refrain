@@ -1,0 +1,5 @@
+{
+  "*": {
+    "dispatch": "npm run test"
+  }
+}
