@@ -4,12 +4,13 @@ const sinon = require('sinon');
 const should = chai.should();
 const nock = require('nock');
 
+process.env.NODE_ENV = 'test';
+process.env.STORAGE_DIR = 'test-storage';
+
 const { app, spotifyApi, webClient } = require('../src/app');
 const store = require('../src/store');
 
 const sandbox = sinon.sandbox.create();
-
-process.env.NODE_ENV = 'test';
 
 chai.use(chaiHttp);
 describe('Slack slash command endpoints', function () {
@@ -116,6 +117,31 @@ describe('Slack slash command endpoints', function () {
   });
 
   describe('/commandeer endpoint', function () {
+    let scope;
+
+    beforeEach(function () {
+      scope = nock('https://accounts.spotify.com')
+        .post('/api/token')
+        .reply(200, {
+          access_token: 'theNewAccessToken',
+          token_type: 'Bearer',
+          scope: [
+            'playlist-read-private',
+            'playlist-read-collaborative',
+            'playlist-modify-public',
+            'playlist-modify-private',
+            'user-read-playback-state',
+            'user-modify-playback-state',
+            'user-read-currently-playing'
+          ].join(' '),
+          expires_in: 3600
+        });
+    });
+
+    afterEach(function () {
+      nock.cleanAll();
+    });
+
     it('rejects unauthenticated users', function (done) {
       sandbox.spy(spotifyApi, 'setRefreshToken');
       sandbox.spy(spotifyApi, 'setAccessToken');
@@ -135,6 +161,7 @@ describe('Slack slash command endpoints', function () {
           );
           chai.assert.isTrue(spotifyApi.setRefreshToken.notCalled);
           chai.assert.isTrue(spotifyApi.setAccessToken.notCalled);
+          chai.assert.isFalse(scope.isDone());
           done();
         });
     });
@@ -165,7 +192,8 @@ describe('Slack slash command endpoints', function () {
             '<@bing.bong>: You are now the active user!'
           );
           chai.assert.isTrue(spotifyApi.setRefreshToken.calledOnce);
-          chai.assert.isTrue(spotifyApi.setAccessToken.calledOnce);
+          chai.assert.isTrue(spotifyApi.setAccessToken.calledTwice);
+          scope.done();
           done();
         });
     });

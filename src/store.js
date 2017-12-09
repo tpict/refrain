@@ -1,4 +1,7 @@
 const storage = require('node-persist');
+const storageDir = process.env.STORAGE_DIR;
+const storageOptions = storageDir ? { dir: storageDir } : {};
+storage.initSync(storageOptions);
 
 module.exports = {
   getPlaylists() {

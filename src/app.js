@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const storage = require('node-persist');
 const uuidv4 = require('uuid/v4');
 const WebClient = require('@slack/client').WebClient;
 const SpotifyWebApi = require('spotify-web-api-node');
@@ -12,8 +11,6 @@ const store = require('./store');
 const app = express();
 app.use(bodyParser.json());
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
-
-storage.initSync();
 
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
