@@ -1,9 +1,13 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const app = require('../src/app');
 const sinon = require('sinon');
 const should = chai.should();
 const nock = require('nock');
+
+const { app, spotifyApi, webClient } = require('../src/app');
+const store = require('../src/store');
+
+const sandbox = sinon.sandbox.create();
 
 process.env.NODE_ENV = 'test';
 
@@ -19,8 +23,8 @@ describe('Slack slash command endpoints', function () {
         channel_name: 'directmessage',
         user_id: 'U1AAAAAAA',
         user_name: 'bing.bong',
-        command: '/shuffled',
-        text: 'on',
+        command: '',
+        text: '',
         response_url:
           'https://hooks.slack.com/commands/T0AAAAAAA/123456789000/AAAAAAAAAAAAAAAAAAAAAAAA',
         trigger_id: '123456789000.1234567890.abcdeff123aaa1111111111111111111'
@@ -29,7 +33,9 @@ describe('Slack slash command endpoints', function () {
     );
   }
 
-  beforeEach(function () {});
+  afterEach(function () {
+    sandbox.restore();
+  });
 
   describe('/shuffle endpoint', function () {
     it('responds to "/shuffled on"', function (done) {
@@ -104,6 +110,62 @@ describe('Slack slash command endpoints', function () {
           );
           chai.assert.equal(res.body.response_type, 'in_channel');
           chai.assert.isFalse(scope.isDone());
+          done();
+        });
+    });
+  });
+
+  describe('/commandeer endpoint', function () {
+    it('rejects unauthenticated users', function (done) {
+      sandbox.spy(spotifyApi, 'setRefreshToken');
+      sandbox.spy(spotifyApi, 'setAccessToken');
+
+      const body = baseSlackRequest({
+        command: '/commandeer'
+      });
+
+      chai
+        .request(app)
+        .post('/commandeer')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: You\'re not authenticated with Spotify. Try `/spotifyauth` if you\'d like to get set up'
+          );
+          chai.assert.isTrue(spotifyApi.setRefreshToken.notCalled);
+          chai.assert.isTrue(spotifyApi.setAccessToken.notCalled);
+          done();
+        });
+    });
+
+    it('updates Spotify tokens for the commandeering user', function (done) {
+      sandbox.spy(spotifyApi, 'setRefreshToken');
+      sandbox.spy(spotifyApi, 'setAccessToken');
+
+      store.setUsers({
+        'bing.bong': {
+          id: 'myID',
+          access_token: 'myAccessToken',
+          refresh_token: 'myRefreshToken'
+        }
+      });
+
+      const body = baseSlackRequest({
+        command: '/commandeer'
+      });
+
+      chai
+        .request(app)
+        .post('/commandeer')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: You are now the active user!'
+          );
+          chai.assert.isTrue(spotifyApi.setRefreshToken.calledOnce);
+          chai.assert.isTrue(spotifyApi.setAccessToken.calledOnce);
           done();
         });
     });

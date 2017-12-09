@@ -156,7 +156,7 @@ app.get('/callback', async function (req, res) {
         refresh_token: refreshToken
       };
 
-      storage.setItemSync('users', users);
+      store.setUsers(users);
       store.setActiveUser(userName);
       authenticated = true;
 
@@ -183,4 +183,6 @@ if (!module.parent) {
   app.listen(4390, () => console.log('Pebble DJ listening on port 4390!'));
 }
 
-module.exports = app;
+module.exports.app = app;
+module.exports.spotifyApi = spotifyApi;
+module.exports.webClient = webClient;

@@ -25,6 +25,14 @@ module.exports = {
     return storage.getItemSync('users') || {};
   },
 
+  setUsers(users) {
+    if (!users) {
+      return;
+    }
+
+    return storage.setItemSync('users', users);
+  },
+
   getActiveUser() {
     return this.getUsers()[this.getActiveUserName()];
   },
