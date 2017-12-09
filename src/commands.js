@@ -480,10 +480,10 @@ module.exports = (webClient, spotifyApi) => ({
   },
 
   listusers(req, res) {
-    const users = store.getUsers();
-    const userNames = Object.keys(users).join('\n');
-    let message = `Authenticated users:\n${userNames}`;
-    if (users.length === 0) {
+    const userNames = Object.keys(store.getUsers());
+    const formattedUserNames = userNames.join('\n');
+    let message = `Authenticated users:\n${formattedUserNames}`;
+    if (userNames.length === 0) {
       message =
         'No users have been authenticated yet! Try `/spotifyauth` to register yourself.';
     }

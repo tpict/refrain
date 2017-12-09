@@ -40,7 +40,7 @@ describe('Slack slash command endpoints', function () {
   });
 
   describe('/shuffle endpoint', function () {
-    it('responds to "/shuffled on"', function (done) {
+    it('should respond to "/shuffled on"', function (done) {
       const scope = nock('https://api.spotify.com')
         .put('/v1/me/player/shuffle')
         .query({
@@ -65,7 +65,7 @@ describe('Slack slash command endpoints', function () {
         });
     });
 
-    it('responds to "/shuffled off"', function (done) {
+    it('should respond to "/shuffled off"', function (done) {
       const scope = nock('https://api.spotify.com')
         .put('/v1/me/player/shuffle')
         .query({
@@ -90,7 +90,7 @@ describe('Slack slash command endpoints', function () {
         });
     });
 
-    it('responds to invalid parameters', function (done) {
+    it('should respond to invalid parameters', function (done) {
       const scope = nock('https://api.spotify.com')
         .put('/v1/me/player/shuffle')
         .query(true)
@@ -143,7 +143,7 @@ describe('Slack slash command endpoints', function () {
       nock.cleanAll();
     });
 
-    it('rejects unauthenticated users', function (done) {
+    it('should reject unauthenticated users', function (done) {
       sandbox.spy(spotifyApi, 'setRefreshToken');
       sandbox.spy(spotifyApi, 'setAccessToken');
 
@@ -167,7 +167,7 @@ describe('Slack slash command endpoints', function () {
         });
     });
 
-    it('updates Spotify tokens for the commandeering user', function (done) {
+    it('should update Spotify tokens for the commandeering user', function (done) {
       sandbox.spy(spotifyApi, 'setRefreshToken');
       sandbox.spy(spotifyApi, 'setAccessToken');
 
@@ -201,7 +201,7 @@ describe('Slack slash command endpoints', function () {
   });
 
   describe('/whichuser endpoint', function () {
-    it('prompts new users to use /spotifyauth', function (done) {
+    it('should prompt new users to use /spotifyauth', function (done) {
       const body = baseSlackRequest({
         command: '/whichuser'
       });
@@ -219,7 +219,7 @@ describe('Slack slash command endpoints', function () {
         });
     });
 
-    it('returns the active user', function (done) {
+    it('should return the active user', function (done) {
       store.setUsers({
         'bing.bong': {
           id: 'myID',
@@ -241,6 +241,57 @@ describe('Slack slash command endpoints', function () {
           chai.assert.equal(
             res.body.text,
             '<@bing.bong>: The active user is <@bing.bong>'
+          );
+          done();
+        });
+    });
+  });
+
+  describe('/listusers endpoint', function () {
+    it('should list authenticated users', function (done) {
+      store.setUsers({
+        'bing.bong': {
+          id: 'myID',
+          access_token: 'myAccessToken',
+          refresh_token: 'myRefreshToken'
+        },
+        'another.user': {
+          id: 'anotherID',
+          access_token: 'anotherAccessToken',
+          refresh_token: 'anotherRefreshToken'
+        }
+      });
+
+      const body = baseSlackRequest({
+        command: '/listusers'
+      });
+
+      chai
+        .request(app)
+        .post('/listusers')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Authenticated users:\nbing.bong\nanother.user'
+          );
+          done();
+        });
+    });
+
+    it('should prompt use of /spotifyauth in new workspaces', function (done) {
+      const body = baseSlackRequest({
+        command: '/listusers'
+      });
+
+      chai
+        .request(app)
+        .post('/listusers')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: No users have been authenticated yet! Try `/spotifyauth` to register yourself.'
           );
           done();
         });
