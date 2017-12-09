@@ -179,5 +179,8 @@ Object.keys(commands).forEach(commandName =>
   )
 );
 
-app.listen(4390, () => console.log('Pebble DJ listening on port 4390!'));
+if (!module.parent) {
+  app.listen(4390, () => console.log('Pebble DJ listening on port 4390!'));
+}
+
 module.exports = app;

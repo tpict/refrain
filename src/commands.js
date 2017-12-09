@@ -532,7 +532,7 @@ module.exports = (webClient, spotifyApi) => ({
 
   shuffle(req, res) {
     const text = req.body.text;
-    if (!text) {
+    if (!['on', 'off'].includes(text)) {
       utils.respond(req, res, 'Please specify `on` or `off`.');
       return;
     }
