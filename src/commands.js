@@ -19,13 +19,12 @@ module.exports = (webClient, spotifyApi) => ({
   ],
 
   addplaylist(req, res) {
+    const customErrorMessage =
+      'Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.';
+
     const splitText = req.body.text.split(' ');
     if (splitText.length !== 2) {
-      utils.respond(
-        req,
-        res,
-        'Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.'
-      );
+      utils.respond(req, res, customErrorMessage);
       return;
     }
 
@@ -63,8 +62,9 @@ module.exports = (webClient, spotifyApi) => ({
           utils.respond(
             req,
             res,
-            errorMessage ||
-              'Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.'
+            err.statusCode == 404
+              ? customErrorMessage
+              : errorMessage || customErrorMessage
           )
         )
     );

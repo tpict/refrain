@@ -35,6 +35,7 @@ describe('Slack slash command endpoints', function () {
   }
 
   afterEach(function () {
+    nock.cleanAll();
     sandbox.restore();
     storage.clearSync();
   });
@@ -137,10 +138,6 @@ describe('Slack slash command endpoints', function () {
           ].join(' '),
           expires_in: 3600
         });
-    });
-
-    afterEach(function () {
-      nock.cleanAll();
     });
 
     it('should reject unauthenticated users', function (done) {
@@ -293,6 +290,162 @@ describe('Slack slash command endpoints', function () {
             res.body.text,
             '<@bing.bong>: No users have been authenticated yet! Try `/spotifyauth` to register yourself.'
           );
+          done();
+        });
+    });
+  });
+
+  describe('/playme endpoint', function () {
+    it('should begin music playback', function (done) {
+      const scope = nock('https://api.spotify.com')
+        .put('/v1/me/player/play')
+        .reply(200);
+
+      const body = baseSlackRequest({
+        command: '/playme'
+      });
+
+      chai
+        .request(app)
+        .post('/playme')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(res.body.text, '<@bing.bong>: Now playing!');
+          chai.assert.equal(res.body.response_type, 'in_channel');
+          scope.done();
+          done();
+        });
+    });
+
+    it('should prompt users to use /findme', function (done) {
+      const scope = nock('https://api.spotify.com')
+        .put('/v1/me/player/play')
+        .reply(200);
+
+      const body = baseSlackRequest({
+        command: '/playme',
+        text: 'paul mccartney temporary secretary'
+      });
+
+      chai
+        .request(app)
+        .post('/playme')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(res.body.text, '<@bing.bong>: Selecting tracks with this command has been deprecated. Please use `/findme` instead.');
+          chai.assert.equal(res.body.response_type, 'in_channel');
+          chai.assert.isFalse(scope.isDone());
+          done();
+        });
+    });
+  });
+
+  describe('/pauseme endpoint', function () {
+    it('should pause music playback', function (done) {
+      const scope = nock('https://api.spotify.com')
+        .put('/v1/me/player/pause')
+        .reply(200);
+
+      const body = baseSlackRequest({
+        command: '/pauseme'
+      });
+
+      chai
+        .request(app)
+        .post('/pauseme')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(res.body.text, '<@bing.bong>: Paused!');
+          chai.assert.equal(res.body.response_type, 'in_channel');
+          scope.done();
+          done();
+        });
+    });
+  });
+
+  describe('/addplaylist endpoint', function () {
+    let scope;
+
+    beforeEach(function () {
+      scope = nock('https://api.spotify.com')
+        .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000')
+        .reply(200, {
+          name: 'My playlist',
+          uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+        });
+    });
+
+    it('should describe its use on invalid requests', function (done) {
+      const body = baseSlackRequest({
+        command: '/addplaylist',
+        text: 'hello'
+      });
+
+      chai
+        .request(app)
+        .post('/addplaylist')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(res.body.text, '<@bing.bong>: Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.');
+          chai.assert.equal(res.body.response_type, 'in_channel');
+          chai.assert.isFalse(scope.isDone());
+          done();
+        });
+    });
+
+    it('should add requested playlist to storage', function (done) {
+      const body = baseSlackRequest({
+        command: '/addplaylist',
+        text: 'myplaylist spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+      });
+
+      chai
+        .request(app)
+        .post('/addplaylist')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(res.body.text, '<@bing.bong>: Added your playlist *My playlist* under the alias *myplaylist*.');
+          chai.assert.equal(res.body.response_type, 'in_channel');
+
+          const playlists = store.getPlaylists();
+          const playlist = playlists['myplaylist'];
+
+          chai.assert.deepEqual(playlist, {
+            id: 'P000000000000000000000',
+            user_id: 'U1AAAAAAA',
+            tracks: {},
+            uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
+            name: 'My playlist'
+          });
+
+          scope.done();
+          done();
+        });
+    });
+
+    it('should not store invalid playlists', function (done) {
+      scope = nock('https://api.spotify.com')
+        .get('/v1/users/U1BBBBBBB/playlists/P000000000000000000000')
+        .reply(404);
+
+      const body = baseSlackRequest({
+        command: '/addplaylist',
+        text: 'myplaylist spotify:user:U1BBBBBBB:playlist:P000000000000000000000'
+      });
+
+      chai
+        .request(app)
+        .post('/addplaylist')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(res.body.text, '<@bing.bong>: Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.');
+          chai.assert.equal(res.body.response_type, 'in_channel');
+
+          const playlists = store.getPlaylists();
+          const playlist = playlists['myplaylist'];
+          chai.assert.isUndefined(playlist);
+
+          scope.done();
           done();
         });
     });
