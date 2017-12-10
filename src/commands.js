@@ -102,6 +102,15 @@ module.exports = (webClient, spotifyApi) => ({
     const playlists = store.getPlaylists();
     const aliases = Object.keys(playlists);
 
+    if (aliases.length === 0) {
+      utils.respond(
+        req,
+        res,
+        'There are no configured playlists. Try `/addplaylist` to get started.'
+      );
+      return;
+    }
+
     const requests = aliases.map(alias =>
       spotifyApi
         .getPlaylist(playlists[alias].user_id, playlists[alias].id)

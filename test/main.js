@@ -164,7 +164,9 @@ describe('Slack slash command endpoints', function () {
         });
     });
 
-    it('should update Spotify tokens for the commandeering user', function (done) {
+    it('should update Spotify tokens for the commandeering user', function (
+      done
+    ) {
       sandbox.spy(spotifyApi, 'setRefreshToken');
       sandbox.spy(spotifyApi, 'setAccessToken');
 
@@ -332,7 +334,10 @@ describe('Slack slash command endpoints', function () {
         .post('/playme')
         .send(body)
         .end((err, res) => {
-          chai.assert.equal(res.body.text, '<@bing.bong>: Selecting tracks with this command has been deprecated. Please use `/findme` instead.');
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Selecting tracks with this command has been deprecated. Please use `/findme` instead.'
+          );
           chai.assert.equal(res.body.response_type, 'in_channel');
           chai.assert.isFalse(scope.isDone());
           done();
@@ -386,7 +391,10 @@ describe('Slack slash command endpoints', function () {
         .post('/addplaylist')
         .send(body)
         .end((err, res) => {
-          chai.assert.equal(res.body.text, '<@bing.bong>: Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.');
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.'
+          );
           chai.assert.equal(res.body.response_type, 'in_channel');
           chai.assert.isFalse(scope.isDone());
           done();
@@ -396,7 +404,8 @@ describe('Slack slash command endpoints', function () {
     it('should add requested playlist to storage', function (done) {
       const body = baseSlackRequest({
         command: '/addplaylist',
-        text: 'myplaylist spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+        text:
+          'myplaylist spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
       });
 
       chai
@@ -404,7 +413,10 @@ describe('Slack slash command endpoints', function () {
         .post('/addplaylist')
         .send(body)
         .end((err, res) => {
-          chai.assert.equal(res.body.text, '<@bing.bong>: Added your playlist *My playlist* under the alias *myplaylist*.');
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Added your playlist *My playlist* under the alias *myplaylist*.'
+          );
           chai.assert.equal(res.body.response_type, 'in_channel');
 
           const playlists = store.getPlaylists();
@@ -430,7 +442,8 @@ describe('Slack slash command endpoints', function () {
 
       const body = baseSlackRequest({
         command: '/addplaylist',
-        text: 'myplaylist spotify:user:U1BBBBBBB:playlist:P000000000000000000000'
+        text:
+          'myplaylist spotify:user:U1BBBBBBB:playlist:P000000000000000000000'
       });
 
       chai
@@ -438,7 +451,10 @@ describe('Slack slash command endpoints', function () {
         .post('/addplaylist')
         .send(body)
         .end((err, res) => {
-          chai.assert.equal(res.body.text, '<@bing.bong>: Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.');
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.'
+          );
           chai.assert.equal(res.body.response_type, 'in_channel');
 
           const playlists = store.getPlaylists();
@@ -446,6 +462,174 @@ describe('Slack slash command endpoints', function () {
           chai.assert.isUndefined(playlist);
 
           scope.done();
+          done();
+        });
+    });
+  });
+
+  describe('removeplaylist', function () {
+    beforeEach(function () {
+      store.setPlaylists({
+        myplaylist: {
+          id: 'P000000000000000000000',
+          user_id: 'U1AAAAAAA',
+          tracks: {},
+          uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
+          name: 'My playlist'
+        }
+      });
+    });
+
+    it('should describe its use on invalid requests', function (done) {
+      const body = baseSlackRequest({
+        command: '/removeplaylist'
+      });
+
+      chai
+        .request(app)
+        .post('/removeplaylist')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Please specify the alias of the playlist you wish to remove.'
+          );
+          chai.assert.equal(res.body.response_type, 'in_channel');
+
+          const playlists = store.getPlaylists();
+          const playlist = playlists['myplaylist'];
+          chai.assert.exists(playlist);
+          done();
+        });
+    });
+
+    it('should tell the user if the playlist doesn\'t exist', function (done) {
+      const body = baseSlackRequest({
+        command: '/removeplaylist',
+        text: 'nonexistentplaylist'
+      });
+
+      chai
+        .request(app)
+        .post('/removeplaylist')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: That doesn\'t look like a valid playlist alias! Try `/listplaylists`.'
+          );
+          chai.assert.equal(res.body.response_type, 'in_channel');
+
+          const playlists = store.getPlaylists();
+          const playlist = playlists['myplaylist'];
+          chai.assert.exists(playlist);
+          done();
+        });
+    });
+
+    it('should delete the given playlist', function (done) {
+      const body = baseSlackRequest({
+        command: '/removeplaylist',
+        text: 'myplaylist'
+      });
+
+      chai
+        .request(app)
+        .post('/removeplaylist')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Removed configuration for *My playlist*.'
+          );
+          chai.assert.equal(res.body.response_type, 'in_channel');
+
+          const playlists = store.getPlaylists();
+          const playlist = playlists['myplaylist'];
+          chai.assert.isUndefined(playlist);
+          done();
+        });
+    });
+  });
+
+  describe('/listplaylists endpoint', function () {
+    it('should tell the user if there are no playlists', function (done) {
+      const body = baseSlackRequest({
+        command: '/listplaylists'
+      });
+
+      chai
+        .request(app)
+        .post('/listplaylists')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: There are no configured playlists. Try `/addplaylist` to get started.'
+          );
+          chai.assert.equal(res.body.response_type, 'in_channel');
+
+          done();
+        });
+    });
+
+    it('should list configured playlists', function (done) {
+      store.setPlaylists({
+        myplaylist: {
+          id: 'P000000000000000000000',
+          user_id: 'U1AAAAAAA',
+          tracks: {},
+          uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
+          name: 'My playlist'
+        },
+        myotherplaylist: {
+          id: 'P000000000000000000001',
+          user_id: 'U1BBBBBBB',
+          tracks: {},
+          uri: 'spotify:user:U1BBBBBBB:playlist:P000000000000000000001',
+          name: 'My other playlist'
+        },
+        misconfiguredplaylist: {
+          id: 'P000000000000000000002',
+          user_id: 'U1CCCCCCC',
+          tracks: {},
+          uri: 'spotify:user:U1CCCCCCC:playlist:P000000000000000000002',
+          name: 'Misconfigured playlist'
+        }
+      });
+
+      const scope1 = nock('https://api.spotify.com')
+        .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000')
+        .reply(200, {
+          name: 'My playlist'
+        });
+      const scope2 = nock('https://api.spotify.com')
+        .get('/v1/users/U1BBBBBBB/playlists/P000000000000000000001')
+        .reply(200, {
+          name: 'My other playlist'
+        });
+      const scope3 = nock('https://api.spotify.com')
+        .get('/v1/users/U1CCCCCCC/playlists/P000000000000000000002')
+        .reply(404);
+
+      const body = baseSlackRequest({
+        command: '/listplaylists'
+      });
+
+      chai
+        .request(app)
+        .post('/listplaylists')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: \nmyplaylist: My playlist\nmyotherplaylist: My other playlist\nmisconfiguredplaylist: Misconfigured!'
+          );
+          chai.assert.equal(res.body.response_type, 'in_channel');
+
+          scope1.done();
+          scope2.done();
+          scope3.done();
           done();
         });
     });
