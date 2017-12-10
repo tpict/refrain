@@ -142,7 +142,7 @@ module.exports = (webClient, spotifyApi) => ({
     const playlist = playlists[text];
 
     if (!playlist) {
-      utils.respond(`Couldn't find a playlist called *${text}*.`);
+      utils.respond(req, res, `Couldn't find a playlist called *${text}*.`);
       return;
     }
 
@@ -165,7 +165,7 @@ module.exports = (webClient, spotifyApi) => ({
             utils.respond(
               req,
               res,
-              errorMessage || 'Looks like a misconfigured playlist'
+              errorMessage || 'Looks like a misconfigured playlist.'
             )
           )
       );

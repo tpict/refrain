@@ -634,4 +634,121 @@ describe('Slack slash command endpoints', function () {
         });
     });
   });
+
+  describe('/playplaylist endpoint', function () {
+    let scope;
+    beforeEach(function () {
+      scope = nock('https://api.spotify.com')
+        .put('/v1/me/player/play', {
+          context_uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+        })
+        .reply(200);
+    });
+
+    it('should tell the user if the requested playlist isn\'t set up', function (
+      done
+    ) {
+      const body = baseSlackRequest({
+        command: '/playplaylist',
+        text: 'hello'
+      });
+
+      chai
+        .request(app)
+        .post('/playplaylist')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Couldn\'t find a playlist called *hello*.'
+          );
+          chai.assert.equal(res.body.response_type, 'in_channel');
+          chai.assert.isFalse(scope.isDone());
+          done();
+        });
+    });
+
+    it('should play the requested playlist', function (done) {
+      store.setPlaylists({
+        myplaylist: {
+          id: 'P000000000000000000000',
+          user_id: 'U1AAAAAAA',
+          tracks: {},
+          uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
+          name: 'My playlist'
+        }
+      });
+
+      const body = baseSlackRequest({
+        command: '/playplaylist',
+        text: 'myplaylist'
+      });
+
+      chai
+        .request(app)
+        .post('/playplaylist')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Now playing from *My playlist*! Commands will now act on this playlist.'
+          );
+          chai.assert.equal(res.body.response_type, 'in_channel');
+          scope.done();
+          done();
+        });
+    });
+  });
+
+  describe('/whichplaylist endpoint', function () {
+    it('should tell the user if no playlist is active', function (done) {
+      const body = baseSlackRequest({
+        command: '/whichplaylist'
+      });
+
+      chai
+        .request(app)
+        .post('/whichplaylist')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: There is no active playlist!'
+          );
+          chai.assert.equal(res.body.response_type, 'in_channel');
+          done();
+        });
+    });
+
+    it('should tell the user which playlist is active', function (done) {
+      store.setActivePlaylist('myplaylist');
+      store.setPlaylists({
+        myplaylist: {
+          id: 'P000000000000000000000',
+          user_id: 'U1AAAAAAA',
+          tracks: {},
+          uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
+          name: 'My playlist'
+        }
+      });
+
+
+      const body = baseSlackRequest({
+        command: '/whichplaylist'
+      });
+
+      chai
+        .request(app)
+        .post('/whichplaylist')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: The active playlist is *My playlist*. If that\'s not what you\'re hearing, you\'ll have to select it from Spotify yourself.'
+          );
+          chai.assert.equal(res.body.response_type, 'in_channel');
+          done();
+        });
+    });
+  });
 });
