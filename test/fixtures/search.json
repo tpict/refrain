@@ -1,0 +1,203 @@
+{
+  "tracks": {
+    "href": "https://api.spotify.com/v1/search?query=temporary+secretary&type=track&market=GB&offset=0&limit=3",
+    "items": [{
+      "album": {
+        "album_type": "album",
+        "artists": [{
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB"
+          },
+          "href": "https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB",
+          "id": "4STHEaNw4mPZ2tzheohgXB",
+          "name": "Paul McCartney",
+          "type": "artist",
+          "uri": "spotify:artist:4STHEaNw4mPZ2tzheohgXB"
+        }],
+        "available_markets": ["AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN"],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/7G2kEoHNNWxq6j8okgMvCr"
+        },
+        "href": "https://api.spotify.com/v1/albums/7G2kEoHNNWxq6j8okgMvCr",
+        "id": "7G2kEoHNNWxq6j8okgMvCr",
+        "images": [{
+          "height": 640,
+          "url": "https://i.scdn.co/image/c55948e61a6004332d309b44907e5e7176d5cde5",
+          "width": 640
+        }, {
+          "height": 300,
+          "url": "https://i.scdn.co/image/639dee528b0b0e3598504acc8a352b7cf8388310",
+          "width": 300
+        }, {
+          "height": 64,
+          "url": "https://i.scdn.co/image/efe6aa64b81256456c889fdaba3976101f627fca",
+          "width": 64
+        }],
+        "name": "McCartney II (Special Edition)",
+        "type": "album",
+        "uri": "spotify:album:7G2kEoHNNWxq6j8okgMvCr"
+      },
+      "artists": [{
+        "external_urls": {
+          "spotify": "https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB"
+        },
+        "href": "https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB",
+        "id": "4STHEaNw4mPZ2tzheohgXB",
+        "name": "Paul McCartney",
+        "type": "artist",
+        "uri": "spotify:artist:4STHEaNw4mPZ2tzheohgXB"
+      }],
+      "available_markets": ["AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN"],
+      "disc_number": 1,
+      "duration_ms": 194280,
+      "explicit": false,
+      "external_ids": {
+        "isrc": "GBCCS1000165"
+      },
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/1hf22wSSuINjqFYc4JE6Xk"
+      },
+      "href": "https://api.spotify.com/v1/tracks/1hf22wSSuINjqFYc4JE6Xk",
+      "id": "1hf22wSSuINjqFYc4JE6Xk",
+      "name": "Temporary Secretary - Remastered 2011",
+      "popularity": 35,
+      "preview_url": null,
+      "track_number": 2,
+      "type": "track",
+      "uri": "spotify:track:1hf22wSSuINjqFYc4JE6Xk"
+    }, {
+      "album": {
+        "album_type": "album",
+        "artists": [{
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/0LyfQWJT6nXafLPZqxe9Of"
+          },
+          "href": "https://api.spotify.com/v1/artists/0LyfQWJT6nXafLPZqxe9Of",
+          "id": "0LyfQWJT6nXafLPZqxe9Of",
+          "name": "Various Artists",
+          "type": "artist",
+          "uri": "spotify:artist:0LyfQWJT6nXafLPZqxe9Of"
+        }],
+        "available_markets": ["AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN"],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/4fojQC00PuvzE209WTbAIS"
+        },
+        "href": "https://api.spotify.com/v1/albums/4fojQC00PuvzE209WTbAIS",
+        "id": "4fojQC00PuvzE209WTbAIS",
+        "images": [{
+          "height": 640,
+          "url": "https://i.scdn.co/image/48703f83585e59fd5906271a4fc4b69be8a1ea99",
+          "width": 640
+        }, {
+          "height": 300,
+          "url": "https://i.scdn.co/image/dc904fcc72675df0dbac3e443312e48b7cdb7c5e",
+          "width": 300
+        }, {
+          "height": 64,
+          "url": "https://i.scdn.co/image/7419f314495b844575619b9ba46365403ce13d94",
+          "width": 64
+        }],
+        "name": "Ed Rec 100",
+        "type": "album",
+        "uri": "spotify:album:4fojQC00PuvzE209WTbAIS"
+      },
+      "artists": [{
+        "external_urls": {
+          "spotify": "https://open.spotify.com/artist/7i9j813KFoSBMldGqlh2Z1"
+        },
+        "href": "https://api.spotify.com/v1/artists/7i9j813KFoSBMldGqlh2Z1",
+        "id": "7i9j813KFoSBMldGqlh2Z1",
+        "name": "Riton",
+        "type": "artist",
+        "uri": "spotify:artist:7i9j813KFoSBMldGqlh2Z1"
+      }],
+      "available_markets": ["AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN"],
+      "disc_number": 1,
+      "duration_ms": 271766,
+      "explicit": false,
+      "external_ids": {
+        "isrc": "FR0NT1703180"
+      },
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/0ffLhKbRhj0GhI8VldV4KJ"
+      },
+      "href": "https://api.spotify.com/v1/tracks/0ffLhKbRhj0GhI8VldV4KJ",
+      "id": "0ffLhKbRhj0GhI8VldV4KJ",
+      "name": "Temporary Secretary",
+      "popularity": 25,
+      "preview_url": "https://p.scdn.co/mp3-preview/6c63236644272228e4538cd0060a6422ecc5a89c?cid=8897482848704f2a8f8d7c79726a70d4",
+      "track_number": 14,
+      "type": "track",
+      "uri": "spotify:track:0ffLhKbRhj0GhI8VldV4KJ"
+    }, {
+      "album": {
+        "album_type": "compilation",
+        "artists": [{
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB"
+          },
+          "href": "https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB",
+          "id": "4STHEaNw4mPZ2tzheohgXB",
+          "name": "Paul McCartney",
+          "type": "artist",
+          "uri": "spotify:artist:4STHEaNw4mPZ2tzheohgXB"
+        }],
+        "available_markets": ["AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN"],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/5ikljNZWFHqZP2M0kKvEWb"
+        },
+        "href": "https://api.spotify.com/v1/albums/5ikljNZWFHqZP2M0kKvEWb",
+        "id": "5ikljNZWFHqZP2M0kKvEWb",
+        "images": [{
+          "height": 640,
+          "url": "https://i.scdn.co/image/88c28fa528c9e90d932654305f9d7d5aa376c511",
+          "width": 640
+        }, {
+          "height": 300,
+          "url": "https://i.scdn.co/image/40e209d55795eee5b65ca582f3dc4c0a0fb459ea",
+          "width": 300
+        }, {
+          "height": 64,
+          "url": "https://i.scdn.co/image/054a80a5c964241641be8565fad32bde46eab168",
+          "width": 64
+        }],
+        "name": "Pure McCartney (Deluxe Edition)",
+        "type": "album",
+        "uri": "spotify:album:5ikljNZWFHqZP2M0kKvEWb"
+      },
+      "artists": [{
+        "external_urls": {
+          "spotify": "https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB"
+        },
+        "href": "https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB",
+        "id": "4STHEaNw4mPZ2tzheohgXB",
+        "name": "Paul McCartney",
+        "type": "artist",
+        "uri": "spotify:artist:4STHEaNw4mPZ2tzheohgXB"
+      }],
+      "available_markets": ["AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN"],
+      "disc_number": 1,
+      "duration_ms": 196040,
+      "explicit": false,
+      "external_ids": {
+        "isrc": "GBCCS1000165"
+      },
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/4aGD2DegeFj7ggkkp4skGx"
+      },
+      "href": "https://api.spotify.com/v1/tracks/4aGD2DegeFj7ggkkp4skGx",
+      "id": "4aGD2DegeFj7ggkkp4skGx",
+      "name": "Temporary Secretary - 2011 Remaster",
+      "popularity": 18,
+      "preview_url": null,
+      "track_number": 65,
+      "type": "track",
+      "uri": "spotify:track:4aGD2DegeFj7ggkkp4skGx"
+    }],
+    "limit": 3,
+    "next": "https://api.spotify.com/v1/search?query=temporary+secretary&type=track&market=GB&offset=3&limit=3",
+    "offset": 0,
+    "previous": null,
+    "total": 12
+  }
+}

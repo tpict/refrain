@@ -1,0 +1,73 @@
+{
+  "text": "You searched for \"temporary secretary\":",
+  "attachments": [{
+    "fallback": "test",
+    "callback_id": "find_track",
+    "title": "Temporary Secretary - Remastered 2011",
+    "text": "Artist: Paul McCartney\nAlbum: McCartney II (Special Edition)",
+    "thumb_url": "https://i.scdn.co/image/639dee528b0b0e3598504acc8a352b7cf8388310",
+    "color": "good",
+    "actions": [{
+      "name": "play",
+      "text": "Play now",
+      "type": "button",
+      "value": "{\"id\":\"1hf22wSSuINjqFYc4JE6Xk\",\"uri\":\"spotify:track:1hf22wSSuINjqFYc4JE6Xk\",\"name\":\"Temporary Secretary - Remastered 2011\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB\"},\"href\":\"https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB\",\"id\":\"4STHEaNw4mPZ2tzheohgXB\",\"name\":\"Paul McCartney\",\"type\":\"artist\",\"uri\":\"spotify:artist:4STHEaNw4mPZ2tzheohgXB\"}]}"
+    }, {
+      "name": "queue",
+      "text": "Queue",
+      "type": "button",
+      "value": "{\"id\":\"1hf22wSSuINjqFYc4JE6Xk\",\"uri\":\"spotify:track:1hf22wSSuINjqFYc4JE6Xk\",\"name\":\"Temporary Secretary - Remastered 2011\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB\"},\"href\":\"https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB\",\"id\":\"4STHEaNw4mPZ2tzheohgXB\",\"name\":\"Paul McCartney\",\"type\":\"artist\",\"uri\":\"spotify:artist:4STHEaNw4mPZ2tzheohgXB\"}]}"
+    }]
+
+  }, {
+    "fallback": "test",
+    "callback_id": "find_track",
+    "title": "Temporary Secretary",
+    "text": "Artist: Riton\nAlbum: Ed Rec 100",
+    "thumb_url": "https://i.scdn.co/image/dc904fcc72675df0dbac3e443312e48b7cdb7c5e",
+    "color": "good",
+    "actions": [{
+        "name": "play",
+        "text": "Play now",
+        "type": "button",
+        "value": "{\"id\":\"0ffLhKbRhj0GhI8VldV4KJ\",\"uri\":\"spotify:track:0ffLhKbRhj0GhI8VldV4KJ\",\"name\":\"Temporary Secretary\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/7i9j813KFoSBMldGqlh2Z1\"},\"href\":\"https://api.spotify.com/v1/artists/7i9j813KFoSBMldGqlh2Z1\",\"id\":\"7i9j813KFoSBMldGqlh2Z1\",\"name\":\"Riton\",\"type\":\"artist\",\"uri\":\"spotify:artist:7i9j813KFoSBMldGqlh2Z1\"}]}"
+      },
+
+      {
+        "name": "queue",
+        "text": "Queue",
+        "type": "button",
+        "value": "{\"id\":\"0ffLhKbRhj0GhI8VldV4KJ\",\"uri\":\"spotify:track:0ffLhKbRhj0GhI8VldV4KJ\",\"name\":\"Temporary Secretary\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/7i9j813KFoSBMldGqlh2Z1\"},\"href\":\"https://api.spotify.com/v1/artists/7i9j813KFoSBMldGqlh2Z1\",\"id\":\"7i9j813KFoSBMldGqlh2Z1\",\"name\":\"Riton\",\"type\":\"artist\",\"uri\":\"spotify:artist:7i9j813KFoSBMldGqlh2Z1\"}]}"
+      }
+    ]
+
+  }, {
+    "fallback": "test",
+    "callback_id": "find_track",
+    "title": "Temporary Secretary - 2011 Remaster",
+    "text": "Artist: Paul McCartney\nAlbum: Pure McCartney (Deluxe Edition)",
+    "thumb_url": "https://i.scdn.co/image/40e209d55795eee5b65ca582f3dc4c0a0fb459ea",
+    "color": "good",
+    "actions": [{
+      "name": "play",
+      "text": "Play now",
+      "type": "button",
+      "value": "{\"id\":\"4aGD2DegeFj7ggkkp4skGx\",\"uri\":\"spotify:track:4aGD2DegeFj7ggkkp4skGx\",\"name\":\"Temporary Secretary - 2011 Remaster\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB\"},\"href\":\"https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB\",\"id\":\"4STHEaNw4mPZ2tzheohgXB\",\"name\":\"Paul McCartney\",\"type\":\"artist\",\"uri\":\"spotify:artist:4STHEaNw4mPZ2tzheohgXB\"}]}"
+    }, {
+      "name": "queue",
+      "text": "Queue",
+      "type": "button",
+      "value": "{\"id\":\"4aGD2DegeFj7ggkkp4skGx\",\"uri\":\"spotify:track:4aGD2DegeFj7ggkkp4skGx\",\"name\":\"Temporary Secretary - 2011 Remaster\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB\"},\"href\":\"https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB\",\"id\":\"4STHEaNw4mPZ2tzheohgXB\",\"name\":\"Paul McCartney\",\"type\":\"artist\",\"uri\":\"spotify:artist:4STHEaNw4mPZ2tzheohgXB\"}]}"
+    }]
+
+  }, {
+    "fallback": "load more",
+    "callback_id": "find_track_more",
+    "actions": [{
+      "name": "load_more",
+      "text": "Load more",
+      "type": "button",
+      "value": "{\"offset\":\"3\",\"limit\":\"3\",\"query\":\"temporary secretary\"}"
+    }]
+  }]
+}

@@ -11,6 +11,7 @@ module.exports = (webClient, spotifyApi) => ({
   requireOn: [
     'playplaylist',
     'playme',
+    'findme',
     'pauseme',
     'shuffle',
     'whomst',
@@ -190,7 +191,7 @@ module.exports = (webClient, spotifyApi) => ({
   findme(req, res) {
     const searchTerms = req.body.text;
     if (!searchTerms) {
-      res.send('Please provide a search query.');
+      utils.respond(req, res, 'Please provide a search query.');
       return;
     }
 
@@ -203,7 +204,8 @@ module.exports = (webClient, spotifyApi) => ({
       },
       err =>
         utils.errorWrapper(err, errorMessage =>
-          res.send(
+          utils.respond(
+            req,
             res,
             errorMessage || 'An error occured while performing the search.'
           )
@@ -421,9 +423,9 @@ module.exports = (webClient, spotifyApi) => ({
           )
       );
     } else if (command === 'off') {
+      this.on = false;
       spotifyApi.pause().then(
         () => {
-          this.on = false;
           res.send(
             utils.inChannel(
               '_If music be the food of love, play on._ - Shakespeare\nSwitching off.'
