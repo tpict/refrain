@@ -26,7 +26,7 @@
   "main": "app.js",
   "devDependencies": {},
   "scripts": {
-    "test": "nyc ./node_modules/.bin/mocha --exit; success=$?; rm -rf test-storage && echo 'Deleted temp storage'; exit $success"
+    "test": "./node_modules/.bin/nyc ./node_modules/.bin/mocha --exit; success=$?; rm -rf test-storage && echo 'Deleted temp storage'; exit $success"
   },
   "author": "",
   "license": "ISC"
