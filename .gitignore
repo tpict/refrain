@@ -2,3 +2,5 @@ node_modules
 .DS_Store
 .env
 .node-persist
+.nyc_output
+coverage
