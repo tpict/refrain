@@ -3,6 +3,7 @@ const chaiHttp = require('chai-http');
 const sinon = require('sinon');
 const nock = require('nock');
 const storage = require('node-persist');
+const queryString = require('query-string');
 
 process.env.NODE_ENV = 'test';
 process.env.STORAGE_DIR = 'test-storage';
@@ -793,7 +794,10 @@ describe('Slack slash command endpoints', function () {
         .post('/findme')
         .send(body)
         .end((err, res) => {
-          chai.assert.deepEqual(res.body, require('./fixtures/search_response.json'));
+          chai.assert.deepEqual(
+            res.body,
+            require('./fixtures/search_response.json')
+          );
 
           scope.done();
           done();
@@ -824,6 +828,56 @@ describe('Slack slash command endpoints', function () {
           scope.done();
           done();
         });
+    });
+  });
+
+  describe('/interactive endpoint', function () {
+    it('should queue tracks', function (done) {
+      store.setActivePlaylist('myplaylist');
+      store.setPlaylists({
+        myplaylist: {
+          id: 'P000000000000000000000',
+          user_id: 'U1AAAAAAA',
+          tracks: {},
+          uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
+          name: 'My playlist'
+        }
+      });
+
+      const addToPlaylistScope = nock('https://api.spotify.com')
+        .post('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
+        .reply(200);
+
+      nock('https://slack.com')
+        .post('/api/chat.postMessage', () => true)
+        .reply(200, (uri, requestBody) => {
+          console.log('test');
+
+          addToPlaylistScope.done();
+          const storedTracks = store.getActivePlaylist().tracks;
+          chai.assert.deepEqual(storedTracks['6sxosT7KMFP9OQL3DdD6Qy'], {
+            requester: 'tom.picton',
+            artist: 'Jme',
+            name: 'Test Me'
+          });
+
+          const parsedBody = queryString.parse(requestBody);
+          chai.assert.equal(
+            parsedBody.text,
+            '<@tom.picton> added *Test Me* by *Jme* to *My playlist*'
+          );
+          chai.assert.equal(parsedBody.channel, 'D1KFLA0JF');
+
+          done();
+        });
+
+      const body = require('./fixtures/findme_queue.json');
+
+      chai
+        .request(app)
+        .post('/interactive')
+        .send(body)
+        .end();
     });
   });
 });

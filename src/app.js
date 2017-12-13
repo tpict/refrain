@@ -87,6 +87,7 @@ function authWrapper(req, res, commandName) {
   }
 
   const userName = req.body.user_name;
+
   const activeUserName = store.getActiveUserName();
 
   if (commandName === 'pdj' && userName !== activeUserName) {

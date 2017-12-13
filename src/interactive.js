@@ -67,10 +67,10 @@ const SpotifyInteractions = (webClient, spotifyApi) => ({
           }
         },
         err =>
-          this.errorWrapper(err, errorMessage => {
+          utils.errorWrapper(err, errorMessage => {
             const message =
               errorMessage ||
-              `There was an error adding ${this.formatSong(
+              `There was an error adding ${utils.formatSong(
                 track.name,
                 artist.name
               )} to *${playlist.name}*.`;
@@ -174,8 +174,6 @@ const callbacks = (webClient, spotifyApi) => ({
       userName,
       !play
     );
-
-    console.log('added');
 
     if (!play) {
       return;
