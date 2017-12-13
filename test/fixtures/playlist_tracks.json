@@ -1,0 +1,240 @@
+{
+  "href" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1/playlists/58eMdUEvDEyONUdEkZysoU/tracks?offset=0&limit=3",
+  "items" : [ {
+    "added_at" : "2017-12-03T17:57:19Z",
+    "added_by" : {
+      "external_urls" : {
+        "spotify" : "http://open.spotify.com/user/q6hu6khb0c4an06hrsmkn6tc1"
+      },
+      "href" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1",
+      "id" : "q6hu6khb0c4an06hrsmkn6tc1",
+      "type" : "user",
+      "uri" : "spotify:user:q6hu6khb0c4an06hrsmkn6tc1"
+    },
+    "is_local" : false,
+    "track" : {
+      "album" : {
+        "album_type" : "album",
+        "artists" : [ {
+          "external_urls" : {
+            "spotify" : "https://open.spotify.com/artist/7sbwBqdkynNUDgiWU3TQ5J"
+          },
+          "href" : "https://api.spotify.com/v1/artists/7sbwBqdkynNUDgiWU3TQ5J",
+          "id" : "7sbwBqdkynNUDgiWU3TQ5J",
+          "name" : "Aztec Camera",
+          "type" : "artist",
+          "uri" : "spotify:artist:7sbwBqdkynNUDgiWU3TQ5J"
+        } ],
+        "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/album/4mF4ZuEhjFpNi96IFiaZzI"
+        },
+        "href" : "https://api.spotify.com/v1/albums/4mF4ZuEhjFpNi96IFiaZzI",
+        "id" : "4mF4ZuEhjFpNi96IFiaZzI",
+        "images" : [ {
+          "height" : 635,
+          "url" : "https://i.scdn.co/image/57ab9d6be4c9355a2be6b21e6ac444dcbad5061d",
+          "width" : 640
+        }, {
+          "height" : 297,
+          "url" : "https://i.scdn.co/image/f04174ecda704e35c27453522c4efd36b4d09b83",
+          "width" : 300
+        }, {
+          "height" : 63,
+          "url" : "https://i.scdn.co/image/3f7e11d371ac2b5cdcb858023299de07a1221c6c",
+          "width" : 64
+        } ],
+        "name" : "High Land, Hard Rain",
+        "type" : "album",
+        "uri" : "spotify:album:4mF4ZuEhjFpNi96IFiaZzI"
+      },
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/7sbwBqdkynNUDgiWU3TQ5J"
+        },
+        "href" : "https://api.spotify.com/v1/artists/7sbwBqdkynNUDgiWU3TQ5J",
+        "id" : "7sbwBqdkynNUDgiWU3TQ5J",
+        "name" : "Aztec Camera",
+        "type" : "artist",
+        "uri" : "spotify:artist:7sbwBqdkynNUDgiWU3TQ5J"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+      "disc_number" : 1,
+      "duration_ms" : 190773,
+      "explicit" : false,
+      "external_ids" : {
+        "isrc" : "GBAHT8303357"
+      },
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/48cEn8VF0sDrpvjUaaCCcu"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/48cEn8VF0sDrpvjUaaCCcu",
+      "id" : "48cEn8VF0sDrpvjUaaCCcu",
+      "name" : "Oblivious",
+      "popularity" : 39,
+      "preview_url" : "https://p.scdn.co/mp3-preview/44b4facd5622a09808b9b450d6e143f4af5615ee?cid=8897482848704f2a8f8d7c79726a70d4",
+      "track_number" : 1,
+      "type" : "track",
+      "uri" : "spotify:track:48cEn8VF0sDrpvjUaaCCcu"
+    }
+  }, {
+    "added_at" : "2017-12-03T17:57:33Z",
+    "added_by" : {
+      "external_urls" : {
+        "spotify" : "http://open.spotify.com/user/q6hu6khb0c4an06hrsmkn6tc1"
+      },
+      "href" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1",
+      "id" : "q6hu6khb0c4an06hrsmkn6tc1",
+      "type" : "user",
+      "uri" : "spotify:user:q6hu6khb0c4an06hrsmkn6tc1"
+    },
+    "is_local" : false,
+    "track" : {
+      "album" : {
+        "album_type" : "album",
+        "artists" : [ {
+          "external_urls" : {
+            "spotify" : "https://open.spotify.com/artist/2x9SpqnPi8rlE9pjHBwmSC"
+          },
+          "href" : "https://api.spotify.com/v1/artists/2x9SpqnPi8rlE9pjHBwmSC",
+          "id" : "2x9SpqnPi8rlE9pjHBwmSC",
+          "name" : "Talking Heads",
+          "type" : "artist",
+          "uri" : "spotify:artist:2x9SpqnPi8rlE9pjHBwmSC"
+        } ],
+        "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/album/5eqcF7pWzHgWpGdEmHgeSN"
+        },
+        "href" : "https://api.spotify.com/v1/albums/5eqcF7pWzHgWpGdEmHgeSN",
+        "id" : "5eqcF7pWzHgWpGdEmHgeSN",
+        "images" : [ {
+          "height" : 570,
+          "url" : "https://i.scdn.co/image/fd1612e7ec4758f79d86ee08de6c983e191190ab",
+          "width" : 640
+        }, {
+          "height" : 267,
+          "url" : "https://i.scdn.co/image/5f2315732c4c73d70798d5649c504260a86040a5",
+          "width" : 300
+        }, {
+          "height" : 57,
+          "url" : "https://i.scdn.co/image/a0ba4bff71b44ceb883889a8de187a45b389c140",
+          "width" : 64
+        } ],
+        "name" : "Talking Heads 77 (Deluxe Version)",
+        "type" : "album",
+        "uri" : "spotify:album:5eqcF7pWzHgWpGdEmHgeSN"
+      },
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/2x9SpqnPi8rlE9pjHBwmSC"
+        },
+        "href" : "https://api.spotify.com/v1/artists/2x9SpqnPi8rlE9pjHBwmSC",
+        "id" : "2x9SpqnPi8rlE9pjHBwmSC",
+        "name" : "Talking Heads",
+        "type" : "artist",
+        "uri" : "spotify:artist:2x9SpqnPi8rlE9pjHBwmSC"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+      "disc_number" : 1,
+      "duration_ms" : 156480,
+      "explicit" : false,
+      "external_ids" : {
+        "isrc" : "USWB10502865"
+      },
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/1w3IeWPxVHuw0gyXcGV2pN"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/1w3IeWPxVHuw0gyXcGV2pN",
+      "id" : "1w3IeWPxVHuw0gyXcGV2pN",
+      "name" : "Sugar On My Tongue - 2005 Remastered Version",
+      "popularity" : 51,
+      "preview_url" : "https://p.scdn.co/mp3-preview/20690edb7d7a6d43aeed6e01c36ab4655e10eaa3?cid=8897482848704f2a8f8d7c79726a70d4",
+      "track_number" : 16,
+      "type" : "track",
+      "uri" : "spotify:track:1w3IeWPxVHuw0gyXcGV2pN"
+    }
+  }, {
+    "added_at" : "2017-12-03T18:08:19Z",
+    "added_by" : {
+      "external_urls" : {
+        "spotify" : "http://open.spotify.com/user/q6hu6khb0c4an06hrsmkn6tc1"
+      },
+      "href" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1",
+      "id" : "q6hu6khb0c4an06hrsmkn6tc1",
+      "type" : "user",
+      "uri" : "spotify:user:q6hu6khb0c4an06hrsmkn6tc1"
+    },
+    "is_local" : false,
+    "track" : {
+      "album" : {
+        "album_type" : "album",
+        "artists" : [ {
+          "external_urls" : {
+            "spotify" : "https://open.spotify.com/artist/2kCcBybjl3SAtIcwdWpUe3"
+          },
+          "href" : "https://api.spotify.com/v1/artists/2kCcBybjl3SAtIcwdWpUe3",
+          "id" : "2kCcBybjl3SAtIcwdWpUe3",
+          "name" : "Lil Peep",
+          "type" : "artist",
+          "uri" : "spotify:artist:2kCcBybjl3SAtIcwdWpUe3"
+        } ],
+        "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/album/33TJ52PuwenGmysJrwMGCe"
+        },
+        "href" : "https://api.spotify.com/v1/albums/33TJ52PuwenGmysJrwMGCe",
+        "id" : "33TJ52PuwenGmysJrwMGCe",
+        "images" : [ {
+          "height" : 640,
+          "url" : "https://i.scdn.co/image/fb502da315dfbebcb72964af5e88ad5befe34019",
+          "width" : 640
+        }, {
+          "height" : 300,
+          "url" : "https://i.scdn.co/image/35dd8618b7cb26d2c2892b8c03e24992728ce872",
+          "width" : 300
+        }, {
+          "height" : 64,
+          "url" : "https://i.scdn.co/image/736d468b2dcbe9280ac953113758e2edfe0b49c1",
+          "width" : 64
+        } ],
+        "name" : "Come Over When You're Sober, Pt. 1",
+        "type" : "album",
+        "uri" : "spotify:album:33TJ52PuwenGmysJrwMGCe"
+      },
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/2kCcBybjl3SAtIcwdWpUe3"
+        },
+        "href" : "https://api.spotify.com/v1/artists/2kCcBybjl3SAtIcwdWpUe3",
+        "id" : "2kCcBybjl3SAtIcwdWpUe3",
+        "name" : "Lil Peep",
+        "type" : "artist",
+        "uri" : "spotify:artist:2kCcBybjl3SAtIcwdWpUe3"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+      "disc_number" : 1,
+      "duration_ms" : 231546,
+      "explicit" : true,
+      "external_ids" : {
+        "isrc" : "UKELY1700052"
+      },
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/0S0vWvyZ6Rc79TXkWxT9QA"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/0S0vWvyZ6Rc79TXkWxT9QA",
+      "id" : "0S0vWvyZ6Rc79TXkWxT9QA",
+      "name" : "Save That Shit",
+      "popularity" : 82,
+      "preview_url" : "https://p.scdn.co/mp3-preview/8058676c82db42a04ceceb90826af22f7726768a?cid=8897482848704f2a8f8d7c79726a70d4",
+      "track_number" : 2,
+      "type" : "track",
+      "uri" : "spotify:track:0S0vWvyZ6Rc79TXkWxT9QA"
+    }
+  } ],
+  "limit" : 3,
+  "next" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1/playlists/58eMdUEvDEyONUdEkZysoU/tracks?offset=3&limit=3",
+  "offset" : 0,
+  "previous" : null,
+  "total" : 48
+}

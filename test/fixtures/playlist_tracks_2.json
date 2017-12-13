@@ -1,0 +1,240 @@
+{
+  "href" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1/playlists/58eMdUEvDEyONUdEkZysoU/tracks?offset=3&limit=3",
+  "items" : [ {
+    "added_at" : "2017-12-03T18:25:56Z",
+    "added_by" : {
+      "external_urls" : {
+        "spotify" : "http://open.spotify.com/user/q6hu6khb0c4an06hrsmkn6tc1"
+      },
+      "href" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1",
+      "id" : "q6hu6khb0c4an06hrsmkn6tc1",
+      "type" : "user",
+      "uri" : "spotify:user:q6hu6khb0c4an06hrsmkn6tc1"
+    },
+    "is_local" : false,
+    "track" : {
+      "album" : {
+        "album_type" : "single",
+        "artists" : [ {
+          "external_urls" : {
+            "spotify" : "https://open.spotify.com/artist/4dpARuHxo51G3z768sgnrY"
+          },
+          "href" : "https://api.spotify.com/v1/artists/4dpARuHxo51G3z768sgnrY",
+          "id" : "4dpARuHxo51G3z768sgnrY",
+          "name" : "Adele",
+          "type" : "artist",
+          "uri" : "spotify:artist:4dpARuHxo51G3z768sgnrY"
+        } ],
+        "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/album/5y28RdPzIRXegzr5YM9Y0D"
+        },
+        "href" : "https://api.spotify.com/v1/albums/5y28RdPzIRXegzr5YM9Y0D",
+        "id" : "5y28RdPzIRXegzr5YM9Y0D",
+        "images" : [ {
+          "height" : 640,
+          "url" : "https://i.scdn.co/image/d83a086148afe6539dae524607cbe4b6ccdd0360",
+          "width" : 640
+        }, {
+          "height" : 300,
+          "url" : "https://i.scdn.co/image/f5a5998ad8ec30e78e425a928cd250bd8902a339",
+          "width" : 300
+        }, {
+          "height" : 64,
+          "url" : "https://i.scdn.co/image/e2227261266297e6532ededd25fee51a14f1b24a",
+          "width" : 64
+        } ],
+        "name" : "Hello",
+        "type" : "album",
+        "uri" : "spotify:album:5y28RdPzIRXegzr5YM9Y0D"
+      },
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/4dpARuHxo51G3z768sgnrY"
+        },
+        "href" : "https://api.spotify.com/v1/artists/4dpARuHxo51G3z768sgnrY",
+        "id" : "4dpARuHxo51G3z768sgnrY",
+        "name" : "Adele",
+        "type" : "artist",
+        "uri" : "spotify:artist:4dpARuHxo51G3z768sgnrY"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+      "disc_number" : 1,
+      "duration_ms" : 295502,
+      "explicit" : false,
+      "external_ids" : {
+        "isrc" : "GBBKS1500214"
+      },
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/1MDoll6jK4rrk2BcFRP5i7"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/1MDoll6jK4rrk2BcFRP5i7",
+      "id" : "1MDoll6jK4rrk2BcFRP5i7",
+      "name" : "Hello",
+      "popularity" : 71,
+      "preview_url" : "https://p.scdn.co/mp3-preview/4ab65f9b193ccc37f2059344322462ae5e9dac90?cid=8897482848704f2a8f8d7c79726a70d4",
+      "track_number" : 1,
+      "type" : "track",
+      "uri" : "spotify:track:1MDoll6jK4rrk2BcFRP5i7"
+    }
+  }, {
+    "added_at" : "2017-12-12T22:12:45Z",
+    "added_by" : {
+      "external_urls" : {
+        "spotify" : "http://open.spotify.com/user/q6hu6khb0c4an06hrsmkn6tc1"
+      },
+      "href" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1",
+      "id" : "q6hu6khb0c4an06hrsmkn6tc1",
+      "type" : "user",
+      "uri" : "spotify:user:q6hu6khb0c4an06hrsmkn6tc1"
+    },
+    "is_local" : false,
+    "track" : {
+      "album" : {
+        "album_type" : "album",
+        "artists" : [ {
+          "external_urls" : {
+            "spotify" : "https://open.spotify.com/artist/4IZLJdhHCqAvT4pjn8TLH5"
+          },
+          "href" : "https://api.spotify.com/v1/artists/4IZLJdhHCqAvT4pjn8TLH5",
+          "id" : "4IZLJdhHCqAvT4pjn8TLH5",
+          "name" : "Jme",
+          "type" : "artist",
+          "uri" : "spotify:artist:4IZLJdhHCqAvT4pjn8TLH5"
+        } ],
+        "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/album/1D9L39944TjCRUuLTYJqBn"
+        },
+        "href" : "https://api.spotify.com/v1/albums/1D9L39944TjCRUuLTYJqBn",
+        "id" : "1D9L39944TjCRUuLTYJqBn",
+        "images" : [ {
+          "height" : 640,
+          "url" : "https://i.scdn.co/image/e30a0a82e088de6dbaf638c819892f4dd3ab1cb7",
+          "width" : 640
+        }, {
+          "height" : 300,
+          "url" : "https://i.scdn.co/image/1c0961e4d7aafefaccb07459c795a866cb5f6651",
+          "width" : 300
+        }, {
+          "height" : 64,
+          "url" : "https://i.scdn.co/image/8092ff244c85382868bcd38df150978747d986f0",
+          "width" : 64
+        } ],
+        "name" : "Integrity>",
+        "type" : "album",
+        "uri" : "spotify:album:1D9L39944TjCRUuLTYJqBn"
+      },
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/4IZLJdhHCqAvT4pjn8TLH5"
+        },
+        "href" : "https://api.spotify.com/v1/artists/4IZLJdhHCqAvT4pjn8TLH5",
+        "id" : "4IZLJdhHCqAvT4pjn8TLH5",
+        "name" : "Jme",
+        "type" : "artist",
+        "uri" : "spotify:artist:4IZLJdhHCqAvT4pjn8TLH5"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+      "disc_number" : 1,
+      "duration_ms" : 249372,
+      "explicit" : false,
+      "external_ids" : {
+        "isrc" : "GBSYA1500115"
+      },
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/6sxosT7KMFP9OQL3DdD6Qy"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/6sxosT7KMFP9OQL3DdD6Qy",
+      "id" : "6sxosT7KMFP9OQL3DdD6Qy",
+      "name" : "Test Me",
+      "popularity" : 44,
+      "preview_url" : "https://p.scdn.co/mp3-preview/5d0bf507f3c18ae22d28307a8a62bbd0877ea007?cid=8897482848704f2a8f8d7c79726a70d4",
+      "track_number" : 15,
+      "type" : "track",
+      "uri" : "spotify:track:6sxosT7KMFP9OQL3DdD6Qy"
+    }
+  }, {
+    "added_at" : "2017-12-03T19:24:36Z",
+    "added_by" : {
+      "external_urls" : {
+        "spotify" : "http://open.spotify.com/user/q6hu6khb0c4an06hrsmkn6tc1"
+      },
+      "href" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1",
+      "id" : "q6hu6khb0c4an06hrsmkn6tc1",
+      "type" : "user",
+      "uri" : "spotify:user:q6hu6khb0c4an06hrsmkn6tc1"
+    },
+    "is_local" : false,
+    "track" : {
+      "album" : {
+        "album_type" : "album",
+        "artists" : [ {
+          "external_urls" : {
+            "spotify" : "https://open.spotify.com/artist/3M4ThdJR28z9eSMcQHAZ5G"
+          },
+          "href" : "https://api.spotify.com/v1/artists/3M4ThdJR28z9eSMcQHAZ5G",
+          "id" : "3M4ThdJR28z9eSMcQHAZ5G",
+          "name" : "The Fratellis",
+          "type" : "artist",
+          "uri" : "spotify:artist:3M4ThdJR28z9eSMcQHAZ5G"
+        } ],
+        "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/album/7avNT7QnpWXl1Khqnsguaw"
+        },
+        "href" : "https://api.spotify.com/v1/albums/7avNT7QnpWXl1Khqnsguaw",
+        "id" : "7avNT7QnpWXl1Khqnsguaw",
+        "images" : [ {
+          "height" : 640,
+          "url" : "https://i.scdn.co/image/cdcd1430af92255b1ec032b9909af7e421f28782",
+          "width" : 640
+        }, {
+          "height" : 300,
+          "url" : "https://i.scdn.co/image/287eb818d05ef0a21ec7ad8558d2afdd18607140",
+          "width" : 300
+        }, {
+          "height" : 64,
+          "url" : "https://i.scdn.co/image/3c978fbe4b4e2dc5e8e0a63cdc720f203c2aa5d6",
+          "width" : 64
+        } ],
+        "name" : "Costello Music (EU Version)",
+        "type" : "album",
+        "uri" : "spotify:album:7avNT7QnpWXl1Khqnsguaw"
+      },
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/3M4ThdJR28z9eSMcQHAZ5G"
+        },
+        "href" : "https://api.spotify.com/v1/artists/3M4ThdJR28z9eSMcQHAZ5G",
+        "id" : "3M4ThdJR28z9eSMcQHAZ5G",
+        "name" : "The Fratellis",
+        "type" : "artist",
+        "uri" : "spotify:artist:3M4ThdJR28z9eSMcQHAZ5G"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY", "VN" ],
+      "disc_number" : 1,
+      "duration_ms" : 215306,
+      "explicit" : false,
+      "external_ids" : {
+        "isrc" : "GBUM70601571"
+      },
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/1bCmvezFg5MRcENzCGG1Cy"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/1bCmvezFg5MRcENzCGG1Cy",
+      "id" : "1bCmvezFg5MRcENzCGG1Cy",
+      "name" : "Chelsea Dagger",
+      "popularity" : 66,
+      "preview_url" : "https://p.scdn.co/mp3-preview/2a61b34b4a8fbed6f1cd788946721ebb54b7804b?cid=8897482848704f2a8f8d7c79726a70d4",
+      "track_number" : 4,
+      "type" : "track",
+      "uri" : "spotify:track:1bCmvezFg5MRcENzCGG1Cy"
+    }
+  } ],
+  "limit" : 3,
+  "next" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1/playlists/58eMdUEvDEyONUdEkZysoU/tracks?offset=6&limit=3",
+  "offset" : 3,
+  "previous" : "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1/playlists/58eMdUEvDEyONUdEkZysoU/tracks?offset=0&limit=3",
+  "total" : 48
+}
