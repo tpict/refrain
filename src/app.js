@@ -55,7 +55,7 @@ async function authenticate() {
 
 setTimeout(async () => {
   for (;;) {
-    authenticated = authenticate();
+    authenticated = await authenticate();
 
     let sleepDurationSecs;
     if (authenticated) {
@@ -148,11 +148,11 @@ app.get('/callback', async function (req, res) {
       }
     );
 
+  spotifyApi.setAccessToken(accessToken);
+  spotifyApi.setRefreshToken(refreshToken);
+
   spotifyApi.getMe().then(
     data => {
-      spotifyApi.setAccessToken(accessToken);
-      spotifyApi.setRefreshToken(refreshToken);
-
       users[userName] = {
         id: data.body.id,
         access_token: accessToken,
