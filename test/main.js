@@ -360,31 +360,6 @@ describe('Slack slash command endpoints', function () {
           done();
         });
     });
-
-    it('should prompt users to use /findme', function (done) {
-      const scope = nock('https://api.spotify.com')
-        .put('/v1/me/player/play')
-        .reply(200);
-
-      const body = baseSlackRequest({
-        command: '/playme',
-        text: 'paul mccartney temporary secretary'
-      });
-
-      chai
-        .request(app)
-        .post('/playme')
-        .send(body)
-        .end((err, res) => {
-          chai.assert.equal(
-            res.body.text,
-            '<@bing.bong>: Selecting tracks with this command has been deprecated. Please use `/findme` instead.'
-          );
-          chai.assert.equal(res.body.response_type, 'in_channel');
-          chai.assert.isFalse(scope.isDone());
-          done();
-        });
-    });
   });
 
   describe('/pauseme endpoint', function () {

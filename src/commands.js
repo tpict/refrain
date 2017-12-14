@@ -213,34 +213,16 @@ module.exports = (webClient, spotifyApi) => ({
     );
   },
 
-  async queue(req, res) {
-    utils.respond(
-      req,
-      res,
-      'This command has been deprecated. Please use `/findme` instead.'
-    );
-  },
-
   async playme(req, res) {
-    const text = req.body.text;
-    if (!text) {
-      await spotifyApi
-        .play()
-        .then(
-          () => utils.respond(req, res, 'Now playing!'),
-          err =>
-            utils.errorWrapper(err, errorMessage =>
-              utils.respond(req, res, errorMessage || 'Couldn\'t resume music!')
-            )
-        );
-      return;
-    }
-
-    utils.respond(
-      req,
-      res,
-      'Selecting tracks with this command has been deprecated. Please use `/findme` instead.'
-    );
+    spotifyApi
+      .play()
+      .then(
+        () => utils.respond(req, res, 'Now playing!'),
+        err =>
+        utils.errorWrapper(err, errorMessage =>
+          utils.respond(req, res, errorMessage || 'Couldn\'t resume music!')
+        )
+      );
   },
 
   pauseme(req, res) {
