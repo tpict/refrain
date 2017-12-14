@@ -8,13 +8,15 @@ const queryString = require('query-string');
 process.env.NODE_ENV = 'test';
 process.env.STORAGE_DIR = 'test-storage';
 
-const { app, spotifyApi, webClient } = require('../src/app');
 const store = require('../src/store');
+const getApp = require('../src/app');
 
 const sandbox = sinon.sandbox.create();
 
 chai.use(chaiHttp);
 describe('Slack slash command endpoints', function () {
+  var app, spotifyApi, webClient;
+
   function baseSlackRequest(fields = {}) {
     return Object.assign(
       {
@@ -34,6 +36,39 @@ describe('Slack slash command endpoints', function () {
       fields
     );
   }
+
+  beforeEach(function (done) {
+    store.setUsers({
+      'bing.bong': {
+        id: 'myID',
+        access_token: 'myAccessToken',
+        refresh_token: 'myRefreshToken'
+      }
+    });
+    store.setActiveUser('bing.bong');
+
+    const authScope = nock('https://accounts.spotify.com')
+      .post('/api/token')
+      .reply(200, {
+        access_token: 'myNewAccessToken',
+        token_type: 'Bearer',
+        scope: [
+          'playlist-read-private',
+          'playlist-read-collaborative',
+          'playlist-modify-public',
+          'playlist-modify-private',
+          'user-read-playback-state',
+          'user-modify-playback-state',
+          'user-read-currently-playing'
+        ].join(' '),
+        expires_in: 3600,
+        refresh_token: 'myRefreshToken'
+      });
+
+    ({ app, spotifyApi, webClient } = getApp());
+
+    authScope.on('replied', () => done());
+  });
 
   afterEach(function () {
     nock.cleanAll();
@@ -120,33 +155,13 @@ describe('Slack slash command endpoints', function () {
   });
 
   describe('/commandeer endpoint', function () {
-    let scope;
-
-    beforeEach(function () {
-      scope = nock('https://accounts.spotify.com')
-        .post('/api/token')
-        .reply(200, {
-          access_token: 'theNewAccessToken',
-          token_type: 'Bearer',
-          scope: [
-            'playlist-read-private',
-            'playlist-read-collaborative',
-            'playlist-modify-public',
-            'playlist-modify-private',
-            'user-read-playback-state',
-            'user-modify-playback-state',
-            'user-read-currently-playing'
-          ].join(' '),
-          expires_in: 3600
-        });
-    });
-
     it('should reject unauthenticated users', function (done) {
       sandbox.spy(spotifyApi, 'setRefreshToken');
       sandbox.spy(spotifyApi, 'setAccessToken');
 
       const body = baseSlackRequest({
-        command: '/commandeer'
+        command: '/commandeer',
+        user_name: 'paul.mccartney'
       });
 
       chai
@@ -156,7 +171,7 @@ describe('Slack slash command endpoints', function () {
         .end((err, res) => {
           chai.assert.equal(
             res.body.text,
-            '<@bing.bong>: You\'re not authenticated with Spotify. Try `/spotifyauth` if you\'d like to get set up'
+            '<@paul.mccartney>: You\'re not authenticated with Spotify. Try `/spotifyauth` if you\'d like to get set up'
           );
           chai.assert.isTrue(spotifyApi.setRefreshToken.notCalled);
           chai.assert.isTrue(spotifyApi.setAccessToken.notCalled);
