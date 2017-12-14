@@ -29,10 +29,6 @@ module.exports = {
   },
 
   setUsers(users) {
-    if (!users) {
-      return;
-    }
-
     return storage.setItemSync('users', users);
   },
 

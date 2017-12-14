@@ -67,7 +67,7 @@ describe('Slack slash command endpoints', function () {
 
     ({ app, spotifyApi, webClient } = getApp());
 
-    authScope.on('replied', () => done());
+    authScope.on('replied', () => { authScope.remove(); done(); });
   });
 
   afterEach(function () {
@@ -155,6 +155,27 @@ describe('Slack slash command endpoints', function () {
   });
 
   describe('/commandeer endpoint', function () {
+    let scope;
+
+    beforeEach(function () {
+      scope = nock('https://accounts.spotify.com')
+        .post('/api/token')
+        .reply(200, {
+          access_token: 'theNewAccessToken',
+          token_type: 'Bearer',
+          scope: [
+            'playlist-read-private',
+            'playlist-read-collaborative',
+            'playlist-modify-public',
+            'playlist-modify-private',
+            'user-read-playback-state',
+            'user-modify-playback-state',
+            'user-read-currently-playing'
+          ].join(' '),
+          expires_in: 3600
+        });
+    });
+
     it('should reject unauthenticated users', function (done) {
       sandbox.spy(spotifyApi, 'setRefreshToken');
       sandbox.spy(spotifyApi, 'setAccessToken');
@@ -217,6 +238,8 @@ describe('Slack slash command endpoints', function () {
 
   describe('/whichuser endpoint', function () {
     it('should prompt new users to use /spotifyauth', function (done) {
+      store.setActiveUser(null);
+
       const body = baseSlackRequest({
         command: '/whichuser'
       });
@@ -295,6 +318,9 @@ describe('Slack slash command endpoints', function () {
     });
 
     it('should prompt use of /spotifyauth in new workspaces', function (done) {
+      store.setUsers(null);
+      store.setActiveUser(null);
+
       const body = baseSlackRequest({
         command: '/listusers'
       });
