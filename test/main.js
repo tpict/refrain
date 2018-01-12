@@ -10,12 +10,13 @@ process.env.STORAGE_DIR = 'test-storage';
 
 const store = require('../src/store');
 const getApp = require('../src/app');
+const permissionWrapper = require('../src/slash_commands/permission_wrapper');
 
 const sandbox = sinon.sandbox.create();
 
 chai.use(chaiHttp);
 describe('Slack slash command endpoints', function () {
-  var app, spotifyApi, webClient;
+  var app;
 
   function baseSlackRequest(fields = {}) {
     return Object.assign(
@@ -37,43 +38,25 @@ describe('Slack slash command endpoints', function () {
     );
   }
 
-  beforeEach(function (done) {
+  beforeEach(function () {
     store.setUsers({
       'bing.bong': {
         id: 'myID',
         access_token: 'myAccessToken',
-        refresh_token: 'myRefreshToken'
+        refresh_token: 'myRefreshToken',
+        token_expiry: '2049-01-01'
       }
     });
     store.setActiveUser('bing.bong');
 
-    const authScope = nock('https://accounts.spotify.com')
-      .post('/api/token')
-      .reply(200, {
-        access_token: 'myNewAccessToken',
-        token_type: 'Bearer',
-        scope: [
-          'playlist-read-private',
-          'playlist-read-collaborative',
-          'playlist-modify-public',
-          'playlist-modify-private',
-          'user-read-playback-state',
-          'user-modify-playback-state',
-          'user-read-currently-playing'
-        ].join(' '),
-        expires_in: 3600,
-        refresh_token: 'myRefreshToken'
-      });
-
-    ({ app, spotifyApi, webClient } = getApp());
-
-    authScope.on('replied', () => { authScope.remove(); done(); });
+    app = getApp();
   });
 
   afterEach(function () {
     nock.cleanAll();
     sandbox.restore();
     storage.clearSync();
+    permissionWrapper.setOn();
   });
 
   describe('/shuffle endpoint', function () {
@@ -155,31 +138,7 @@ describe('Slack slash command endpoints', function () {
   });
 
   describe('/commandeer endpoint', function () {
-    let scope;
-
-    beforeEach(function () {
-      scope = nock('https://accounts.spotify.com')
-        .post('/api/token')
-        .reply(200, {
-          access_token: 'theNewAccessToken',
-          token_type: 'Bearer',
-          scope: [
-            'playlist-read-private',
-            'playlist-read-collaborative',
-            'playlist-modify-public',
-            'playlist-modify-private',
-            'user-read-playback-state',
-            'user-modify-playback-state',
-            'user-read-currently-playing'
-          ].join(' '),
-          expires_in: 3600
-        });
-    });
-
     it('should reject unauthenticated users', function (done) {
-      sandbox.spy(spotifyApi, 'setRefreshToken');
-      sandbox.spy(spotifyApi, 'setAccessToken');
-
       const body = baseSlackRequest({
         command: '/commandeer',
         user_name: 'paul.mccartney'
@@ -194,27 +153,11 @@ describe('Slack slash command endpoints', function () {
             res.body.text,
             '<@paul.mccartney>: You\'re not authenticated with Spotify. Try `/spotifyauth` if you\'d like to get set up'
           );
-          chai.assert.isTrue(spotifyApi.setRefreshToken.notCalled);
-          chai.assert.isTrue(spotifyApi.setAccessToken.notCalled);
-          chai.assert.isFalse(scope.isDone());
           done();
         });
     });
 
-    it('should update Spotify tokens for the commandeering user', function (
-      done
-    ) {
-      sandbox.spy(spotifyApi, 'setRefreshToken');
-      sandbox.spy(spotifyApi, 'setAccessToken');
-
-      store.setUsers({
-        'bing.bong': {
-          id: 'myID',
-          access_token: 'myAccessToken',
-          refresh_token: 'myRefreshToken'
-        }
-      });
-
+    it('should pass command to the requesting user', function (done) {
       const body = baseSlackRequest({
         command: '/commandeer'
       });
@@ -228,9 +171,6 @@ describe('Slack slash command endpoints', function () {
             res.body.text,
             '<@bing.bong>: You are now the active user!'
           );
-          chai.assert.isTrue(spotifyApi.setRefreshToken.calledOnce);
-          chai.assert.isTrue(spotifyApi.setAccessToken.calledTwice);
-          scope.done();
           done();
         });
     });
@@ -867,8 +807,6 @@ describe('Slack slash command endpoints', function () {
       nock('https://slack.com')
         .post('/api/chat.postMessage', () => true)
         .reply(200, (uri, requestBody) => {
-          console.log('test');
-
           addToPlaylistScope.done();
           const storedTracks = store.getActivePlaylist().tracks;
           chai.assert.deepEqual(storedTracks['6sxosT7KMFP9OQL3DdD6Qy'], {
@@ -964,6 +902,195 @@ describe('Slack slash command endpoints', function () {
         .post('/interactive')
         .send(body)
         .end((err, res) => chai.assert.equal(res.text, 'Just a moment...'));
+    });
+  });
+
+  describe('Spotify authentication refresh', function () {
+    let authScope;
+    let shuffleScope;
+
+    beforeEach(function () {
+      authScope = nock('https://accounts.spotify.com')
+        .post('/api/token')
+        .reply(200, {
+          access_token: 'myNewAccessToken',
+          refresh_token: 'myRefreshToken',
+          expires_in: 3600
+        });
+
+      shuffleScope = nock('https://api.spotify.com')
+        .put('/v1/me/player/shuffle')
+        .query({
+          state: false
+        })
+        .reply(200);
+    });
+
+    it('should refresh the access token for users after espiry', function (
+      done
+    ) {
+      const clock = sinon.useFakeTimers(new Date(2049, 2, 1).getTime());
+
+      const body = baseSlackRequest({
+        command: '/shuffled',
+        text: 'off'
+      });
+
+      chai
+        .request(app)
+        .post('/shuffle')
+        .send(body)
+        .end(() => {
+          clock.restore();
+          authScope.done();
+          shuffleScope.done();
+          done();
+        });
+    });
+
+    it('should skip refresh if access token is still valid', function (done) {
+      const clock = sinon.useFakeTimers(new Date(2049, 0, 1).getTime());
+
+      const body = baseSlackRequest({
+        command: '/shuffled',
+        text: 'off'
+      });
+
+      chai
+        .request(app)
+        .post('/shuffle')
+        .send(body)
+        .end(() => {
+          clock.restore();
+          chai.assert.isFalse(authScope.isDone());
+          shuffleScope.done();
+          done();
+        });
+    });
+  });
+
+  describe('command permissions', function () {
+    it('should disallow restricted commands when off', function (done) {
+      const pauseScope = nock('https://api.spotify.com')
+        .put('/v1/me/player/pause')
+        .reply(200);
+
+      const shuffleScope = nock('https://api.spotify.com')
+        .put('/v1/me/player/shuffle')
+        .query({
+          state: true
+        })
+        .reply(200);
+
+      const shuffleBody = baseSlackRequest({
+        command: '/shuffled',
+        text: 'off'
+      });
+
+      const pdjBody = baseSlackRequest({
+        command: '/pdj',
+        text: 'off'
+      });
+
+      chai
+        .request(app)
+        .post('/pdj')
+        .send(pdjBody)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '_If music be the food of love, play on._ - Shakespeare\nSwitching off.'
+          );
+          chai.assert.equal(res.body.response_type, 'in_channel');
+          pauseScope.done();
+
+          chai
+            .request(app)
+            .post('/shuffle')
+            .send(shuffleBody)
+            .end((err, res) => {
+              chai.assert.equal(
+                res.body.text,
+                '<@bing.bong>: The jukebox is off!'
+              );
+              chai.assert.isFalse(shuffleScope.isDone());
+              done();
+            });
+        });
+    });
+  });
+
+  describe('/eradicate endpoint', function () {
+    it('should display an interactive confirmation message', function (done) {
+      const currentlyPlayingScope = nock('https://api.spotify.com')
+        .get('/v1/me/player/currently-playing')
+        .reply(200, require('./fixtures/currently_playing.json'));
+
+      const body = baseSlackRequest({
+        command: '/eradicate'
+      });
+
+      const expected = {
+        text:
+          '<@bing.bong>: Whoa! Are you absolutely positive that you want to delete *Mr. Brightside* by *The Killers*?',
+        attachments: [
+          {
+            fallback: 'Your device doesn\'t support this.',
+            callback_id: 'delete_track',
+            color: 'danger',
+            actions: [
+              {
+                name: 'delete',
+                text: 'Do it.',
+                type: 'button',
+                style: 'danger',
+                value:
+                  '{"uri":"spotify:track:0eGsygTp906u18L0Oimnem","name":"Mr. Brightside","artist":"The Killers"}'
+              },
+              {
+                name: 'cancel',
+                text: 'Cancel',
+                type: 'button',
+                value: {}
+              }
+            ]
+          }
+        ],
+        response_type: 'in_channel'
+      };
+
+      chai
+        .request(app)
+        .post('/eradicate')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.deepEqual(res.body, expected);
+          currentlyPlayingScope.done();
+          done();
+        });
+    });
+
+    it('should notify the user if no track is playing', function (done) {
+      const currentlyPlayingScope = nock('https://api.spotify.com')
+        .get('/v1/me/player/currently-playing')
+        .reply(204);
+
+      const body = baseSlackRequest({
+        command: '/eradicate'
+      });
+
+      chai
+        .request(app)
+        .post('/eradicate')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.'
+          );
+          currentlyPlayingScope.done();
+          done();
+        });
     });
   });
 });

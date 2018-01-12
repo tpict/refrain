@@ -86,8 +86,8 @@ const SpotifyInteractions = (webClient, spotifyApi) => ({
   }
 });
 
-const callbacks = (webClient, spotifyApi) => ({
-  delete_track(payload, res) {
+const callbacks = {
+  async delete_track(payload, res) {
     const action = payload.actions[0];
 
     if (action.name === 'cancel') {
@@ -98,6 +98,8 @@ const callbacks = (webClient, spotifyApi) => ({
     const track = JSON.parse(action.value);
     const formattedSong = utils.formatSong(track.name, track.artist);
     const playlist = store.getActivePlaylist();
+
+    const spotifyApi = await utils.getSpotifyApi();
 
     spotifyApi
       .removeTracksFromPlaylist(playlist.user_id, playlist.id, [
@@ -135,6 +137,8 @@ const callbacks = (webClient, spotifyApi) => ({
   },
 
   async find_track(payload, res) {
+    const spotifyApi = await utils.getSpotifyApi();
+    const webClient = utils.getWebClient();
     const spotifyInteractions = SpotifyInteractions(webClient, spotifyApi);
 
     const userName = payload.user.name;
@@ -198,7 +202,7 @@ const callbacks = (webClient, spotifyApi) => ({
       );
   },
 
-  find_track_more(payload, res) {
+  async find_track_more(payload, res) {
     const action = payload.actions[0];
     const data = JSON.parse(action.value);
 
@@ -208,6 +212,7 @@ const callbacks = (webClient, spotifyApi) => ({
       limit: data.limit
     };
 
+    const spotifyApi = await utils.getSpotifyApi();
     spotifyApi.searchTracks(query, options).then(
       data => {
         res.send({
@@ -224,12 +229,12 @@ const callbacks = (webClient, spotifyApi) => ({
     );
     return;
   }
-});
+};
 
-module.exports = (app, webClient, spotifyApi) => {
+module.exports = app => {
   app.post('/interactive', urlencodedParser, (req, res) => {
     const payload = JSON.parse(req.body.payload);
-    const callback = callbacks(webClient, spotifyApi)[payload.callback_id];
+    const callback = callbacks[payload.callback_id];
     callback(payload, res);
   });
 };

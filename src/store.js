@@ -32,6 +32,12 @@ module.exports = {
     return storage.setItemSync('users', users);
   },
 
+  setUser(userName, data) {
+    const users = this.getUsers();
+    users[userName] = data;
+    return this.setUsers(users);
+  },
+
   getActiveUser() {
     return this.getUsers()[this.getActiveUserName()];
   },

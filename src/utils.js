@@ -1,4 +1,29 @@
 const { URL } = require('url');
+const SpotifyWebApi = require('spotify-web-api-node');
+const WebClient = require('@slack/client').WebClient;
+const moment = require('moment');
+
+const store = require('./store');
+
+// Drop out of commands early if we aren't authenticated or if the jukebox is
+// off.
+// function authWrapper(req, res, commandName) {
+//   const userName = req.body.user_name;
+
+//   const activeUserName = store.getActiveUserName();
+
+//   if (commandName === 'pdj' && userName !== activeUserName) {
+//     utils.respond(req, res, 'Only the active user may do that.', req);
+//     return;
+//   }
+
+//   if (commands.requireOn.includes(commandName) && !commands.on) {
+//     utils.respond(req, res, 'The jukebox is off!', req);
+//     return;
+//   }
+
+//   commands[commandName](req, res);
+// }
 
 module.exports = {
   getSearchAttachments(query, data) {
@@ -152,5 +177,41 @@ module.exports = {
   splitPlaylistURI(uri) {
     const splitURI = uri.split(':');
     return { userID: splitURI[2], playlistID: splitURI[4] };
+  },
+
+  async getSpotifyApi() {
+    const spotifyApi = new SpotifyWebApi({
+      clientId: process.env.SPOTIFY_CLIENT_ID,
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+      redirectUri: process.env.SPOTIFY_REDIRECT_URI
+    });
+
+    const activeUser = store.getActiveUser();
+    const activeUserName = store.getActiveUserName();
+
+    const accessToken = activeUser.access_token;
+    const refreshToken = activeUser.refresh_token;
+
+    spotifyApi.setAccessToken(accessToken);
+    spotifyApi.setRefreshToken(refreshToken);
+
+    const tokenExpiry = moment(activeUser.token_expiry);
+    if (!tokenExpiry || moment() > tokenExpiry) {
+      const data = await spotifyApi
+        .refreshAccessToken()
+        .then(data => data, err => console.log(err));
+
+      spotifyApi.setAccessToken(data.body['access_token']);
+
+      activeUser.access_token = data.body['access_token'];
+      activeUser.token_expiry = moment().add(data.body['expires_in'], 'seconds');
+      store.setUser(activeUserName, activeUser);
+    }
+
+    return spotifyApi;
+  },
+
+  getWebClient() {
+    return new WebClient(process.env.SLACK_API_TOKEN);
   }
 };
