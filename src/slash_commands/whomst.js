@@ -8,7 +8,7 @@ module.exports = wrapper(async function whomst(req, res) {
     data => {
       const track = data.body.item;
       if (!track) {
-        utils.respond(
+        return utils.respond(
           req,
           res,
           'Are you hearing things? If so, check that `/whichuser` matches the user signed in to Spotify.'
