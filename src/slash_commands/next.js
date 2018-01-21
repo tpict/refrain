@@ -1,8 +1,8 @@
 const utils = require('../utils');
 const { wrapper } = require('./permission_wrapper');
 
-module.exports = wrapper(function next(req, res) {
-  const spotifyApi = utils.getSpotifyApi();
+module.exports = wrapper(async function next(req, res) {
+  const spotifyApi = await utils.getSpotifyApi();
   const webClient = utils.getWebClient();
 
   const callback = (skippedName, skippedArtist, errorText) => {

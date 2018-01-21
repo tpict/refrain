@@ -820,7 +820,7 @@ describe('Slack slash command endpoints', function () {
             parsedBody.text,
             '<@tom.picton> added *Test Me* by *Jme* to *My playlist*'
           );
-          chai.assert.equal(parsedBody.channel, 'D1KFLA0JF');
+          chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
 
           done();
         });
@@ -890,7 +890,7 @@ describe('Slack slash command endpoints', function () {
             parsedBody.text,
             'Now playing *Test Me* by *Jme*, as requested by <@tom.picton>'
           );
-          chai.assert.equal(parsedBody.channel, 'D1KFLA0JF');
+          chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
 
           done();
         });
@@ -902,6 +902,89 @@ describe('Slack slash command endpoints', function () {
         .post('/interactive')
         .send(body)
         .end((err, res) => chai.assert.equal(res.text, 'Just a moment...'));
+    });
+
+    it('should delete tracks', function (done) {
+      store.setActivePlaylist('myplaylist');
+      store.setPlaylists({
+        myplaylist: {
+          id: 'P000000000000000000000',
+          user_id: 'U1AAAAAAA',
+          tracks: {
+            '6sxosT7KMFP9OQL3DdD6Qy': {
+              requester: 'tom.picton',
+              artist: 'Jme',
+              name: 'Test Me'
+            }
+          },
+          uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
+          name: 'My playlist'
+        }
+      });
+
+      const removeTrackScope = nock('https://api.spotify.com')
+        .delete('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
+        .reply(200);
+
+      const nextTrackScope = nock('https://api.spotify.com')
+        .post('/v1/me/player/next')
+        .reply(200);
+
+      const body = require('./fixtures/eradicate_delete.json');
+
+      chai
+        .request(app)
+        .post('/interactive')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: That bad? Let\'s not listen to *Test Me* by *Jme* again. :bomb:'
+          );
+          removeTrackScope.done();
+          nextTrackScope.done();
+          done();
+        });
+    });
+
+    it('should cancel track deletion', function (done) {
+      store.setActivePlaylist('myplaylist');
+      store.setPlaylists({
+        myplaylist: {
+          id: 'P000000000000000000000',
+          user_id: 'U1AAAAAAA',
+          tracks: {
+            '6sxosT7KMFP9OQL3DdD6Qy': {
+              requester: 'tom.picton',
+              artist: 'Jme',
+              name: 'Test Me'
+            }
+          },
+          uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
+          name: 'My playlist'
+        }
+      });
+
+      const removeTrackScope = nock('https://api.spotify.com')
+        .delete('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
+        .reply(200);
+
+      const nextTrackScope = nock('https://api.spotify.com')
+        .post('/v1/me/player/next')
+        .reply(200);
+
+      const body = require('./fixtures/eradicate_cancel.json');
+
+      chai
+        .request(app)
+        .post('/interactive')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(res.body.text, 'Crisis averted.');
+          chai.assert.isFalse(removeTrackScope.isDone());
+          chai.assert.isFalse(nextTrackScope.isDone());
+          done();
+        });
     });
   });
 
@@ -1090,6 +1173,54 @@ describe('Slack slash command endpoints', function () {
           );
           currentlyPlayingScope.done();
           done();
+        });
+    });
+  });
+
+  describe('/next endpoint', function () {
+    it('should skip tracks as requested', function (done) {
+      const nextTrackScope = nock('https://api.spotify.com')
+        .post('/v1/me/player/next')
+        .reply(200);
+
+      const currentlyPlayingScope = nock('https://api.spotify.com')
+        .get('/v1/me/player/currently-playing')
+        .reply(200, require('./fixtures/currently_playing.json'));
+
+      const currentlyPlayingScope2 = nock('https://api.spotify.com')
+        .get('/v1/me/player/currently-playing')
+        .reply(200, require('./fixtures/currently_playing_2.json'));
+
+      nock('https://slack.com')
+        .post('/api/chat.postMessage', () => true)
+        .reply(200, (uri, requestBody) => {
+          nextTrackScope.done();
+          currentlyPlayingScope2.done();
+
+          const parsedBody = queryString.parse(requestBody);
+          chai.assert.equal(
+            parsedBody.text,
+            'Now playing *Psycho Killer - 2005 Remastered Version* by *Talking Heads*'
+          );
+          chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
+
+          done();
+        });
+
+      const body = baseSlackRequest({
+        command: '/next'
+      });
+
+      chai
+        .request(app)
+        .post('/next')
+        .send(body)
+        .end((err, res) => {
+          chai.assert.equal(
+            res.body.text,
+            '<@bing.bong>: Skipping *Mr. Brightside* by *The Killers*...'
+          );
+          currentlyPlayingScope.done();
         });
     });
   });

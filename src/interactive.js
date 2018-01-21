@@ -91,7 +91,7 @@ const callbacks = {
     const action = payload.actions[0];
 
     if (action.name === 'cancel') {
-      res.send('Crisis averted.');
+      res.send({ text: 'Crisis averted.' });
       return;
     }
 

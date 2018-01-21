@@ -5,26 +5,6 @@ const moment = require('moment');
 
 const store = require('./store');
 
-// Drop out of commands early if we aren't authenticated or if the jukebox is
-// off.
-// function authWrapper(req, res, commandName) {
-//   const userName = req.body.user_name;
-
-//   const activeUserName = store.getActiveUserName();
-
-//   if (commandName === 'pdj' && userName !== activeUserName) {
-//     utils.respond(req, res, 'Only the active user may do that.', req);
-//     return;
-//   }
-
-//   if (commands.requireOn.includes(commandName) && !commands.on) {
-//     utils.respond(req, res, 'The jukebox is off!', req);
-//     return;
-//   }
-
-//   commands[commandName](req, res);
-// }
-
 module.exports = {
   getSearchAttachments(query, data) {
     const attachments = data.body.tracks.items.map(item => ({
