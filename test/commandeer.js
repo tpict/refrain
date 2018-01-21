@@ -1,0 +1,58 @@
+const nock = require('nock');
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+
+const utils = require('../test_utils');
+const getApp = require('../src/app');
+
+chai.use(chaiHttp);
+
+describe('/commandeer endpoint', function () {
+  var app;
+
+  beforeEach(function () {
+    utils.setDefaultUsers();
+    app = getApp();
+  });
+
+  afterEach(function () {
+    nock.cleanAll();
+  });
+
+  it('should reject unauthenticated users', function (done) {
+    const body = utils.baseSlackRequest({
+      command: '/commandeer',
+      user_name: 'paul.mccartney'
+    });
+
+    chai
+      .request(app)
+      .post('/commandeer')
+      .send(body)
+      .end((err, res) => {
+        chai.assert.equal(
+          res.body.text,
+          '<@paul.mccartney>: You\'re not authenticated with Spotify. Try `/spotifyauth` if you\'d like to get set up'
+        );
+        done();
+      });
+  });
+
+  it('should pass command to the requesting user', function (done) {
+    const body = utils.baseSlackRequest({
+      command: '/commandeer'
+    });
+
+    chai
+      .request(app)
+      .post('/commandeer')
+      .send(body)
+      .end((err, res) => {
+        chai.assert.equal(
+          res.body.text,
+          '<@bing.bong>: You are now the active user!'
+        );
+        done();
+      });
+  });
+});
