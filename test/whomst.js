@@ -2,7 +2,7 @@ const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const utils = require('../test_utils');
+const utils = require('./utils');
 
 const getApp = require('../src/app');
 const store = require('../src/store');
@@ -13,8 +13,8 @@ describe('/whomst endpoint', function () {
   var app;
 
   beforeEach(function () {
-    utils.setDefaultUsers();
     app = getApp();
+    utils.setDefaultUsers();
 
     store.setActivePlaylist('myplaylist');
     store.setPlaylists({

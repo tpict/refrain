@@ -2,19 +2,19 @@ const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const utils = require('../test_utils');
+const utils = require('./utils');
 
 const getApp = require('../src/app');
 const permissionWrapper = require('../src/slash_commands/permission_wrapper');
 
 chai.use(chaiHttp);
 
-describe('command permissions', function () {
+describe('/pdj endpoint', function () {
   var app;
 
   beforeEach(function () {
-    utils.setDefaultUsers();
     app = getApp();
+    utils.setDefaultUsers();
   });
 
   afterEach(function () {
@@ -22,7 +22,7 @@ describe('command permissions', function () {
     permissionWrapper.setOn();
   });
 
-  it('/pdj endpoint', function (done) {
+  it('disables commands when switched off', function (done) {
     const pauseScope = nock('https://api.spotify.com')
       .put('/v1/me/player/pause')
       .reply(200);
@@ -68,6 +68,59 @@ describe('command permissions', function () {
             chai.assert.isFalse(shuffleScope.isDone());
             done();
           });
+      });
+  });
+
+  it('does not disable itself', function (done) {
+    permissionWrapper.setOff();
+
+    nock('https://api.spotify.com')
+      .put('/v1/me/player/play')
+      .reply(200);
+
+    const body = utils.baseSlackRequest({
+      command: '/pdj',
+      text: 'on'
+    });
+
+    chai
+      .request(app)
+      .post('/pdj')
+      .send(body)
+      .end((err, res) => {
+        chai.assert.equal(
+          res.body.text,
+          '<@bing.bong>: Switched on. Add a playlist with `/addplaylist` to get started.'
+        );
+        done();
+      });
+  });
+
+  it('can only be switched on by the active user', function (done) {
+    permissionWrapper.setOff();
+
+    const playScope = nock('https://api.spotify.com')
+      .put('/v1/me/player/play')
+      .reply(200);
+
+    const body = utils.baseSlackRequest({
+      command: '/pdj',
+      text: 'on',
+      user_id: 'U1BBBBBBB',
+      user_name: 'bing.bing'
+    });
+
+    chai
+      .request(app)
+      .post('/pdj')
+      .send(body)
+      .end((err, res) => {
+        chai.assert.equal(
+          res.body.text,
+          '<@bing.bing>: Only the active user may do that.'
+        );
+        chai.assert.isFalse(playScope.isDone());
+        done();
       });
   });
 });

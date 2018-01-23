@@ -3,11 +3,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const uuidv4 = require('uuid/v4');
 const moment = require('moment');
+const storage = require('node-persist');
 
 const store = require('./store');
 const utils = require('./utils');
 
 function getApp() {
+  storage.initSync();
+
   const app = express();
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));

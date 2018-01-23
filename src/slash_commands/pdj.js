@@ -6,6 +6,13 @@ module.exports = async function pdj(req, res) {
   const spotifyApi = await utils.getSpotifyApi();
   const command = req.body.text.toLowerCase();
 
+  const userName = req.body.user_name;
+  const activeUserName = store.getActiveUserName();
+
+  if (userName != activeUserName) {
+    return utils.respond(req, res, 'Only the active user may do that.');
+  }
+
   if (command === 'on') {
     const playlistID = store.getActivePlaylistAlias();
     const playlists = store.getPlaylists();

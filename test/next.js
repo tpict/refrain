@@ -3,7 +3,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const queryString = require('query-string');
 
-const utils = require('../test_utils');
+const utils = require('./utils');
 
 const getApp = require('../src/app');
 
@@ -13,8 +13,8 @@ describe('/next endpoint', function () {
   var app;
 
   beforeEach(function () {
-    utils.setDefaultUsers();
     app = getApp();
+    utils.setDefaultUsers();
   });
 
   afterEach(function () {

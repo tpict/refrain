@@ -4,7 +4,7 @@ const chaiHttp = require('chai-http');
 const queryString = require('query-string');
 const storage = require('node-persist');
 
-const utils = require('../test_utils');
+const utils = require('./utils');
 
 const getApp = require('../src/app');
 const store = require('../src/store');
@@ -15,8 +15,8 @@ describe('/interactive endpoint', function () {
   var app;
 
   beforeEach(function () {
-    utils.setDefaultUsers();
     app = getApp();
+    utils.setDefaultUsers();
   });
 
   afterEach(function () {

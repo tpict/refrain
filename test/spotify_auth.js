@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http');
 const nock = require('nock');
 const sinon = require('sinon');
 
-const utils = require('../test_utils');
+const utils = require('./utils');
 
 const getApp = require('../src/app');
 const store = require('../src/store');
@@ -17,8 +17,8 @@ describe('Spotify authentication refresh', function () {
   let shuffleScope;
 
   beforeEach(function () {
-    utils.setDefaultUsers();
     app = getApp();
+    utils.setDefaultUsers();
 
     authScope = nock('https://accounts.spotify.com')
       .post('/api/token')
