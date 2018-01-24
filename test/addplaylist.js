@@ -5,17 +5,15 @@ const storage = require('node-persist');
 
 const utils = require('./utils');
 
-const getApp = require('../src/app');
+const app = require('../src/app');
 const store = require('../src/store');
 
 chai.use(chaiHttp);
 
 describe('/addplaylist endpoint', function () {
-  var app;
   var scope;
 
   beforeEach(function () {
-    app = getApp();
     utils.setDefaultUsers();
 
     scope = nock('https://api.spotify.com')

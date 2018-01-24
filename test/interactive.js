@@ -6,16 +6,13 @@ const storage = require('node-persist');
 
 const utils = require('./utils');
 
-const getApp = require('../src/app');
+const app = require('../src/app');
 const store = require('../src/store');
 
 chai.use(chaiHttp);
 
 describe('/interactive endpoint', function () {
-  var app;
-
   beforeEach(function () {
-    app = getApp();
     utils.setDefaultUsers();
   });
 

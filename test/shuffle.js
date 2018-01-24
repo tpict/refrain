@@ -4,16 +4,13 @@ const chaiHttp = require('chai-http');
 
 const utils = require('./utils');
 
-const getApp = require('../src/app');
+const app = require('../src/app');
 const permissionWrapper = require('../src/slash_commands/permission_wrapper');
 
 chai.use(chaiHttp);
 
 describe('/shuffle endpoint', function () {
-  var app;
-
   beforeEach(function () {
-    app = getApp();
     utils.setDefaultUsers();
   });
 

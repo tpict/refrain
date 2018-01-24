@@ -4,7 +4,7 @@ const chaiHttp = require('chai-http');
 
 const utils = require('./utils');
 
-const getApp = require('../src/app');
+const app = require('../src/app');
 const store = require('../src/store');
 const permissionWrapper = require('../src/slash_commands/permission_wrapper');
 
@@ -12,10 +12,8 @@ chai.use(chaiHttp);
 
 describe('/playplaylist endpoint', function () {
   var scope;
-  var app;
 
   beforeEach(function () {
-    app = getApp();
     utils.setDefaultUsers();
 
     scope = nock('https://api.spotify.com')

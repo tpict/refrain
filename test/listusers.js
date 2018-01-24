@@ -4,16 +4,13 @@ const chaiHttp = require('chai-http');
 
 const utils = require('./utils');
 
-const getApp = require('../src/app');
+const app = require('../src/app');
 const store = require('../src/store');
 
 chai.use(chaiHttp);
 
 describe('/listusers endpoint', function () {
-  var app;
-
   beforeEach(function () {
-    app = getApp();
     utils.setDefaultUsers();
   });
 

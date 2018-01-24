@@ -5,16 +5,13 @@ const queryString = require('query-string');
 
 const utils = require('./utils');
 
-const getApp = require('../src/app');
+const app = require('../src/app');
 const permissionWrapper = require('../src/slash_commands/permission_wrapper');
 
 chai.use(chaiHttp);
 
 describe('/next endpoint', function () {
-  var app;
-
   beforeEach(function () {
-    app = getApp();
     utils.setDefaultUsers();
   });
 

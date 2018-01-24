@@ -5,19 +5,16 @@ const sinon = require('sinon');
 
 const utils = require('./utils');
 
-const getApp = require('../src/app');
-const store = require('../src/store');
+const app = require('../src/app');
 
 chai.use(chaiHttp);
 const sandbox = sinon.sandbox.create();
 
 describe('Spotify authentication refresh', function () {
-  let app;
   let authScope;
   let shuffleScope;
 
   beforeEach(function () {
-    app = getApp();
     utils.setDefaultUsers();
 
     authScope = nock('https://accounts.spotify.com')
