@@ -113,7 +113,7 @@ module.exports = {
   },
 
   // Handle common HTTP error responses
-  errorWrapper(err, callback) {
+  errorWrapper(err, callback = () => {}) {
     console.error(err);
 
     const responses = {

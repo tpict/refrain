@@ -29,32 +29,11 @@ describe('/addplaylist endpoint', function () {
     storage.clearSync();
   });
 
-  it('should describe its use on invalid requests', function (done) {
-    const body = utils.baseSlackRequest({
-      command: '/addplaylist',
-      text: 'hello'
-    });
-
-    chai
-      .request(app)
-      .post('/addplaylist')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        chai.assert.isFalse(scope.isDone());
-        done();
-      });
-  });
-
   it('should add requested playlist to storage', function (done) {
     const body = utils.baseSlackRequest({
       command: '/addplaylist',
       text:
-      'myplaylist spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+      'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
     });
 
     chai
@@ -64,12 +43,12 @@ describe('/addplaylist endpoint', function () {
       .end((err, res) => {
         chai.assert.equal(
           res.body.text,
-          '<@bing.bong>: Added your playlist *My playlist* under the alias *myplaylist*.'
+          '<@bing.bong>: Added your playlist *My playlist*.'
         );
         chai.assert.equal(res.body.response_type, 'in_channel');
 
         const playlists = store.getPlaylists();
-        const playlist = playlists['myplaylist'];
+        const playlist = playlists['P000000000000000000000'];
 
         chai.assert.deepEqual(playlist, {
           id: 'P000000000000000000000',
@@ -102,7 +81,7 @@ describe('/addplaylist endpoint', function () {
       .end((err, res) => {
         chai.assert.equal(
           res.body.text,
-          '<@bing.bong>: Didn\'t catch that. Give me an alphanumeric alias for your playlist followed by its URI. You can get the URI from Spotify by clicking Share -> Copy Spotify URI.'
+          '<@bing.bong>: Couldn\'t find that playlist.'
         );
         chai.assert.equal(res.body.response_type, 'in_channel');
 
