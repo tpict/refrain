@@ -1,5 +1,13 @@
 {
   "*": {
     "dispatch": "npm run test"
+  },
+  "src/slash_commands/*.js": {
+    "alternate": "test/slash_commands/{}.js",
+    "type": "source"
+  },
+  "test/slash_commands/*.js": {
+    "alternate": "src/slash_commands/{}.js",
+    "type": "test"
   }
 }
