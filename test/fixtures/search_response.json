@@ -1,7 +1,7 @@
 {
   "text": "You searched for \"temporary secretary\":",
   "attachments": [{
-    "fallback": "test",
+    "fallback": "Search result: Artist: Paul McCartney\nAlbum: McCartney II (Special Edition)",
     "callback_id": "find_track",
     "title": "Temporary Secretary - Remastered 2011",
     "text": "Artist: Paul McCartney\nAlbum: McCartney II (Special Edition)",
@@ -20,7 +20,7 @@
     }]
 
   }, {
-    "fallback": "test",
+    "fallback": "Search result: Artist: Riton\nAlbum: Ed Rec 100",
     "callback_id": "find_track",
     "title": "Temporary Secretary",
     "text": "Artist: Riton\nAlbum: Ed Rec 100",
@@ -42,7 +42,7 @@
     ]
 
   }, {
-    "fallback": "test",
+    "fallback": "Search result: Artist: Paul McCartney\nAlbum: Pure McCartney (Deluxe Edition)",
     "callback_id": "find_track",
     "title": "Temporary Secretary - 2011 Remaster",
     "text": "Artist: Paul McCartney\nAlbum: Pure McCartney (Deluxe Edition)",

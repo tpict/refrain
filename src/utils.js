@@ -7,38 +7,41 @@ const store = require('./store');
 
 module.exports = {
   getSearchAttachments(query, data) {
-    const attachments = data.body.tracks.items.map(item => ({
-      fallback: 'test',
-      callback_id: 'find_track',
-      title: item.name,
-      text: `Artist: ${item.artists[0].name}\nAlbum: ${item.album.name}`,
-      thumb_url: item.album.images[1].url,
-      color: 'good',
-      actions: [
-        {
-          name: 'play',
-          text: 'Play now',
-          type: 'button',
-          value: JSON.stringify({
-            id: item.id,
-            uri: item.uri,
-            name: item.name,
-            artists: item.artists
-          })
-        },
-        {
-          name: 'queue',
-          text: 'Queue',
-          type: 'button',
-          value: JSON.stringify({
-            id: item.id,
-            uri: item.uri,
-            name: item.name,
-            artists: item.artists
-          })
-        }
-      ]
-    }));
+    const attachments = data.body.tracks.items.map(item => {
+      const text = `Artist: ${item.artists[0].name}\nAlbum: ${item.album.name}`;
+      return {
+        fallback: `Search result: ${text}`,
+        callback_id: 'find_track',
+        title: item.name,
+        text,
+        thumb_url: item.album.images[1].url,
+        color: 'good',
+        actions: [
+          {
+            name: 'play',
+            text: 'Play now',
+            type: 'button',
+            value: JSON.stringify({
+              id: item.id,
+              uri: item.uri,
+              name: item.name,
+              artists: item.artists
+            })
+          },
+          {
+            name: 'queue',
+            text: 'Queue',
+            type: 'button',
+            value: JSON.stringify({
+              id: item.id,
+              uri: item.uri,
+              name: item.name,
+              artists: item.artists
+            })
+          }
+        ]
+      };
+    });
 
     const nextURL = data.body.tracks.next;
     if (nextURL) {
@@ -184,7 +187,10 @@ module.exports = {
       spotifyApi.setAccessToken(data.body['access_token']);
 
       activeUser.access_token = data.body['access_token'];
-      activeUser.token_expiry = moment().add(data.body['expires_in'], 'seconds');
+      activeUser.token_expiry = moment().add(
+        data.body['expires_in'],
+        'seconds'
+      );
       store.setUser(activeUserName, activeUser);
     }
 
