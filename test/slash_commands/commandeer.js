@@ -2,9 +2,9 @@ const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const utils = require('./utils');
+const utils = require('../utils');
 
-const app = require('../src/app');
+const app = require('../../src/app');
 
 chai.use(chaiHttp);
 

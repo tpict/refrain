@@ -2,10 +2,10 @@ const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const utils = require('./utils');
+const utils = require('../utils');
 
-const app = require('../src/app');
-const permissionWrapper = require('../src/slash_commands/permission_wrapper');
+const app = require('../../src/app');
+const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
 
 chai.use(chaiHttp);
 
@@ -23,7 +23,7 @@ describe('/findme endpoint', function () {
     const scope = nock('https://api.spotify.com')
       .get('/v1/search/')
       .query({ type: 'track', q: 'temporary secretary', limit: 3 })
-      .reply(200, require('./fixtures/search.json'));
+      .reply(200, require('../fixtures/search.json'));
 
     const body = utils.baseSlackRequest({
       command: '/findme'
@@ -48,7 +48,7 @@ describe('/findme endpoint', function () {
     const scope = nock('https://api.spotify.com')
       .get('/v1/search/')
       .query({ type: 'track', q: 'temporary secretary', limit: 3 })
-      .reply(200, require('./fixtures/search.json'));
+      .reply(200, require('../fixtures/search.json'));
 
     const body = utils.baseSlackRequest({
       command: '/findme',
@@ -62,7 +62,7 @@ describe('/findme endpoint', function () {
       .end((err, res) => {
         chai.assert.deepEqual(
           res.body,
-          require('./fixtures/search_response.json')
+          require('../fixtures/search_response.json')
         );
 
         scope.done();
@@ -71,7 +71,7 @@ describe('/findme endpoint', function () {
   });
 
   it('should hide the "find more" button on the last page', function (done) {
-    const response = require('./fixtures/search.json');
+    const response = require('../fixtures/search.json');
     response.tracks.next = null;
     const scope = nock('https://api.spotify.com')
       .get('/v1/search/')
@@ -88,7 +88,7 @@ describe('/findme endpoint', function () {
       .post('/findme')
       .send(body)
       .end((err, res) => {
-        const expected = require('./fixtures/search_response.json');
+        const expected = require('../fixtures/search_response.json');
         expected.attachments.pop();
         chai.assert.deepEqual(res.body, expected);
         scope.done();

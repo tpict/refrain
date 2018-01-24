@@ -2,10 +2,10 @@ const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const utils = require('./utils');
+const utils = require('../utils');
 
-const app = require('../src/app');
-const permissionWrapper = require('../src/slash_commands/permission_wrapper');
+const app = require('../../src/app');
+const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
 
 chai.use(chaiHttp);
 
@@ -22,7 +22,7 @@ describe('/eradicate endpoint', function () {
   it('should display an interactive confirmation message', function (done) {
     const currentlyPlayingScope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')
-      .reply(200, require('./fixtures/currently_playing.json'));
+      .reply(200, require('../fixtures/currently_playing.json'));
 
     const body = utils.baseSlackRequest({
       command: '/eradicate'

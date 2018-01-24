@@ -3,11 +3,11 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const storage = require('node-persist');
 
-const utils = require('./utils');
+const utils = require('../utils');
 
-const app = require('../src/app');
-const permissionWrapper = require('../src/slash_commands/permission_wrapper');
-const store = require('../src/store');
+const app = require('../../src/app');
+const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
+const store = require('../../src/store');
 
 chai.use(chaiHttp);
 
@@ -42,7 +42,7 @@ describe('/whomst endpoint', function () {
   it('should track who requested a track', function (done) {
     const scope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')
-      .reply(200, require('./fixtures/currently_playing.json'));
+      .reply(200, require('../fixtures/currently_playing.json'));
 
     const body = utils.baseSlackRequest({
       command: '/whomst'
@@ -66,7 +66,7 @@ describe('/whomst endpoint', function () {
   it('should tell the user if the track was added directly', function (done) {
     const scope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')
-      .reply(200, require('./fixtures/currently_playing_2.json'));
+      .reply(200, require('../fixtures/currently_playing_2.json'));
 
     const body = utils.baseSlackRequest({
       command: '/whomst'

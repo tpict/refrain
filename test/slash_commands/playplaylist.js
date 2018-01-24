@@ -3,11 +3,11 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const storage = require('node-persist');
 
-const utils = require('./utils');
+const utils = require('../utils');
 
-const app = require('../src/app');
-const store = require('../src/store');
-const permissionWrapper = require('../src/slash_commands/permission_wrapper');
+const app = require('../../src/app');
+const store = require('../../src/store');
+const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
 
 chai.use(chaiHttp);
 
