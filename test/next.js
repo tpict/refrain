@@ -6,6 +6,7 @@ const queryString = require('query-string');
 const utils = require('./utils');
 
 const getApp = require('../src/app');
+const permissionWrapper = require('../src/slash_commands/permission_wrapper');
 
 chai.use(chaiHttp);
 
@@ -19,6 +20,7 @@ describe('/next endpoint', function () {
 
   afterEach(function () {
     nock.cleanAll();
+    permissionWrapper.setOn();
   });
 
   it('should skip tracks as requested', function (done) {
@@ -64,6 +66,27 @@ describe('/next endpoint', function () {
           '<@bing.bong>: Skipping *Mr. Brightside* by *The Killers*...'
         );
         currentlyPlayingScope.done();
+      });
+  });
+
+  it('should only work when the jukebox is on', function (done) {
+    permissionWrapper.setOff();
+
+    const body = utils.baseSlackRequest({
+      command: '/next'
+    });
+
+    chai
+      .request(app)
+      .post('/next')
+      .send(body)
+      .end((err, res) => {
+        chai.assert.equal(
+          res.body.text,
+          '<@bing.bong>: The jukebox is off!'
+        );
+        chai.assert.equal(res.body.response_type, 'in_channel');
+        done();
       });
   });
 });

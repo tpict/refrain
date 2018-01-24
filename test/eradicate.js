@@ -5,6 +5,7 @@ const chaiHttp = require('chai-http');
 const utils = require('./utils');
 
 const getApp = require('../src/app');
+const permissionWrapper = require('../src/slash_commands/permission_wrapper');
 
 chai.use(chaiHttp);
 
@@ -18,6 +19,7 @@ describe('/eradicate endpoint', function () {
 
   afterEach(function () {
     nock.cleanAll();
+    permissionWrapper.setOn();
   });
 
   it('should display an interactive confirmation message', function (done) {
@@ -88,6 +90,27 @@ describe('/eradicate endpoint', function () {
           '<@bing.bong>: Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.'
         );
         currentlyPlayingScope.done();
+        done();
+      });
+  });
+
+  it('should only work when the jukebox is on', function (done) {
+    permissionWrapper.setOff();
+
+    const body = utils.baseSlackRequest({
+      command: '/eradicate'
+    });
+
+    chai
+      .request(app)
+      .post('/eradicate')
+      .send(body)
+      .end((err, res) => {
+        chai.assert.equal(
+          res.body.text,
+          '<@bing.bong>: The jukebox is off!'
+        );
+        chai.assert.equal(res.body.response_type, 'in_channel');
         done();
       });
   });

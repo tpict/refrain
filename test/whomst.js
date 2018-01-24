@@ -5,6 +5,7 @@ const chaiHttp = require('chai-http');
 const utils = require('./utils');
 
 const getApp = require('../src/app');
+const permissionWrapper = require('../src/slash_commands/permission_wrapper');
 const store = require('../src/store');
 
 chai.use(chaiHttp);
@@ -36,6 +37,7 @@ describe('/whomst endpoint', function () {
 
   afterEach(function () {
     nock.cleanAll();
+    permissionWrapper.setOn();
   });
 
   it('should track who requested a track', function (done) {
@@ -106,6 +108,27 @@ describe('/whomst endpoint', function () {
         );
 
         scope.done();
+        done();
+      });
+  });
+
+  it('should only work when the jukebox is on', function (done) {
+    permissionWrapper.setOff();
+
+    const body = utils.baseSlackRequest({
+      command: '/whomst'
+    });
+
+    chai
+      .request(app)
+      .post('/whomst')
+      .send(body)
+      .end((err, res) => {
+        chai.assert.equal(
+          res.body.text,
+          '<@bing.bong>: The jukebox is off!'
+        );
+        chai.assert.equal(res.body.response_type, 'in_channel');
         done();
       });
   });
