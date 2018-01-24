@@ -1,6 +1,7 @@
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const storage = require('node-persist');
 
 const utils = require('./utils');
 
@@ -26,6 +27,7 @@ describe('removeplaylist', function () {
 
   afterEach(function () {
     nock.cleanAll();
+    storage.clearSync();
   });
 
   it('should describe its use on invalid requests', function (done) {

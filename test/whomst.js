@@ -1,6 +1,7 @@
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const storage = require('node-persist');
 
 const utils = require('./utils');
 
@@ -35,6 +36,7 @@ describe('/whomst endpoint', function () {
   afterEach(function () {
     nock.cleanAll();
     permissionWrapper.setOn();
+    storage.clearSync();
   });
 
   it('should track who requested a track', function (done) {

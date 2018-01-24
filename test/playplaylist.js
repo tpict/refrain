@@ -1,6 +1,7 @@
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const storage = require('node-persist');
 
 const utils = require('./utils');
 
@@ -26,6 +27,7 @@ describe('/playplaylist endpoint', function () {
   afterEach(function () {
     nock.cleanAll();
     permissionWrapper.setOn();
+    storage.clearSync();
   });
 
   it('should tell the user if the requested playlist isn\'t set up', function (

@@ -1,6 +1,7 @@
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const storage = require('node-persist');
 
 const utils = require('./utils');
 
@@ -16,6 +17,7 @@ describe('/listusers endpoint', function () {
 
   afterEach(function () {
     nock.cleanAll();
+    storage.clearSync();
   });
 
   it('should list authenticated users', function (done) {

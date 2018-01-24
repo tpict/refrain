@@ -2,7 +2,7 @@ const store = require('../store');
 const utils = require('../utils');
 const { setOn, setOff } = require('./permission_wrapper');
 
-module.exports = async function pdj(req, res) {
+module.exports = async function refrain(req, res) {
   const spotifyApi = await utils.getSpotifyApi();
   const command = req.body.text.toLowerCase();
 

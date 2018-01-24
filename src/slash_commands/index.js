@@ -1,5 +1,5 @@
 module.exports = app => {
-  app.post('/pdj', require('./pdj'));
+  app.post('/refrain', require('./refrain'));
   app.post('/commandeer', require('./commandeer'));
 
   app.post('/findme', require('./findme'));

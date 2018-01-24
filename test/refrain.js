@@ -9,7 +9,7 @@ const permissionWrapper = require('../src/slash_commands/permission_wrapper');
 
 chai.use(chaiHttp);
 
-describe('/pdj endpoint', function () {
+describe('/refrain endpoint', function () {
   beforeEach(function () {
     utils.setDefaultUsers();
   });
@@ -36,15 +36,15 @@ describe('/pdj endpoint', function () {
       text: 'off'
     });
 
-    const pdjBody = utils.baseSlackRequest({
-      command: '/pdj',
+    const refrainBody = utils.baseSlackRequest({
+      command: '/refrain',
       text: 'off'
     });
 
     chai
       .request(app)
-      .post('/pdj')
-      .send(pdjBody)
+      .post('/refrain')
+      .send(refrainBody)
       .end((err, res) => {
         chai.assert.equal(
           res.body.text,
@@ -76,13 +76,13 @@ describe('/pdj endpoint', function () {
       .reply(200);
 
     const body = utils.baseSlackRequest({
-      command: '/pdj',
+      command: '/refrain',
       text: 'on'
     });
 
     chai
       .request(app)
-      .post('/pdj')
+      .post('/refrain')
       .send(body)
       .end((err, res) => {
         chai.assert.equal(
@@ -101,7 +101,7 @@ describe('/pdj endpoint', function () {
       .reply(200);
 
     const body = utils.baseSlackRequest({
-      command: '/pdj',
+      command: '/refrain',
       text: 'on',
       user_id: 'U1BBBBBBB',
       user_name: 'bing.bing'
@@ -109,7 +109,7 @@ describe('/pdj endpoint', function () {
 
     chai
       .request(app)
-      .post('/pdj')
+      .post('/refrain')
       .send(body)
       .end((err, res) => {
         chai.assert.equal(
