@@ -51,18 +51,6 @@ module.exports = {
     );
   },
 
-  endpointBeforeEach() {
-    store.setUsers({
-      'bing.bong': {
-        id: 'myID',
-        access_token: 'myAccessToken',
-        refresh_token: 'myRefreshToken',
-        token_expiry: '2049-01-01'
-      }
-    });
-    store.setActiveUser('bing.bong');
-  },
-
   setDefaultUsers() {
     store.setUsers({
       'bing.bong': {

@@ -175,8 +175,8 @@ module.exports = {
     spotifyApi.setAccessToken(accessToken);
     spotifyApi.setRefreshToken(refreshToken);
 
-    const tokenExpiry = moment(activeUser.token_expiry);
-    if (!tokenExpiry || moment() > tokenExpiry) {
+    const tokenExpiry = activeUser.token_expiry;
+    if (!tokenExpiry || moment() > moment(tokenExpiry)) {
       const data = await spotifyApi
         .refreshAccessToken()
         .then(data => data, err => console.log(err));

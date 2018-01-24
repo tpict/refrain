@@ -6,6 +6,7 @@ const sinon = require('sinon');
 const utils = require('./utils');
 
 const app = require('../src/app');
+const store = require('../src/store');
 
 chai.use(chaiHttp);
 const sandbox = sinon.sandbox.create();
@@ -38,10 +39,36 @@ describe('Spotify authentication refresh', function () {
     sandbox.restore();
   });
 
-  it('should refresh the access token for users after espiry', function (
+  it('should refresh the access token for users after expiry', function (
     done
   ) {
     const clock = sinon.useFakeTimers(new Date(2049, 2, 1).getTime());
+
+    const body = utils.baseSlackRequest({
+      command: '/shuffled',
+      text: 'off'
+    });
+
+    chai
+      .request(app)
+      .post('/shuffle')
+      .send(body)
+      .end(() => {
+        clock.restore();
+        authScope.done();
+        shuffleScope.done();
+        done();
+      });
+  });
+
+  it('should refresh the access token for users with no set expiry', function (
+    done
+  ) {
+    const clock = sinon.useFakeTimers(new Date(2049, 0, 1).getTime());
+
+    const user = store.getActiveUser();
+    user.token_expiry = undefined;
+    store.setUsers({ 'bing.bong': user });
 
     const body = utils.baseSlackRequest({
       command: '/shuffled',
