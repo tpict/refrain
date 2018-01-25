@@ -18,7 +18,6 @@
       "type": "button",
       "value": "{\"id\":\"1hf22wSSuINjqFYc4JE6Xk\",\"uri\":\"spotify:track:1hf22wSSuINjqFYc4JE6Xk\",\"name\":\"Temporary Secretary - Remastered 2011\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB\"},\"href\":\"https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB\",\"id\":\"4STHEaNw4mPZ2tzheohgXB\",\"name\":\"Paul McCartney\",\"type\":\"artist\",\"uri\":\"spotify:artist:4STHEaNw4mPZ2tzheohgXB\"}]}"
     }]
-
   }, {
     "fallback": "Search result: Artist: Riton\nAlbum: Ed Rec 100",
     "callback_id": "find_track",
@@ -40,7 +39,6 @@
         "value": "{\"id\":\"0ffLhKbRhj0GhI8VldV4KJ\",\"uri\":\"spotify:track:0ffLhKbRhj0GhI8VldV4KJ\",\"name\":\"Temporary Secretary\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/7i9j813KFoSBMldGqlh2Z1\"},\"href\":\"https://api.spotify.com/v1/artists/7i9j813KFoSBMldGqlh2Z1\",\"id\":\"7i9j813KFoSBMldGqlh2Z1\",\"name\":\"Riton\",\"type\":\"artist\",\"uri\":\"spotify:artist:7i9j813KFoSBMldGqlh2Z1\"}]}"
       }
     ]
-
   }, {
     "fallback": "Search result: Artist: Paul McCartney\nAlbum: Pure McCartney (Deluxe Edition)",
     "callback_id": "find_track",
@@ -59,7 +57,6 @@
       "type": "button",
       "value": "{\"id\":\"4aGD2DegeFj7ggkkp4skGx\",\"uri\":\"spotify:track:4aGD2DegeFj7ggkkp4skGx\",\"name\":\"Temporary Secretary - 2011 Remaster\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB\"},\"href\":\"https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB\",\"id\":\"4STHEaNw4mPZ2tzheohgXB\",\"name\":\"Paul McCartney\",\"type\":\"artist\",\"uri\":\"spotify:artist:4STHEaNw4mPZ2tzheohgXB\"}]}"
     }]
-
   }, {
     "fallback": "load more",
     "callback_id": "find_track_more",

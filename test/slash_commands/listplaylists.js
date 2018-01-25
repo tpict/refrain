@@ -68,12 +68,22 @@ describe('/listplaylists endpoint', function () {
     const scope1 = nock('https://api.spotify.com')
       .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000')
       .reply(200, {
-        name: 'My playlist'
+        id: 'P000000000000000000000',
+        name: 'My playlist',
+        tracks: {
+          total: 5
+        },
+        images: [{ url: 'https://spotify.com/lovely_image.jpg' }]
       });
     const scope2 = nock('https://api.spotify.com')
       .get('/v1/users/U1BBBBBBB/playlists/P000000000000000000001')
       .reply(200, {
-        name: 'My other playlist'
+        id: 'P000000000000000000001',
+        name: 'My other playlist',
+        tracks: {
+          total: 10
+        },
+        images: [{ url: 'https://spotify.com/cool_image.jpg' }]
       });
     const scope3 = nock('https://api.spotify.com')
       .get('/v1/users/U1CCCCCCC/playlists/P000000000000000000002')
@@ -88,11 +98,13 @@ describe('/listplaylists endpoint', function () {
       .post('/listplaylists')
       .send(body)
       .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: \nmyplaylist: My playlist\nmyotherplaylist: My other playlist\nmisconfiguredplaylist: Misconfigured!'
+        console.log(res.body.attachments[0].actions);
+        console.log(res.body.attachments[1].actions);
+        console.log(res.body.attachments[2].actions);
+        chai.assert.deepEqual(
+          res.body.attachments,
+          require('../fixtures/listplaylists_response.json').attachments
         );
-        chai.assert.equal(res.body.response_type, 'in_channel');
 
         scope1.done();
         scope2.done();

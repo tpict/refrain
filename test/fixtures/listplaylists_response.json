@@ -1,0 +1,53 @@
+{
+  "text": "Your configured playlists are:",
+  "attachments": [{
+    "fallback": "Playlist: My playlist",
+    "callback_id": "list_playlists",
+    "title": "My playlist",
+    "text": "Total tracks: 5",
+    "thumb_url": "https://spotify.com/lovely_image.jpg",
+    "color": "good",
+    "actions": [{
+      "name": "play",
+      "text": "Play",
+      "type": "button",
+      "value": "P000000000000000000000"
+    }, {
+      "name": "remove",
+      "text": "Remove",
+      "type": "button",
+      "value": "P000000000000000000000"
+    }]
+  }, {
+    "fallback": "Playlist: My other playlist",
+    "callback_id": "list_playlists",
+    "title": "My other playlist",
+    "text": "Total tracks: 10",
+    "thumb_url": "https://spotify.com/cool_image.jpg",
+    "color": "good",
+    "actions": [{
+      "name": "play",
+      "text": "Play",
+      "type": "button",
+      "value": "P000000000000000000001"
+    }, {
+      "name": "remove",
+      "text": "Remove",
+      "type": "button",
+      "value": "P000000000000000000001"
+    }]
+  }, {
+    "fallback": "Playlist: Invalid playlist",
+    "callback_id": "list_playlists",
+    "title": "Invalid playlist",
+    "text": "This playlist is misconfigured, or there's a problem with Spotify",
+    "thumb_url": null,
+    "color": "good",
+    "actions": [{
+      "name": "remove",
+      "text": "Remove",
+      "type": "button",
+      "value": "P000000000000000000002"
+    }]
+  }]
+}
