@@ -27,7 +27,7 @@
   "main": "app.js",
   "devDependencies": {},
   "scripts": {
-    "test": "./node_modules/.bin/nyc ./node_modules/.bin/mocha --reporter=tap --exit;"
+    "test": "./node_modules/.bin/nyc ./node_modules/.bin/mocha --reporter=tap --recursive --exit;"
   },
   "author": "",
   "license": "ISC"

@@ -10,9 +10,7 @@ module.exports = app => {
   app.post('/next', require('./next'));
   app.post('/eradicate', require('./eradicate'));
 
-  app.post('/playplaylist', require('./playplaylist'));
   app.post('/addplaylist', require('./addplaylist'));
-  app.post('/removeplaylist', require('./removeplaylist'));
   app.post('/whichplaylist', require('./whichplaylist'));
   app.post('/listplaylists', require('./listplaylists'));
 

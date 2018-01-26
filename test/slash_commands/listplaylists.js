@@ -98,9 +98,6 @@ describe('/listplaylists endpoint', function () {
       .post('/listplaylists')
       .send(body)
       .end((err, res) => {
-        console.log(res.body.attachments[0].actions);
-        console.log(res.body.attachments[1].actions);
-        console.log(res.body.attachments[2].actions);
         chai.assert.deepEqual(
           res.body.attachments,
           require('../fixtures/listplaylists_response.json').attachments

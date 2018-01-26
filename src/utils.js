@@ -72,7 +72,8 @@ module.exports = {
   // This is a work-around for a bug in the Spotify API that prevents specifying
   // a playlist offset by URI.
   // https://github.com/spotify/web-api/issues/630
-  async playlistContextOffset(spotifyApi, playlist, track) {
+  async playlistContextOffset(playlist, track) {
+    const spotifyApi = await this.getSpotifyApi();
     const { userID, playlistID } = this.splitPlaylistURI(playlist.uri);
 
     let next = {};
