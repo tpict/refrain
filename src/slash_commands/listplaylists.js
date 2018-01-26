@@ -35,9 +35,12 @@ module.exports = async function listplaylists(req, res) {
         const text = found
           ? `Total tracks: ${response.body.tracks.total}`
           : 'This playlist is misconfigured, or there\'s a problem with Spotify';
-        const thumb_url = found ? response.body.images[0].url : null;
         const callback_id = 'list_playlists';
         const color = 'good';
+        const thumb_url =
+          found && response.body.images.length > 0
+            ? response.body.images[0].url
+            : null;
 
         const attachment = {
           fallback,
