@@ -4,14 +4,14 @@ const chaiHttp = require('chai-http');
 const queryString = require('query-string');
 const storage = require('node-persist');
 
-const utils = require('./utils');
+const utils = require('../utils');
 
-const app = require('../src/app');
-const store = require('../src/store');
+const app = require('../../src/app');
+const store = require('../../src/store');
 
 chai.use(chaiHttp);
 
-describe('/interactive endpoint', function () {
+describe('/findme interactive callback', function () {
   beforeEach(function () {
     utils.setDefaultUsers();
   });
@@ -58,7 +58,7 @@ describe('/interactive endpoint', function () {
         done();
       });
 
-    const body = require('./fixtures/findme_queue.json');
+    const body = require('../fixtures/findme_queue.json');
 
     chai
       .request(app)
@@ -83,7 +83,7 @@ describe('/interactive endpoint', function () {
 
     const getTracksScope = nock('https://api.spotify.com')
       .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
-      .reply(200, require('./fixtures/playlist_tracks.json'));
+      .reply(200, require('../fixtures/playlist_tracks.json'));
 
     const getTracksScope2 = nock('https://api.spotify.com')
       .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
@@ -91,7 +91,7 @@ describe('/interactive endpoint', function () {
         offset: 3,
         limit: 3
       })
-      .reply(200, require('./fixtures/playlist_tracks_2.json'));
+      .reply(200, require('../fixtures/playlist_tracks_2.json'));
 
     const addToPlaylistScope = nock('https://api.spotify.com')
       .post('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
@@ -128,7 +128,7 @@ describe('/interactive endpoint', function () {
         done();
       });
 
-    const body = require('./fixtures/findme_play.json');
+    const body = require('../fixtures/findme_play.json');
 
     chai
       .request(app)
@@ -137,86 +137,4 @@ describe('/interactive endpoint', function () {
       .end((err, res) => chai.assert.equal(res.text, 'Just a moment...'));
   });
 
-  it('should delete tracks', function (done) {
-    store.setActivePlaylist('myplaylist');
-    store.setPlaylists({
-      myplaylist: {
-        id: 'P000000000000000000000',
-        user_id: 'U1AAAAAAA',
-        tracks: {
-          '6sxosT7KMFP9OQL3DdD6Qy': {
-            requester: 'tom.picton',
-            artist: 'Jme',
-            name: 'Test Me'
-          }
-        },
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
-      }
-    });
-
-    const removeTrackScope = nock('https://api.spotify.com')
-      .delete('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
-      .reply(200);
-
-    const nextTrackScope = nock('https://api.spotify.com')
-      .post('/v1/me/player/next')
-      .reply(200);
-
-    const body = require('./fixtures/eradicate_delete.json');
-
-    chai
-      .request(app)
-      .post('/interactive')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: That bad? Let\'s not listen to *Test Me* by *Jme* again. :bomb:'
-        );
-        removeTrackScope.done();
-        nextTrackScope.done();
-        done();
-      });
-  });
-
-  it('should cancel track deletion', function (done) {
-    store.setActivePlaylist('myplaylist');
-    store.setPlaylists({
-      myplaylist: {
-        id: 'P000000000000000000000',
-        user_id: 'U1AAAAAAA',
-        tracks: {
-          '6sxosT7KMFP9OQL3DdD6Qy': {
-            requester: 'tom.picton',
-            artist: 'Jme',
-            name: 'Test Me'
-          }
-        },
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
-      }
-    });
-
-    const removeTrackScope = nock('https://api.spotify.com')
-      .delete('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
-      .reply(200);
-
-    const nextTrackScope = nock('https://api.spotify.com')
-      .post('/v1/me/player/next')
-      .reply(200);
-
-    const body = require('./fixtures/eradicate_cancel.json');
-
-    chai
-      .request(app)
-      .post('/interactive')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(res.body.text, 'Crisis averted.');
-        chai.assert.isFalse(removeTrackScope.isDone());
-        chai.assert.isFalse(nextTrackScope.isDone());
-        done();
-      });
-  });
 });

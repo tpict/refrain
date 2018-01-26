@@ -9,5 +9,13 @@
   "test/slash_commands/*.js": {
     "alternate": "src/slash_commands/{}.js",
     "type": "test"
+  },
+  "src/interactive/*.js": {
+    "alternate": "test/interactive/{}.js",
+    "type": "source"
+  },
+  "test/interactive/*.js": {
+    "alternate": "src/interactive/{}.js",
+    "type": "test"
   }
 }
