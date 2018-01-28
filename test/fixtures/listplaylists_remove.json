@@ -1,0 +1,3 @@
+{
+  "payload": "{\"type\":\"interactive_message\",\"actions\":[{\"name\":\"remove\",\"type\":\"button\",\"value\":\"P000000000000000000001\"}],\"callback_id\":\"list_playlists\",\"team\":{\"id\":\"T8FJ42VT8\",\"domain\":\"tompicton\"},\"channel\":{\"id\":\"D1AAAAAAA\",\"name\":\"random\"},\"user\":{\"id\":\"U8FJ42W4E\",\"name\":\"tom\"},\"action_ts\":\"1516996398.900941\",\"message_ts\":\"1516996377.000528\",\"attachment_id\":\"2\",\"token\":\"QLvdDhYujXaN2kNywRWxVnmo\",\"is_app_unfurl\":false,\"response_url\":\"https:\\/\\/hooks.slack.com\\/actions\\/T8FJ42VT8\\/305586157717\\/2lSeMPk4D8ks1koaAv4usiUm\",\"trigger_id\":\"304815881888.287616097926.2b20d9786e8d56aa2a9a459ad597cbae\"}"
+}

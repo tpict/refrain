@@ -2,10 +2,10 @@ const store = require('../store');
 const utils = require('../utils');
 
 function removePlaylist(payload, res) {
-  const action = payload.actions[0];
+  const playlistID = payload.actions[0].value;
   const playlists = store.getPlaylists();
-  const playlist = playlists[action.value];
-  delete playlists[action.value];
+  const playlist = playlists[playlistID];
+  delete playlists[playlistID];
   store.setPlaylists(playlists);
   res.send(`Removed configuration for *${playlist.name}*.`);
 }
@@ -34,7 +34,7 @@ async function playPlaylist(payload, res) {
     );
 }
 
-module.exports = async function list_playlists(payload, res) {
+module.exports = function list_playlists(payload, res) {
   const action = payload.actions[0];
 
   if (action.name === 'remove') {
