@@ -6,38 +6,40 @@ const storage = require('node-persist');
 const utils = require('../utils');
 
 const app = require('../../src/app');
-const store = require('../../src/store');
+const Playlist = require('../../src/models/playlist');
+const Track = require('../../src/models/track');
 
 chai.use(chaiHttp);
 
 describe('/eradicate interactive callback', function () {
-  beforeEach(function () {
+  beforeEach(async function () {
     utils.setDefaultUsers();
+
+    const track = new Track({
+      requestedBy: 'tom.picton',
+      artist: 'Jme',
+      title: 'Test Me'
+    });
+    await track.save();
+
+    const playlist = new Playlist({
+      spotifyID: 'P000000000000000000000',
+      spotifyUserID: 'U1AAAAAAA',
+      tracks: [track._id],
+      name: 'My playlist',
+      active: true
+    });
+    await playlist.save();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     nock.cleanAll();
     storage.clearSync();
+    await Playlist.remove({});
+    await Track.remove({});
   });
 
   it('should delete tracks', function (done) {
-    store.setActivePlaylist('myplaylist');
-    store.setPlaylists({
-      myplaylist: {
-        id: 'P000000000000000000000',
-        user_id: 'U1AAAAAAA',
-        tracks: {
-          '6sxosT7KMFP9OQL3DdD6Qy': {
-            requester: 'tom.picton',
-            artist: 'Jme',
-            name: 'Test Me'
-          }
-        },
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
-      }
-    });
-
     const removeTrackScope = nock('https://api.spotify.com')
       .delete('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
       .reply(200);
@@ -64,23 +66,6 @@ describe('/eradicate interactive callback', function () {
   });
 
   it('should cancel track deletion', function (done) {
-    store.setActivePlaylist('myplaylist');
-    store.setPlaylists({
-      myplaylist: {
-        id: 'P000000000000000000000',
-        user_id: 'U1AAAAAAA',
-        tracks: {
-          '6sxosT7KMFP9OQL3DdD6Qy': {
-            requester: 'tom.picton',
-            artist: 'Jme',
-            name: 'Test Me'
-          }
-        },
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
-      }
-    });
-
     const removeTrackScope = nock('https://api.spotify.com')
       .delete('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
       .reply(200);

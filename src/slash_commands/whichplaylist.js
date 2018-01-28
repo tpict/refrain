@@ -1,8 +1,8 @@
-const store = require('../store');
+const Playlist = require('../models/playlist');
 const utils = require('../utils');
 
-module.exports = function whichplaylist(req, res) {
-  const activePlaylist = store.getActivePlaylist();
+module.exports = async function whichplaylist(req, res) {
+  const activePlaylist = await Playlist.getActive();
 
   if (activePlaylist) {
     utils.respond(

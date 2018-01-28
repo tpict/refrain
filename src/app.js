@@ -1,6 +1,8 @@
 require('dotenv').config();
-const express = require('express');
+
 const bodyParser = require('body-parser');
+const express = require('express');
+const mongoose = require('mongoose');
 const storage = require('node-persist');
 
 storage.initSync();
@@ -14,6 +16,15 @@ require('./spotify_auth')(app);
 require('./slash_commands/index')(app);
 require('./interactive/index')(app);
 
-app.listen(4390, () => console.log('Pebble DJ listening on port 4390!'));
+const uristring = process.env.MONGODB_URI;
+mongoose.connect(uristring, function (err, res) {
+  if (err) {
+    console.log('Error connecting to ' + uristring + ': ' + err);
+  } else {
+    console.log('Successfully connected to ' + uristring);
+  }
+});
+
+app.listen(4390, () => console.log('Refrain listening on port 4390!'));
 
 module.exports = app;

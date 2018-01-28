@@ -1,5 +1,5 @@
-const store = require('../store');
 const utils = require('../utils');
+const Playlist = require('../models/playlist');
 
 module.exports = async function delete_track(payload, res) {
   const action = payload.actions[0];
@@ -11,12 +11,11 @@ module.exports = async function delete_track(payload, res) {
 
   const track = JSON.parse(action.value);
   const formattedSong = utils.formatSong(track.name, track.artist);
-  const playlist = store.getActivePlaylist();
-
+  const playlist = await Playlist.getActive();
   const spotifyApi = await utils.getSpotifyApi();
 
   spotifyApi
-    .removeTracksFromPlaylist(playlist.user_id, playlist.id, [
+    .removeTracksFromPlaylist(playlist.spotifyUserID, playlist.spotifyID, [
       { uri: track.uri }
     ])
     .then(
@@ -40,12 +39,12 @@ module.exports = async function delete_track(payload, res) {
     .then(
       () => {},
       err =>
-      utils.errorWrapper(err, errorMessage =>
-        utils.respond(
-          payload.user_name,
-          res,
-          errorMessage || 'Couldn\'t start the next track.'
+        utils.errorWrapper(err, errorMessage =>
+          utils.respond(
+            payload.user_name,
+            res,
+            errorMessage || 'Couldn\'t start the next track.'
+          )
         )
-      )
     );
 };

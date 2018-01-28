@@ -1,33 +1,30 @@
-const store = require('../store');
+const Playlist = require('../models/playlist');
 const utils = require('../utils');
 
 module.exports = async function addplaylist(req, res) {
   const playlistURI = req.body.text;
   const splitURI = playlistURI.split(':');
-  const userID = splitURI[2];
-  const playlistID = splitURI[4];
+  const spotifyUserID = splitURI[2];
+  const spotifyID = splitURI[4];
 
   const spotifyApi = await utils.getSpotifyApi();
 
-  spotifyApi.getPlaylist(userID, playlistID).then(
+  spotifyApi.getPlaylist(spotifyUserID, spotifyID).then(
     data => {
       const name = data.body.name;
-
-      const playlists = store.getPlaylists();
-      playlists[playlistID] = {
-        id: playlistID,
-        user_id: utils.splitPlaylistURI(data.body.uri).userID,
-        tracks: {},
-        uri: data.body.uri,
+      const playlist = new Playlist({
+        spotifyID,
+        spotifyUserID,
         name
-      };
-      store.setPlaylists(playlists);
+      });
+      playlist.save().then(() => {
 
-      if (!store.getActivePlaylist()) {
-        store.setActivePlaylist(playlistID);
-      }
+        // if (!Playlist.getActive()) {
+        //   playlist.setActive();
+        // }
 
-      utils.respond(req, res, `Added your playlist *${name}*.`);
+        utils.respond(req, res, `Added your playlist *${name}*.`);
+      });
     },
     err => {
       const error404 = 'Couldn\'t find that playlist.';

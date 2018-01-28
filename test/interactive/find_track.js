@@ -7,7 +7,8 @@ const storage = require('node-persist');
 const utils = require('../utils');
 
 const app = require('../../src/app');
-const store = require('../../src/store');
+const Playlist = require('../../src/models/playlist');
+const Track = require('../../src/models/track');
 
 chai.use(chaiHttp);
 
@@ -16,23 +17,14 @@ describe('/findme interactive callback', function () {
     utils.setDefaultUsers();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     nock.cleanAll();
     storage.clearSync();
+    await Playlist.remove({});
+    await Track.remove({});
   });
 
   it('should queue tracks', function (done) {
-    store.setActivePlaylist('myplaylist');
-    store.setPlaylists({
-      myplaylist: {
-        id: 'P000000000000000000000',
-        user_id: 'U1AAAAAAA',
-        tracks: {},
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
-      }
-    });
-
     const addToPlaylistScope = nock('https://api.spotify.com')
       .post('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
       .reply(200);
@@ -41,46 +33,49 @@ describe('/findme interactive callback', function () {
       .post('/api/chat.postMessage', () => true)
       .reply(200, (uri, requestBody) => {
         addToPlaylistScope.done();
-        const storedTracks = store.getActivePlaylist().tracks;
-        chai.assert.deepEqual(storedTracks['6sxosT7KMFP9OQL3DdD6Qy'], {
-          requester: 'tom.picton',
-          artist: 'Jme',
-          name: 'Test Me'
-        });
+        Playlist.getActive()
+          .then(activePlaylist =>
+            activePlaylist.populate('tracks').execPopulate()
+          )
+          .then(activePlaylist => {
+            const storedTracks = activePlaylist.tracks;
 
-        const parsedBody = queryString.parse(requestBody);
-        chai.assert.equal(
-          parsedBody.text,
-          '<@tom.picton> added *Test Me* by *Jme* to *My playlist*'
-        );
-        chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
+            chai.assert.include(storedTracks[0].toObject(), {
+              spotifyID: '6sxosT7KMFP9OQL3DdD6Qy',
+              requestedBy: 'tom.picton',
+              artist: 'Jme',
+              title: 'Test Me'
+            });
 
-        done();
+            const parsedBody = queryString.parse(requestBody);
+            chai.assert.equal(
+              parsedBody.text,
+              '<@tom.picton> added *Test Me* by *Jme* to *My playlist*'
+            );
+            chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
+            done();
+          });
       });
 
-    const body = require('../fixtures/findme_queue.json');
+    const playlist = new Playlist({
+      spotifyID: 'P000000000000000000000',
+      spotifyUserID: 'U1AAAAAAA',
+      name: 'My playlist',
+      active: true
+    });
 
-    chai
-      .request(app)
-      .post('/interactive')
-      .send(body)
-      .end((err, res) => chai.assert.equal(res.text, 'Just a moment...'));
+    playlist.save().then(() =>
+      chai
+        .request(app)
+        .post('/interactive')
+        .send(require('../fixtures/findme_queue.json'))
+        .end((err, res) => chai.assert.equal(res.text, 'Just a moment...'))
+    );
   });
 
   it('should play tracks that are already in the playlist immediately', function (
     done
   ) {
-    store.setActivePlaylist('myplaylist');
-    store.setPlaylists({
-      myplaylist: {
-        id: 'P000000000000000000000',
-        user_id: 'U1AAAAAAA',
-        tracks: {},
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
-      }
-    });
-
     const getTracksScope = nock('https://api.spotify.com')
       .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
       .reply(200, require('../fixtures/playlist_tracks.json'));
@@ -101,9 +96,9 @@ describe('/findme interactive callback', function () {
       .put(
         '/v1/me/player/play',
         data =>
-        data.context_uri ==
-        'spotify:user:U1AAAAAAA:playlist:P000000000000000000000' &&
-        data.offset.position == 4
+          data.context_uri ==
+            'spotify:user:U1AAAAAAA:playlist:P000000000000000000000' &&
+          data.offset.position == 4
       )
       .reply(200);
 
@@ -115,26 +110,34 @@ describe('/findme interactive callback', function () {
         chai.assert.isFalse(addToPlaylistScope.isDone());
         playScope.done();
 
-        const storedTracks = store.getActivePlaylist().tracks;
-        chai.assert.equal(Object.keys(storedTracks).length, 0);
+        Playlist.getActive()
+          .then(playlist => playlist.populate('tracks').execPopulate())
+          .then(playlist => {
+            chai.assert.equal(playlist.tracks.length, 0);
 
-        const parsedBody = queryString.parse(requestBody);
-        chai.assert.equal(
-          parsedBody.text,
-          'Now playing *Test Me* by *Jme*, as requested by <@tom.picton>'
-        );
-        chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
+            const parsedBody = queryString.parse(requestBody);
+            chai.assert.equal(
+              parsedBody.text,
+              'Now playing *Test Me* by *Jme*, as requested by <@tom.picton>'
+            );
+            chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
 
-        done();
+            done();
+          });
       });
 
-    const body = require('../fixtures/findme_play.json');
-
-    chai
-      .request(app)
-      .post('/interactive')
-      .send(body)
-      .end((err, res) => chai.assert.equal(res.text, 'Just a moment...'));
+    const playlist = new Playlist({
+      spotifyID: 'P000000000000000000000',
+      spotifyUserID: 'U1AAAAAAA',
+      name: 'My playlist',
+      active: true
+    });
+    playlist.save().then(() =>
+      chai
+        .request(app)
+        .post('/interactive')
+        .send(require('../fixtures/findme_play.json'))
+        .end((err, res) => chai.assert.equal(res.text, 'Just a moment...'))
+    );
   });
-
 });

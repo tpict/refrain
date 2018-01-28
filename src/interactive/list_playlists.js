@@ -1,27 +1,25 @@
-const store = require('../store');
+const Playlist = require('../models/playlist');
 const utils = require('../utils');
 
-function removePlaylist(payload, res) {
-  const playlistID = payload.actions[0].value;
-  const playlists = store.getPlaylists();
-  const playlist = playlists[playlistID];
-  delete playlists[playlistID];
-  store.setPlaylists(playlists);
+async function removePlaylist(payload, res) {
+  const spotifyID = payload.actions[0].value;
+  const playlist = await Playlist.findOne({ spotifyID });
+  await playlist.remove({});
   res.send(`Removed configuration for *${playlist.name}*.`);
 }
 
 async function playPlaylist(payload, res) {
-  const action = payload.actions[0];
-  const spotifyApi = await utils.getSpotifyApi();
-  const playlist = store.getPlaylists()[action.value];
+  const spotifyID = payload.actions[0].value;
+  const playlist = await Playlist.findOne({ spotifyID });
 
+  const spotifyApi = await utils.getSpotifyApi();
   spotifyApi
     .play({
       context_uri: playlist.uri
     })
     .then(
-      () => {
-        store.setActivePlaylist(action.value);
+      async () => {
+        await playlist.setActive();
 
         res.send(
           `Now playing from *${playlist.name}*! Commands will now act on this playlist.`

@@ -1,11 +1,12 @@
-const store = require('../store');
+const Playlist = require('../models/playlist');
+const Track = require('../models/track');
 const utils = require('../utils');
 const { wrapper } = require('./permission_wrapper');
 
 module.exports = wrapper(async function whomst(req, res) {
   const spotifyApi = await utils.getSpotifyApi();
   spotifyApi.getMyCurrentPlayingTrack().then(
-    data => {
+    async data => {
       const track = data.body.item;
       if (!track) {
         return utils.respond(
@@ -17,19 +18,22 @@ module.exports = wrapper(async function whomst(req, res) {
 
       const name = track.name;
       const artist = track.artists[0].name;
-      const playlist = store.getActivePlaylist();
 
-      const storedTrack = playlist.tracks[track.id];
+      const playlist = await Playlist.getActive()
+        .then(playlist =>
+          playlist.populate({
+            path: 'tracks',
+            match: { spotifyID: track.id }
+          })
+        )
+        .then(playlist => playlist.execPopulate());
 
-      if (storedTrack) {
-        const requester = storedTrack.requester;
+      if (playlist.tracks.length) {
         utils.respond(
           req,
           res,
-          `${utils.formatSong(
-            name,
-            artist
-          )} was last requested by <@${requester}>`
+          `${utils.formatSong(name, artist)} was last requested by <@${playlist
+            .tracks[0].requestedBy}>`
         );
       } else {
         utils.respond(

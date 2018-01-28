@@ -1,10 +1,8 @@
-const store = require('../store');
+const Playlist = require('../models/playlist');
 const utils = require('../utils');
 
 module.exports = async function listplaylists(req, res) {
-  const playlists = Object.values(store.getPlaylists());
-
-  if (playlists.length === 0) {
+  if (await Playlist.count() === 0) {
     utils.respond(
       req,
       res,
@@ -15,11 +13,12 @@ module.exports = async function listplaylists(req, res) {
 
   const spotifyApi = await utils.getSpotifyApi();
 
+  const playlists = await Playlist.find({});
   const requests = playlists.map(playlist =>
     spotifyApi
-      .getPlaylist(playlist.user_id, playlist.id)
-      .then(data => Object.assign(data, { id: playlist.id }))
-      .catch(err => Object.assign(err, { id: playlist.id }))
+      .getPlaylist(playlist.spotifyUserID, playlist.spotifyID)
+      .then(data => Object.assign(data, { id: playlist.spotifyID }))
+      .catch(err => Object.assign(err, { id: playlist.spotifyID }))
   );
 
   const body = {

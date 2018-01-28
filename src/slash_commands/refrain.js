@@ -1,3 +1,4 @@
+const Playlist = require('../models/playlist');
 const store = require('../store');
 const utils = require('../utils');
 const { setOn, setOff } = require('./permission_wrapper');
@@ -14,9 +15,7 @@ module.exports = async function refrain(req, res) {
   }
 
   if (command === 'on') {
-    const playlistID = store.getActivePlaylistAlias();
-    const playlists = store.getPlaylists();
-    const playlist = playlists[playlistID];
+    const playlist = await Playlist.getActive();
 
     if (!playlist) {
       setOn();

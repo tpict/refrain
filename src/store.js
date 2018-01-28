@@ -4,26 +4,6 @@ const storageOptions = storageDir ? { dir: storageDir } : {};
 storage.initSync(storageOptions);
 
 module.exports = {
-  getPlaylists() {
-    return storage.getItemSync('playlists') || {};
-  },
-
-  setPlaylists(playlists) {
-    return storage.setItemSync('playlists', playlists);
-  },
-
-  getActivePlaylistAlias() {
-    return storage.getItemSync('active_playlist');
-  },
-
-  setActivePlaylist(playlistAlias) {
-    storage.setItemSync('active_playlist', playlistAlias);
-  },
-
-  getActivePlaylist() {
-    return this.getPlaylists()[this.getActivePlaylistAlias()];
-  },
-
   getUsers() {
     return storage.getItemSync('users') || {};
   },

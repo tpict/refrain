@@ -1,4 +1,6 @@
 const store = require('../store');
+const Playlist = require('../models/playlist');
+const Track = require('../models/track');
 const utils = require('../utils');
 
 async function playTrackInPlaylistContext(
@@ -42,7 +44,7 @@ async function playTrackInPlaylistContext(
 
 async function addAndStoreTrack(
   playlist,
-  track,
+  trackData,
   channelID,
   userName,
   chat
@@ -50,24 +52,25 @@ async function addAndStoreTrack(
   const spotifyApi = await utils.getSpotifyApi();
   const webClient = utils.getWebClient();
 
-  const artist = track.artists[0];
-
-  const playlists = store.getPlaylists();
+  const artist = trackData.artists[0];
 
   await spotifyApi
-    .addTracksToPlaylist(playlist.user_id, playlist.id, [track.uri])
+    .addTracksToPlaylist(playlist.spotifyUserID, playlist.spotifyID, [trackData.uri])
     .then(
-      () => {
-        playlist.tracks[track.id] = {
-          requester: userName,
+      async () => {
+        const track = new Track({
+          spotifyID: trackData.id,
+          requestedBy: userName,
           artist: artist.name,
-          name: track.name
-        };
-        playlists[playlist.id] = playlist;
-        store.setPlaylists(playlists);
+          title: trackData.name
+        });
+        await track.save();
+
+        playlist.tracks.push(track._id);
+        await playlist.save();
 
         const message = `<@${userName}> added ${utils.formatSong(
-          track.name,
+          track.title,
           artist.name
         )} to *${playlist.name}*`;
 
@@ -80,7 +83,7 @@ async function addAndStoreTrack(
           const message =
             errorMessage ||
             `There was an error adding ${utils.formatSong(
-              track.name,
+              trackData.title,
               artist.name
             )} to *${playlist.name}*.`;
 
@@ -95,7 +98,7 @@ async function addAndStoreTrack(
 }
 
 async function playAndAddTrack(track, channelID, userName) {
-  const playlist = store.getActivePlaylist();
+  const playlist = await Playlist.getActive();
 
   const [found, total] = await playTrackInPlaylistContext(
     playlist,
@@ -141,7 +144,7 @@ module.exports = async function find_track(payload, res) {
   const track = JSON.parse(action.value);
   const play = action.name == 'play';
 
-  const playlist = store.getActivePlaylist();
+  const playlist = await Playlist.getActive();
 
   res.send('Just a moment...');
 

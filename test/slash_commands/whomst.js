@@ -1,42 +1,51 @@
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const storage = require('node-persist');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
 const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
-const store = require('../../src/store');
+const Playlist = require('../../src/models/playlist');
+const Track = require('../../src/models/track');
 
 chai.use(chaiHttp);
 
-describe('/whomst endpoint', function () {
-  beforeEach(function () {
+describe('/whomst endpoint', async function () {
+  beforeEach(async function () {
     utils.setDefaultUsers();
 
-    store.setActivePlaylist('myplaylist');
-    store.setPlaylists({
-      myplaylist: {
-        id: 'P000000000000000000000',
-        user_id: 'U1AAAAAAA',
-        tracks: {
-          '0eGsygTp906u18L0Oimnem': {
-            requester: 'bing.bong',
-            artist: 'The Killers',
-            name: 'Mr. Brightside'
-          }
-        },
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
-      }
+    const track = new Track({
+      spotifyID: '0eGsygTp906u18L0Oimnem',
+      requestedBy: 'bing.bong',
+      artist: 'The Killers',
+      name: 'Mr. Brightside'
     });
+    await track.save();
+
+    const track2 = new Track({
+      spotifyID: '2x9SpqnPi8rlE9pjHBwmSC',
+      requestedBy: 'bing.bong',
+      artist: 'Talking Heads',
+      name: 'Psycho Killer - 2005 Remastered Version'
+    });
+    await track2.save();
+
+    const playlist = new Playlist({
+      spotifyID: 'P000000000000000000000',
+      spotifyUserID: 'U1AAAAAAA',
+      tracks: [track._id, track2._id],
+      name: 'My playlist',
+      active: true
+    });
+    await playlist.save();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     nock.cleanAll();
     permissionWrapper.setOn();
-    storage.clearSync();
+    await Playlist.remove({});
+    await Track.remove({});
   });
 
   it('should track who requested a track', function (done) {

@@ -1,41 +1,36 @@
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const storage = require('node-persist');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
-const store = require('../../src/store');
+const Playlist = require('../../src/models/playlist');
 
 chai.use(chaiHttp);
 
 describe('/listplaylists interactive callback', function () {
-  beforeEach(function () {
+  beforeEach(async function () {
     utils.setDefaultUsers();
-    store.setActivePlaylist('P000000000000000000000');
-    store.setPlaylists({
-      P000000000000000000000: {
-        id: 'P000000000000000000000',
-        user_id: 'U1AAAAAAA',
-        tracks: {},
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
+
+    await Playlist.insertMany([
+      {
+        spotifyID: 'P000000000000000000000',
+        spotifyUserID: 'U1AAAAAAA',
+        name: 'My playlist',
+        active: true
       },
-      P000000000000000000001: {
-        id: 'P000000000000000000001',
-        user_id: 'U1AAAAAAA',
-        tracks: {},
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000001',
+      {
+        spotifyID: 'P000000000000000000001',
+        spotifyUserID: 'U1AAAAAAA',
         name: 'My other playlist'
       }
-    });
-
+    ]);
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     nock.cleanAll();
-    storage.clearSync();
+    await Playlist.remove({});
   });
 
   it('should play playlists', function (done) {
@@ -51,17 +46,17 @@ describe('/listplaylists interactive callback', function () {
       .send(body)
       .end((err, res) => {
         playScope.done();
-        chai.assert.equal(
-          store.getActivePlaylistAlias(),
-          'P000000000000000000001'
-        );
 
-        chai.assert.equal(
-          res.text,
-          'Now playing from *My other playlist*! Commands will now act on this playlist.'
-        );
+        Playlist.getActive().then(playlist => {
+          chai.assert.equal(playlist.spotifyID, 'P000000000000000000001');
 
-        done();
+          chai.assert.equal(
+            res.text,
+            'Now playing from *My other playlist*! Commands will now act on this playlist.'
+          );
+
+          done();
+        });
       });
   });
 
@@ -72,15 +67,13 @@ describe('/listplaylists interactive callback', function () {
       .request(app)
       .post('/interactive')
       .send(body)
-      .end((err, res) => {
-        chai.assert.deepEqual(store.getPlaylists(), {
-          P000000000000000000000: {
-            id: 'P000000000000000000000',
-            user_id: 'U1AAAAAAA',
-            tracks: {},
-            uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-            name: 'My playlist'
-          }
+      .end(async (err, res) => {
+        const playlists = await Playlist.find({});
+        chai.assert.equal(playlists.length, 1);
+        chai.assert.include(playlists[0].toObject(), {
+          spotifyID: 'P000000000000000000000',
+          spotifyUserID: 'U1AAAAAAA',
+          name: 'My playlist'
         });
 
         chai.assert.equal(
