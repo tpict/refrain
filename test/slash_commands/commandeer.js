@@ -5,22 +5,25 @@ const chaiHttp = require('chai-http');
 const utils = require('../utils');
 
 const app = require('../../src/app');
+const User = require('../../src/models/user');
 
 chai.use(chaiHttp);
 
 describe('/commandeer endpoint', function () {
-  beforeEach(function () {
-    utils.setDefaultUsers();
+  beforeEach(async function () {
+    await utils.setDefaultUsers();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     nock.cleanAll();
+    await User.remove({});
   });
 
   it('should reject unauthenticated users', function (done) {
     const body = utils.baseSlackRequest({
       command: '/commandeer',
-      user_name: 'paul.mccartney'
+      user_name: 'paul.mccartney',
+      user_id: 'U1BBBBBBB'
     });
 
     chai

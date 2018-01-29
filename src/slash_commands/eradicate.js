@@ -1,8 +1,10 @@
+const User = require('../models/user');
 const utils = require('../utils');
 const { wrapper } = require('./permission_wrapper');
 
 module.exports = wrapper(async function eradicate(req, res) {
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
 
   const data = await spotifyApi
     .getMyCurrentPlayingTrack()

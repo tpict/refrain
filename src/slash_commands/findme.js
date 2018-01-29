@@ -1,3 +1,4 @@
+const User = require('../models/user');
 const utils = require('../utils');
 const { wrapper } = require('./permission_wrapper');
 
@@ -8,7 +9,8 @@ module.exports = wrapper(async function findme(req, res) {
     return;
   }
 
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
 
   spotifyApi.searchTracks(searchTerms, { limit: 3 }).then(
     data => {

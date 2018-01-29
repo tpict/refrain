@@ -1,6 +1,6 @@
-const store = require('../store');
 const Playlist = require('../models/playlist');
 const Track = require('../models/track');
+const User = require('../models/user');
 const utils = require('../utils');
 
 async function playTrackInPlaylistContext(
@@ -9,7 +9,8 @@ async function playTrackInPlaylistContext(
   channelID,
   userName
 ) {
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
   const webClient = utils.getWebClient();
 
   const formattedSong = utils.formatSong(track.name, track.artists[0].name);
@@ -49,7 +50,8 @@ async function addAndStoreTrack(
   userName,
   chat
 ) {
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
   const webClient = utils.getWebClient();
 
   const artist = trackData.artists[0];
@@ -113,7 +115,8 @@ async function playAndAddTrack(track, channelID, userName) {
 
   await addAndStoreTrack(playlist, track, channelID, userName, false);
 
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
   const webClient = await utils.getWebClient();
   const formattedSong = utils.formatSong(track.name, track.artists[0].name);
 

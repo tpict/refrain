@@ -1,1 +1,2 @@
 --require test/mocha.env.js
+--timeout 120000

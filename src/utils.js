@@ -1,9 +1,7 @@
 const { URL } = require('url');
-const SpotifyWebApi = require('spotify-web-api-node');
 const WebClient = require('@slack/client').WebClient;
-const moment = require('moment');
 
-const store = require('./store');
+const User = require('./models/user');
 
 module.exports = {
   getSearchAttachments(query, data) {
@@ -73,7 +71,8 @@ module.exports = {
   // a playlist offset by URI.
   // https://github.com/spotify/web-api/issues/630
   async playlistContextOffset(playlist, track) {
-    const spotifyApi = await this.getSpotifyApi();
+    const activeUser = await User.getActive();
+    const spotifyApi = await activeUser.getSpotifyApi();
     const { userID, playlistID } = this.splitPlaylistURI(playlist.uri);
 
     let next = {};
@@ -161,41 +160,6 @@ module.exports = {
   splitPlaylistURI(uri) {
     const splitURI = uri.split(':');
     return { userID: splitURI[2], playlistID: splitURI[4] };
-  },
-
-  async getSpotifyApi() {
-    const spotifyApi = new SpotifyWebApi({
-      clientId: process.env.SPOTIFY_CLIENT_ID,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-      redirectUri: process.env.SPOTIFY_REDIRECT_URI
-    });
-
-    const activeUser = store.getActiveUser();
-    const activeUserName = store.getActiveUserName();
-
-    const accessToken = activeUser.access_token;
-    const refreshToken = activeUser.refresh_token;
-
-    spotifyApi.setAccessToken(accessToken);
-    spotifyApi.setRefreshToken(refreshToken);
-
-    const tokenExpiry = activeUser.token_expiry;
-    if (!tokenExpiry || moment() > moment(tokenExpiry)) {
-      const data = await spotifyApi
-        .refreshAccessToken()
-        .then(data => data, err => console.log(err));
-
-      spotifyApi.setAccessToken(data.body['access_token']);
-
-      activeUser.access_token = data.body['access_token'];
-      activeUser.token_expiry = moment().add(
-        data.body['expires_in'],
-        'seconds'
-      );
-      store.setUser(activeUserName, activeUser);
-    }
-
-    return spotifyApi;
   },
 
   getWebClient() {

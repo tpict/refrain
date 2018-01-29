@@ -1,10 +1,10 @@
-const store = require('../store');
+const User = require('../models/user');
 const utils = require('../utils');
 
-module.exports = function whichuser(req, res) {
-  const activeUser = store.getActiveUserName();
+module.exports = async function whichuser(req, res) {
+  const activeUser = await User.getActive();
   const message = activeUser
-    ? `The active user is <@${activeUser}>`
+    ? `The active user is <@${activeUser.slackID}>`
     : 'No authenticated users yet. Use `/spotifyauth` to get started.';
   utils.respond(req, res, message);
 };

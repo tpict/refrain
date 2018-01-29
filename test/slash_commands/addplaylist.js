@@ -6,27 +6,27 @@ const utils = require('../utils');
 
 const app = require('../../src/app');
 const Playlist = require('../../src/models/playlist');
+const User = require('../../src/models/user');
 
 chai.use(chaiHttp);
 
 describe('/addplaylist endpoint', function () {
   var scope;
 
-  beforeEach(function () {
-    utils.setDefaultUsers();
-
+  beforeEach(async function () {
     scope = nock('https://api.spotify.com')
       .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000')
       .reply(200, {
         name: 'My playlist',
         uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
       });
-
+    await utils.setDefaultUsers();
   });
 
-  afterEach(function (done) {
+  afterEach(async function () {
     nock.cleanAll();
-    Playlist.remove({}, done);
+    await Playlist.remove({});
+    await User.remove({});
   });
 
   it('should add requested playlist to storage', function (done) {

@@ -1,5 +1,6 @@
-const utils = require('../utils');
+const User = require('../models/user');
 const Playlist = require('../models/playlist');
+const utils = require('../utils');
 
 module.exports = async function delete_track(payload, res) {
   const action = payload.actions[0];
@@ -12,7 +13,8 @@ module.exports = async function delete_track(payload, res) {
   const track = JSON.parse(action.value);
   const formattedSong = utils.formatSong(track.name, track.artist);
   const playlist = await Playlist.getActive();
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
 
   spotifyApi
     .removeTracksFromPlaylist(playlist.spotifyUserID, playlist.spotifyID, [

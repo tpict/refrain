@@ -1,16 +1,16 @@
 const Playlist = require('../models/playlist');
-const store = require('../store');
+const User = require('../models/user');
 const utils = require('../utils');
 const { setOn, setOff } = require('./permission_wrapper');
 
 module.exports = async function refrain(req, res) {
-  const spotifyApi = await utils.getSpotifyApi();
   const command = req.body.text.toLowerCase();
 
-  const userName = req.body.user_name;
-  const activeUserName = store.getActiveUserName();
+  const incomingUserID = req.body.user_id;
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
 
-  if (userName != activeUserName) {
+  if (activeUser.slackID != incomingUserID) {
     return utils.respond(req, res, 'Only the active user may do that.');
   }
 

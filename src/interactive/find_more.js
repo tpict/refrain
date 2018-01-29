@@ -1,3 +1,4 @@
+const User = require('../models/user');
 const utils = require('../utils');
 
 module.exports = async function find_track_more(payload, res) {
@@ -10,7 +11,9 @@ module.exports = async function find_track_more(payload, res) {
     limit: data.limit
   };
 
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
+
   spotifyApi.searchTracks(query, options).then(
     data => {
       res.send({

@@ -1,9 +1,9 @@
-const store = require('../store');
 const utils = require('../utils');
+const User = require('../models/user');
 
-module.exports = function commandeer(req, res) {
-  const userName = req.body.user_name;
-  const user = store.getUsers()[userName];
+module.exports = async function commandeer(req, res) {
+  const userID = req.body.user_id;
+  const user = await User.findOne({ slackID: userID });
   if (!user) {
     utils.respond(
       req,
@@ -14,6 +14,6 @@ module.exports = function commandeer(req, res) {
     return;
   }
 
-  store.setActiveUser(userName);
+  user.setActive();
   utils.respond(req, res, 'You are now the active user!');
 };

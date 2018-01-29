@@ -1,4 +1,5 @@
 const Playlist = require('../models/playlist');
+const User = require('../models/user');
 const utils = require('../utils');
 
 module.exports = async function addplaylist(req, res) {
@@ -7,7 +8,8 @@ module.exports = async function addplaylist(req, res) {
   const spotifyUserID = splitURI[2];
   const spotifyID = splitURI[4];
 
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
 
   spotifyApi.getPlaylist(spotifyUserID, spotifyID).then(
     data => {

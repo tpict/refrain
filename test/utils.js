@@ -1,34 +1,4 @@
-const sinon = require('sinon');
-const storage = require('node-persist');
-
-const store = require('../src/store');
-
-class MockStorage {
-  constructor() {
-    this.storage = null;
-  }
-
-  setup() {
-  sinon.stub(storage, 'initSync').callsFake(() => {
-    this.storage = {};
-  });
-
-  sinon.stub(storage, 'getItemSync').callsFake((key) => {
-    return this.storage[key] || null;
-  });
-
-  sinon.stub(storage, 'setItemSync').callsFake((key, data) => {
-    this.storage[key] = data;
-  });
-
-  sinon.stub(storage, 'clearSync').callsFake(() => {
-    this.storage = {};
-  });
-  }
-}
-
-const mockStorage = new MockStorage();
-mockStorage.setup();
+const User = require('../src/models/user');
 
 module.exports = {
   baseSlackRequest(fields = {}) {
@@ -51,15 +21,15 @@ module.exports = {
     );
   },
 
-  setDefaultUsers() {
-    store.setUsers({
-      'bing.bong': {
-        id: 'myID',
-        access_token: 'myAccessToken',
-        refresh_token: 'myRefreshToken',
-        token_expiry: '2049-01-01'
-      }
+  async setDefaultUsers(callback) {
+    await User.remove({});
+    const user = new User({
+      slackID: 'U1AAAAAAA',
+      spotifyAccessToken: 'myAccessToken',
+      spotifyRefreshToken: 'myRefreshToken',
+      spotifyTokenExpiry: '2049-01-01',
+      active: true
     });
-    store.setActiveUser('bing.bong');
+    return user.save(callback);
   }
 };

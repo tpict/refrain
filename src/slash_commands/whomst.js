@@ -1,10 +1,11 @@
 const Playlist = require('../models/playlist');
-const Track = require('../models/track');
+const User = require('../models/user');
 const utils = require('../utils');
 const { wrapper } = require('./permission_wrapper');
 
 module.exports = wrapper(async function whomst(req, res) {
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
   spotifyApi.getMyCurrentPlayingTrack().then(
     async data => {
       const track = data.body.item;

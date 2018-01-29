@@ -6,17 +6,19 @@ const utils = require('../utils');
 
 const app = require('../../src/app');
 const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
+const User = require('../../src/models/user');
 
 chai.use(chaiHttp);
 
 describe('/playme endpoint', function () {
-  beforeEach(function () {
-    utils.setDefaultUsers();
+  beforeEach(async function () {
+    await utils.setDefaultUsers();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     nock.cleanAll();
     permissionWrapper.setOn();
+    await User.remove({});
   });
 
   it('should begin music playback', function (done) {

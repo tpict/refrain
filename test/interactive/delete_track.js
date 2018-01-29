@@ -1,7 +1,6 @@
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const storage = require('node-persist');
 
 const utils = require('../utils');
 
@@ -34,7 +33,6 @@ describe('/eradicate interactive callback', function () {
 
   afterEach(async function () {
     nock.cleanAll();
-    storage.clearSync();
     await Playlist.remove({});
     await Track.remove({});
   });

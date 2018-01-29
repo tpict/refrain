@@ -5,18 +5,20 @@ const chaiHttp = require('chai-http');
 const utils = require('../utils');
 
 const app = require('../../src/app');
+const User = require('../../src/models/user');
 const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
 
 chai.use(chaiHttp);
 
 describe('/refrain endpoint', function () {
-  beforeEach(function () {
-    utils.setDefaultUsers();
+  beforeEach(async function () {
+    await utils.setDefaultUsers();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     nock.cleanAll();
     permissionWrapper.setOn();
+    await User.remove({});
   });
 
   it('disables commands when switched off', function (done) {

@@ -7,17 +7,19 @@ const utils = require('../utils');
 
 const app = require('../../src/app');
 const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
+const User = require('../../src/models/user');
 
 chai.use(chaiHttp);
 
 describe('/next endpoint', function () {
-  beforeEach(function () {
-    utils.setDefaultUsers();
+  beforeEach(async function () {
+    await utils.setDefaultUsers();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     nock.cleanAll();
     permissionWrapper.setOn();
+    await User.remove({});
   });
 
   it('should skip tracks as requested', function (done) {

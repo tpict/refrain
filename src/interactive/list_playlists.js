@@ -1,3 +1,4 @@
+const User = require('../models/user');
 const Playlist = require('../models/playlist');
 const utils = require('../utils');
 
@@ -12,7 +13,9 @@ async function playPlaylist(payload, res) {
   const spotifyID = payload.actions[0].value;
   const playlist = await Playlist.findOne({ spotifyID });
 
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
+
   spotifyApi
     .play({
       context_uri: playlist.uri
