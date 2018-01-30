@@ -15,15 +15,9 @@ const sandbox = sinon.sandbox.create();
 describe('Spotify authentication refresh', function () {
   let authScope;
   let shuffleScope;
-  let clock;
 
   beforeEach(async function () {
-    let theMoment = moment();
-    sinon.stub(moment.prototype, 'constructor');
-    moment.prototype.constructor.returns(theMoment);
-    // clock = sinon.useFakeTimers(new Date(2049, 2, 1).getTime());
-
-    authScope = await nock('https://accounts.spotify.com')
+    authScope = nock('https://accounts.spotify.com')
       .post('/api/token')
       .reply(200, {
         access_token: 'myNewAccessToken',
@@ -31,24 +25,28 @@ describe('Spotify authentication refresh', function () {
         expires_in: 3600
       });
 
-    shuffleScope = await nock('https://api.spotify.com')
+    shuffleScope = nock('https://api.spotify.com')
       .put('/v1/me/player/shuffle')
       .query({
         state: false
       })
       .reply(200);
 
-    return utils.setDefaultUsers();
+    await utils.setDefaultUsers();
   });
 
-  afterEach(function (done) {
+  afterEach(async function () {
     nock.cleanAll();
     sandbox.restore();
-    // clock.restore();
-    User.remove({}, done);
+    await User.remove({});
   });
 
   it('should refresh the access token for users after expiry', function (done) {
+    const theFuture = moment('2049-02-01');
+    sandbox.stub(moment, 'now').callsFake(function () {
+      return theFuture;
+    });
+
     const body = utils.baseSlackRequest({
       command: '/shuffled',
       text: 'off'
@@ -68,9 +66,12 @@ describe('Spotify authentication refresh', function () {
   it('should refresh the access token for users with no set expiry', function (
     done
   ) {
-    User.getActive(function (err, user) {
-      user.spotifyTokenExpiry = undefined;
-      user.save(function () {
+    User.getActive()
+      .then(user => {
+        user.spotifyTokenExpiry = undefined;
+        return user.save();
+      })
+      .then(() => {
         const body = utils.baseSlackRequest({
           command: '/shuffled',
           text: 'off'
@@ -86,10 +87,14 @@ describe('Spotify authentication refresh', function () {
             done();
           });
       });
-    });
   });
 
   it('should skip refresh if access token is still valid', function (done) {
+    const theFuture = moment('2049-01-01');
+    sandbox.stub(moment, 'now').callsFake(function () {
+      return theFuture;
+    });
+
     const body = utils.baseSlackRequest({
       command: '/shuffled',
       text: 'off'
