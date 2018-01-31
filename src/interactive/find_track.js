@@ -3,55 +3,31 @@ const Track = require('../models/track');
 const User = require('../models/user');
 const utils = require('../utils');
 
-async function playTrackInPlaylistContext(
-  playlist,
-  track,
-  channelID,
-  userName
-) {
+async function playAndAddTrack(track, channelID) {
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
-  const webClient = utils.getWebClient();
-
-  const formattedSong = utils.formatSong(track.name, track.artists[0].name);
-
-  const [offset, total, found] = await spotifyApi.getPlaylistOffset(
-    playlist,
-    track
-  );
-
-  if (found) {
-    await spotifyApi
-      .play({ context_uri: playlist.uri, offset: { position: offset } })
-      .then(
-        () =>
-          webClient.chat.postMessage(
-            channelID,
-            `Now playing ${formattedSong}, as requested by <@${userName}>`
-          ),
-        err =>
-          utils.errorWrapper(err, errorMessage =>
-            webClient.chat.postMessage(
-              channelID,
-              errorMessage ||
-                `<@{userName}> added ${formattedSong} to *${playlist.name}*, but there was an error playing it.`
-            )
-          )
-      );
-  }
-
-  return [found, total];
-}
-
-async function playAndAddTrack(track, channelID, userName) {
   const playlist = await Playlist.getActive();
+  const webClient = await utils.getWebClient();
+  const userID = track.requestedBy;
 
-  const [found, total] = await playTrackInPlaylistContext(
-    playlist,
-    track,
-    channelID,
-    userName
-  );
+  const [found, total] = await spotifyApi
+    .playTrackInPlaylistContext(track, playlist)
+    .then(result => {
+      webClient.chat.postMessage(
+        channelID,
+        `Now playing ${track.formattedTitle}, as requested by <@${userID}>`
+      );
+      return result;
+    })
+    .catch(err =>
+      utils.errorWrapper(err, errorMessage =>
+        webClient.chat.postMessage(
+          channelID,
+          errorMessage ||
+            `<@{userID}> added ${track.formattedTitle} to *${playlist.name}*, but there was an error playing it.`
+        )
+      )
+    );
 
   if (found) {
     return;
@@ -59,25 +35,20 @@ async function playAndAddTrack(track, channelID, userName) {
 
   await spotifyApi.addAndStoreTrack(playlist, track);
 
-  const activeUser = await User.getActive();
-  const spotifyApi = await activeUser.getSpotifyApi();
-  const webClient = await utils.getWebClient();
-  const formattedSong = utils.formatSong(track.name, track.artists[0].name);
-
   spotifyApi
     .play({ context_uri: playlist.uri, offset: { position: total } })
     .then(
       () =>
         webClient.chat.postMessage(
           channelID,
-          `Now playing ${formattedSong}, as requested by <@${userName}>`
+          `Now playing ${track.formattedTitle}, as requested by <@${userID}>`
         ),
       err =>
         utils.errorWrapper(err, errorMessage =>
           webClient.chat.postMessage(
             channelID,
             errorMessage ||
-              `<@{userName}> added ${formattedSong} to *${playlist.name}*, but there was an error playing it.`
+              `<@{userID}> added ${track.formattedTitle} to *${playlist.name}*, but there was an error playing it.`
           )
         )
     );
@@ -89,7 +60,6 @@ module.exports = async function find_track(payload, res) {
 
   const action = payload.actions[0];
   const trackData = JSON.parse(action.value);
-  const play = action.name == 'play';
 
   const playlist = await Playlist.getActive();
 
@@ -99,11 +69,18 @@ module.exports = async function find_track(payload, res) {
 
   res.send('Just a moment...');
 
-  if (play) {
-    return playAndAddTrack(trackData, channelID, userID);
+  const track = new Track({
+    spotifyID: trackData.id,
+    requestedBy: userID,
+    artist: trackData.artists[0].name,
+    title: trackData.name
+  });
+
+  if (action.name === 'play') {
+    return playAndAddTrack(track, channelID, userID);
   } else {
     spotifyApi
-      .addAndStoreTrack(trackData, playlist, userID)
+      .addAndStoreTrack(track, playlist)
       .then(track => {
         const message = `<@${userID}> added ${track.formattedTitle} to *${playlist.name}*`;
         webClient.chat.postMessage(channelID, message);

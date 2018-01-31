@@ -11,4 +11,8 @@ schema.virtual('formattedTitle').get(function () {
   return `*${this.title}* by *${this.artist}*`;
 });
 
+schema.virtual('uri').get(function () {
+  return `spotify:track:${this.spotifyID}`;
+});
+
 module.exports = mongoose.model('Track', schema);
