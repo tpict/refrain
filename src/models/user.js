@@ -1,6 +1,7 @@
 const moment = require('moment');
 const mongoose = require('mongoose');
-const SpotifyWebApi = require('spotify-web-api-node');
+
+const SpotifyWebApi = require('../spotify_api');
 
 const schema = new mongoose.Schema({
   slackID: String,

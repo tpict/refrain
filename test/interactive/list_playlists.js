@@ -11,7 +11,7 @@ chai.use(chaiHttp);
 
 describe('/listplaylists interactive callback', function () {
   beforeEach(async function () {
-    utils.setDefaultUsers();
+    await utils.setDefaultUsers();
 
     await Playlist.insertMany([
       {

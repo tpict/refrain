@@ -1,8 +1,6 @@
 const { URL } = require('url');
 const WebClient = require('@slack/client').WebClient;
 
-const User = require('./models/user');
-
 module.exports = {
   getSearchAttachments(query, data) {
     const attachments = data.body.tracks.items.map(item => {
@@ -66,51 +64,6 @@ module.exports = {
     return attachments;
   },
 
-  // Find the index of the given track in the given playlist.
-  // This is a work-around for a bug in the Spotify API that prevents specifying
-  // a playlist offset by URI.
-  // https://github.com/spotify/web-api/issues/630
-  async playlistContextOffset(playlist, track) {
-    const activeUser = await User.getActive();
-    const spotifyApi = await activeUser.getSpotifyApi();
-    const { userID, playlistID } = this.splitPlaylistURI(playlist.uri);
-
-    let next = {};
-    let nextURL = true;
-    let found = false;
-
-    let index = 0;
-    let total = 0;
-
-    while (nextURL && !found) {
-      let tracks;
-      [tracks, total, nextURL] = await spotifyApi
-        .getPlaylistTracks(userID, playlistID, next)
-        .then(
-          data => [data.body.items, data.body.total, data.body.next],
-          err => console.error(err)
-        );
-
-      if (nextURL) {
-        const searchParams = new URL(nextURL).searchParams;
-        next.offset = searchParams.get('offset');
-        next.limit = searchParams.get('limit');
-      }
-
-      tracks.some(item => {
-        if (item.track.id === track.id) {
-          found = true;
-          return true;
-        }
-
-        index++;
-        return false;
-      });
-    }
-
-    return [index, total, found];
-  },
-
   sleep(duration) {
     return new Promise(resolve => setTimeout(resolve, duration));
   },
@@ -155,11 +108,6 @@ module.exports = {
 
   formatSong(trackName, artistName) {
     return `*${trackName}* by *${artistName}*`;
-  },
-
-  splitPlaylistURI(uri) {
-    const splitURI = uri.split(':');
-    return { userID: splitURI[2], playlistID: splitURI[4] };
   },
 
   getWebClient() {

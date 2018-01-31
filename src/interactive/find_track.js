@@ -15,7 +15,7 @@ async function playTrackInPlaylistContext(
 
   const formattedSong = utils.formatSong(track.name, track.artists[0].name);
 
-  const [offset, total, found] = await utils.playlistContextOffset(
+  const [offset, total, found] = await spotifyApi.getPlaylistOffset(
     playlist,
     track
   );
@@ -43,62 +43,6 @@ async function playTrackInPlaylistContext(
   return [found, total];
 }
 
-async function addAndStoreTrack(
-  playlist,
-  trackData,
-  channelID,
-  userName,
-  chat
-) {
-  const activeUser = await User.getActive();
-  const spotifyApi = await activeUser.getSpotifyApi();
-  const webClient = utils.getWebClient();
-
-  const artist = trackData.artists[0];
-
-  await spotifyApi
-    .addTracksToPlaylist(playlist.spotifyUserID, playlist.spotifyID, [trackData.uri])
-    .then(
-      async () => {
-        const track = new Track({
-          spotifyID: trackData.id,
-          requestedBy: userName,
-          artist: artist.name,
-          title: trackData.name
-        });
-        await track.save();
-
-        playlist.tracks.push(track._id);
-        await playlist.save();
-
-        const message = `<@${userName}> added ${utils.formatSong(
-          track.title,
-          artist.name
-        )} to *${playlist.name}*`;
-
-        if (chat) {
-          webClient.chat.postMessage(channelID, message);
-        }
-      },
-      err =>
-        utils.errorWrapper(err, errorMessage => {
-          const message =
-            errorMessage ||
-            `There was an error adding ${utils.formatSong(
-              trackData.title,
-              artist.name
-            )} to *${playlist.name}*.`;
-
-          if (chat) {
-            webClient.chat.postMessage(
-              channelID,
-              utils.formatResponse(userName, message)
-            );
-          }
-        })
-    );
-}
-
 async function playAndAddTrack(track, channelID, userName) {
   const playlist = await Playlist.getActive();
 
@@ -113,7 +57,7 @@ async function playAndAddTrack(track, channelID, userName) {
     return;
   }
 
-  await addAndStoreTrack(playlist, track, channelID, userName, false);
+  await spotifyApi.addAndStoreTrack(playlist, track);
 
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
@@ -140,20 +84,41 @@ async function playAndAddTrack(track, channelID, userName) {
 }
 
 module.exports = async function find_track(payload, res) {
-  const userName = payload.user.name;
+  const userID = payload.user.id;
   const channelID = payload.channel.id;
 
   const action = payload.actions[0];
-  const track = JSON.parse(action.value);
+  const trackData = JSON.parse(action.value);
   const play = action.name == 'play';
 
   const playlist = await Playlist.getActive();
 
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
+  const webClient = utils.getWebClient();
+
   res.send('Just a moment...');
 
   if (play) {
-    return playAndAddTrack(track, channelID, userName);
+    return playAndAddTrack(trackData, channelID, userID);
   } else {
-    await addAndStoreTrack(playlist, track, channelID, userName, !play);
+    spotifyApi
+      .addAndStoreTrack(trackData, playlist, userID)
+      .then(track => {
+        const message = `<@${userID}> added ${track.formattedTitle} to *${playlist.name}*`;
+        webClient.chat.postMessage(channelID, message);
+      })
+      .catch(err =>
+        utils.errorWrapper(err, errorMessage => {
+          const message =
+            errorMessage ||
+            `There was an error adding your track to *${playlist.name}*.`;
+
+          webClient.chat.postMessage(
+            channelID,
+            utils.formatResponse(userID, message)
+          );
+        })
+      );
   }
 };

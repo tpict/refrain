@@ -15,7 +15,7 @@ describe('/eradicate interactive callback', function () {
     utils.setDefaultUsers();
 
     const track = new Track({
-      requestedBy: 'tom.picton',
+      requestedBy: 'U1AAAAAAA',
       artist: 'Jme',
       title: 'Test Me'
     });

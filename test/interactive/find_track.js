@@ -42,7 +42,7 @@ describe('/findme interactive callback', function () {
 
             chai.assert.include(storedTracks[0].toObject(), {
               spotifyID: '6sxosT7KMFP9OQL3DdD6Qy',
-              requestedBy: 'tom.picton',
+              requestedBy: 'U1AAAAAAA',
               artist: 'Jme',
               title: 'Test Me'
             });
@@ -50,7 +50,7 @@ describe('/findme interactive callback', function () {
             const parsedBody = queryString.parse(requestBody);
             chai.assert.equal(
               parsedBody.text,
-              '<@tom.picton> added *Test Me* by *Jme* to *My playlist*'
+              '<@U1AAAAAAA> added *Test Me* by *Jme* to *My playlist*'
             );
             chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
             done();
@@ -118,7 +118,7 @@ describe('/findme interactive callback', function () {
             const parsedBody = queryString.parse(requestBody);
             chai.assert.equal(
               parsedBody.text,
-              'Now playing *Test Me* by *Jme*, as requested by <@tom.picton>'
+              'Now playing *Test Me* by *Jme*, as requested by <@U1AAAAAAA>'
             );
             chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
 
