@@ -7,13 +7,14 @@ function splitPlaylistURI(uri) {
 }
 
 // Convenience methods for Refrain. These accept Mongoose models.
-SpotifyWebApi.prototype.refrain = {};
+const helpers = {};
+SpotifyWebApi.prototype.refrain = helpers;
 
 // Find the index of the given track in the given playlist.
 // This is a work-around for a bug in the Spotify API that prevents specifying
 // a playlist offset by URI.
 // https://github.com/spotify/web-api/issues/630
-SpotifyWebApi.prototype.refrain.getPlaylistOffset = async function (track, playlist) {
+helpers.getPlaylistOffset = async function (track, playlist) {
   const { userID, playlistID } = splitPlaylistURI(playlist.uri);
 
   let next = {};
@@ -55,10 +56,7 @@ SpotifyWebApi.prototype.refrain.getPlaylistOffset = async function (track, playl
 }.bind(SpotifyWebApi.prototype);
 
 // Add a track to the given playlist and store it in the database.
-SpotifyWebApi.prototype.addAndStoreTrack = async function (
-  track,
-  playlist
-) {
+helpers.addAndStoreTrack = async function (track, playlist) {
   return this.addTracksToPlaylist(playlist.spotifyUserID, playlist.spotifyID, [
     track.uri
   ])
@@ -70,14 +68,14 @@ SpotifyWebApi.prototype.addAndStoreTrack = async function (
       await playlist.save();
       return track;
     });
-};
+}.bind(SpotifyWebApi.prototype);
 
-// Play a track in the context of a playlist
-SpotifyWebApi.prototype.playTrackInPlaylistContext = async function (
-  track,
-  playlist
-) {
-  const [offset, total, found] = await this.refrain.getPlaylistOffset(track, playlist);
+// Play a track in the context of a playlist.
+helpers.playTrackInPlaylistContext = async function (track, playlist) {
+  const [offset, total, found] = await this.refrain.getPlaylistOffset(
+    track,
+    playlist
+  );
 
   if (found) {
     await this.play({
@@ -87,6 +85,22 @@ SpotifyWebApi.prototype.playTrackInPlaylistContext = async function (
   }
 
   return [found, total];
-};
+}.bind(SpotifyWebApi.prototype);
+
+// Play a track in the context of a playlist, adding it to the playlist and
+// and database if it's new.
+helpers.playAndAddTrack = async function (track, playlist) {
+  const [found, total] = await this.refrain.playTrackInPlaylistContext(
+    track,
+    playlist
+  );
+
+  if (found) {
+    return;
+  }
+
+  await this.refrain.addAndStoreTrack(playlist, track);
+  return this.play({ context_uri: playlist.uri, offset: { position: total } });
+}.bind(SpotifyWebApi.prototype);
 
 module.exports = SpotifyWebApi;
