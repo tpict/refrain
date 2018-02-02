@@ -1,3 +1,5 @@
+require('../setup');
+
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -6,19 +8,13 @@ const utils = require('../utils');
 
 const app = require('../../src/app');
 const Playlist = require('../../src/models/playlist');
-const User = require('../../src/models/user');
 
 chai.use(chaiHttp);
 
 describe('/listplaylists endpoint', function () {
-  beforeEach(async function () {
-    await utils.setDefaultUsers();
-  });
-
   afterEach(async function () {
     nock.cleanAll();
     await Playlist.remove({});
-    await User.remove({});
   });
 
   it('should tell the user if there are no playlists', function (done) {

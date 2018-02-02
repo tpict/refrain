@@ -1,8 +1,8 @@
+require('../setup');
+
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-
-const utils = require('../utils');
 
 const app = require('../../src/app');
 const Playlist = require('../../src/models/playlist');
@@ -11,8 +11,6 @@ chai.use(chaiHttp);
 
 describe('/listplaylists interactive callback', function () {
   beforeEach(async function () {
-    await utils.setDefaultUsers();
-
     await Playlist.insertMany([
       {
         spotifyID: 'P000000000000000000000',

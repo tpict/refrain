@@ -16,7 +16,7 @@ describe('Spotify authentication refresh', function () {
   let authScope;
   let shuffleScope;
 
-  beforeEach(async function () {
+  beforeEach(function () {
     authScope = nock('https://accounts.spotify.com')
       .post('/api/token')
       .reply(200, {
@@ -31,14 +31,11 @@ describe('Spotify authentication refresh', function () {
         state: false
       })
       .reply(200);
-
-    await utils.setDefaultUsers();
   });
 
-  afterEach(async function () {
+  afterEach(function () {
     nock.cleanAll();
     sandbox.restore();
-    await User.remove({});
   });
 
   it('should refresh the access token for users after expiry', function (done) {

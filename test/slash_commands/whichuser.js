@@ -1,3 +1,5 @@
+require('../setup');
+
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -10,13 +12,8 @@ const User = require('../../src/models/user');
 chai.use(chaiHttp);
 
 describe('/whichuser endpoint', function () {
-  beforeEach(async function () {
-    await utils.setDefaultUsers();
-  });
-
-  afterEach(async function () {
+  afterEach(function () {
     nock.cleanAll();
-    await User.remove({});
   });
 
   it('should prompt new users to use /spotifyauth', function (done) {

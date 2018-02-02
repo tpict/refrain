@@ -1,27 +1,21 @@
+require('../setup');
+
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const queryString = require('query-string');
 
-const utils = require('../utils');
-
 const app = require('../../src/app');
 const Playlist = require('../../src/models/playlist');
 const Track = require('../../src/models/track');
-const User = require('../../src/models/user');
 
 chai.use(chaiHttp);
 
 describe('/findme interactive callback', function () {
-  beforeEach(async function () {
-    await utils.setDefaultUsers();
-  });
-
   afterEach(async function () {
     nock.cleanAll();
     await Playlist.remove({});
     await Track.remove({});
-    await User.remove({});
   });
 
   it('should queue tracks', function (done) {

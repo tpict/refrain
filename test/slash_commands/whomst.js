@@ -1,3 +1,5 @@
+require('../setup');
+
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -13,8 +15,6 @@ chai.use(chaiHttp);
 
 describe('/whomst endpoint', async function () {
   beforeEach(async function () {
-    utils.setDefaultUsers();
-
     const track = new Track({
       spotifyID: '0eGsygTp906u18L0Oimnem',
       requestedBy: 'bing.bong',

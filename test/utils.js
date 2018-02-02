@@ -1,5 +1,3 @@
-const User = require('../src/models/user');
-
 module.exports = {
   baseSlackRequest(fields = {}) {
     return Object.assign(
@@ -21,15 +19,4 @@ module.exports = {
     );
   },
 
-  async setDefaultUsers(callback) {
-    await User.remove({});
-    const user = new User({
-      slackID: 'U1AAAAAAA',
-      spotifyAccessToken: 'myAccessToken',
-      spotifyRefreshToken: 'myRefreshToken',
-      spotifyTokenExpiry: '2049-01-01',
-      active: true
-    });
-    return user.save(callback);
-  }
 };

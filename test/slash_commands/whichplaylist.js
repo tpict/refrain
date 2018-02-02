@@ -1,3 +1,5 @@
+require('../setup');
+
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -10,10 +12,6 @@ const Playlist = require('../../src/models/playlist');
 chai.use(chaiHttp);
 
 describe('/whichplaylist endpoint', function () {
-  beforeEach(function () {
-    utils.setDefaultUsers();
-  });
-
   afterEach(async function () {
     nock.cleanAll();
     await Playlist.remove({});

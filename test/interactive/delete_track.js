@@ -1,8 +1,8 @@
+require('../setup');
+
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-
-const utils = require('../utils');
 
 const app = require('../../src/app');
 const Playlist = require('../../src/models/playlist');
@@ -12,8 +12,6 @@ chai.use(chaiHttp);
 
 describe('/eradicate interactive callback', function () {
   beforeEach(async function () {
-    utils.setDefaultUsers();
-
     const track = new Track({
       requestedBy: 'U1AAAAAAA',
       artist: 'Jme',
