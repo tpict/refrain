@@ -12,11 +12,6 @@ const permissionWrapper = require('../../src/slash_commands/permission_wrapper')
 chai.use(chaiHttp);
 
 describe('/eradicate endpoint', function () {
-  afterEach(function () {
-    nock.cleanAll();
-    permissionWrapper.setOn();
-  });
-
   it('should display an interactive confirmation message', function (done) {
     const currentlyPlayingScope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')

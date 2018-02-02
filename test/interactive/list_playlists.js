@@ -26,11 +26,6 @@ describe('/listplaylists interactive callback', function () {
     ]);
   });
 
-  afterEach(async function () {
-    nock.cleanAll();
-    await Playlist.remove({});
-  });
-
   it('should play playlists', function (done) {
     const playScope = nock('https://api.spotify.com')
       .put('/v1/me/player/play')

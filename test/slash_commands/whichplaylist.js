@@ -1,6 +1,5 @@
 require('../setup');
 
-const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
@@ -12,11 +11,6 @@ const Playlist = require('../../src/models/playlist');
 chai.use(chaiHttp);
 
 describe('/whichplaylist endpoint', function () {
-  afterEach(async function () {
-    nock.cleanAll();
-    await Playlist.remove({});
-  });
-
   it('should tell the user if no playlist is active', function (done) {
     const body = utils.baseSlackRequest({
       command: '/whichplaylist'

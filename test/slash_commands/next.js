@@ -13,11 +13,6 @@ const permissionWrapper = require('../../src/slash_commands/permission_wrapper')
 chai.use(chaiHttp);
 
 describe('/next endpoint', function () {
-  afterEach(function () {
-    nock.cleanAll();
-    permissionWrapper.setOn();
-  });
-
   it('should skip tracks as requested', function (done) {
     const nextTrackScope = nock('https://api.spotify.com')
       .post('/v1/me/player/next')

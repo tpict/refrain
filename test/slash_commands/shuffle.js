@@ -12,11 +12,6 @@ const permissionWrapper = require('../../src/slash_commands/permission_wrapper')
 chai.use(chaiHttp);
 
 describe('/shuffle endpoint', function () {
-  afterEach(function () {
-    nock.cleanAll();
-    permissionWrapper.setOn();
-  });
-
   it('should respond to "/shuffled on"', function (done) {
     const scope = nock('https://api.spotify.com')
       .put('/v1/me/player/shuffle')

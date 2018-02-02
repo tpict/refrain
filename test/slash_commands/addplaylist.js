@@ -23,11 +23,6 @@ describe('/addplaylist endpoint', function () {
       });
   });
 
-  afterEach(async function () {
-    nock.cleanAll();
-    await Playlist.remove({});
-  });
-
   it('should add requested playlist to storage', function (done) {
     const body = utils.baseSlackRequest({
       command: '/addplaylist',

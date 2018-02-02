@@ -7,17 +7,10 @@ const queryString = require('query-string');
 
 const app = require('../../src/app');
 const Playlist = require('../../src/models/playlist');
-const Track = require('../../src/models/track');
 
 chai.use(chaiHttp);
 
 describe('/findme interactive callback', function () {
-  afterEach(async function () {
-    nock.cleanAll();
-    await Playlist.remove({});
-    await Track.remove({});
-  });
-
   it('should queue tracks', function (done) {
     const addToPlaylistScope = nock('https://api.spotify.com')
       .post('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')

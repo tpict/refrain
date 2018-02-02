@@ -12,10 +12,6 @@ const User = require('../../src/models/user');
 chai.use(chaiHttp);
 
 describe('/listusers endpoint', function () {
-  afterEach(function () {
-    nock.cleanAll();
-  });
-
   it('should list authenticated users', function (done) {
     const newUser = new User({
       slackID: 'U1BBBBBBB',

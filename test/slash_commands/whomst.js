@@ -41,13 +41,6 @@ describe('/whomst endpoint', async function () {
     await playlist.save();
   });
 
-  afterEach(async function () {
-    nock.cleanAll();
-    permissionWrapper.setOn();
-    await Playlist.remove({});
-    await Track.remove({});
-  });
-
   it('should track who requested a track', function (done) {
     const scope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')

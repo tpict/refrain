@@ -12,11 +12,6 @@ const permissionWrapper = require('../../src/slash_commands/permission_wrapper')
 chai.use(chaiHttp);
 
 describe('/pauseme endpoint', function () {
-  afterEach(function () {
-    nock.cleanAll();
-    permissionWrapper.setOn();
-  });
-
   it('should pause music playback', function (done) {
     const scope = nock('https://api.spotify.com')
       .put('/v1/me/player/pause')

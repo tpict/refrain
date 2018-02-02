@@ -29,12 +29,6 @@ describe('/eradicate interactive callback', function () {
     await playlist.save();
   });
 
-  afterEach(async function () {
-    nock.cleanAll();
-    await Playlist.remove({});
-    await Track.remove({});
-  });
-
   it('should delete tracks', function (done) {
     const removeTrackScope = nock('https://api.spotify.com')
       .delete('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')

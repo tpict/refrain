@@ -1,6 +1,5 @@
 require('../setup');
 
-const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
@@ -11,10 +10,6 @@ const app = require('../../src/app');
 chai.use(chaiHttp);
 
 describe('/commandeer endpoint', function () {
-  afterEach(async function () {
-    nock.cleanAll();
-  });
-
   it('should reject unauthenticated users', function (done) {
     const body = utils.baseSlackRequest({
       command: '/commandeer',

@@ -1,6 +1,5 @@
 require('../setup');
 
-const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
@@ -12,10 +11,6 @@ const User = require('../../src/models/user');
 chai.use(chaiHttp);
 
 describe('/whichuser endpoint', function () {
-  afterEach(function () {
-    nock.cleanAll();
-  });
-
   it('should prompt new users to use /spotifyauth', function (done) {
     User.remove({}).then(() => {
       const body = utils.baseSlackRequest({

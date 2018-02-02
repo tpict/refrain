@@ -12,11 +12,6 @@ const Playlist = require('../../src/models/playlist');
 chai.use(chaiHttp);
 
 describe('/listplaylists endpoint', function () {
-  afterEach(async function () {
-    nock.cleanAll();
-    await Playlist.remove({});
-  });
-
   it('should tell the user if there are no playlists', function (done) {
     const body = utils.baseSlackRequest({
       command: '/listplaylists'

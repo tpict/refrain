@@ -34,7 +34,6 @@ describe('Spotify authentication refresh', function () {
   });
 
   afterEach(function () {
-    nock.cleanAll();
     sandbox.restore();
   });
 

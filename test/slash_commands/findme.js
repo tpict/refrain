@@ -12,11 +12,6 @@ const permissionWrapper = require('../../src/slash_commands/permission_wrapper')
 chai.use(chaiHttp);
 
 describe('/findme endpoint', function () {
-  afterEach(function () {
-    nock.cleanAll();
-    permissionWrapper.setOn();
-  });
-
   it('should prompt the user to enter a search query', function (done) {
     const scope = nock('https://api.spotify.com')
       .get('/v1/search/')
