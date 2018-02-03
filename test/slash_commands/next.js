@@ -3,7 +3,6 @@ require('../setup');
 const nock = require('nock');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const queryString = require('query-string');
 
 const utils = require('../utils');
 

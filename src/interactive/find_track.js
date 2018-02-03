@@ -2,8 +2,9 @@ const Playlist = require('../models/playlist');
 const Track = require('../models/track');
 const User = require('../models/user');
 const utils = require('../utils');
+const logger = require('../logger');
 
-module.exports = async function find_track(payload, res) {
+module.exports = async function find_track(payload) {
   const userID = payload.user.id;
   const channelID = payload.channel.id;
   const action = payload.actions[0];
@@ -14,8 +15,6 @@ module.exports = async function find_track(payload, res) {
   const spotifyApi = await activeUser.getSpotifyApi();
   const webClient = utils.getWebClient();
 
-  res.send('Just a moment...');
-
   const trackData = JSON.parse(action.value);
   const track = new Track({
     spotifyID: trackData.id,
@@ -25,39 +24,28 @@ module.exports = async function find_track(payload, res) {
   });
 
   if (action.name === 'play') {
-    spotifyApi.refrain
-      .playAndAddTrack(track, playlist)
-      .then(() =>
-        webClient.chat.postMessage(
-          channelID,
-          `Now playing ${track.formattedTitle}, as requested by <@${userID}>`
-        )
-      )
-      .catch((err, errorMessage) =>
-        webClient.chat.postMessage(
-          channelID,
-          errorMessage ||
-            `There was an error playing your track in the context of *${playlist.name}`
-        )
+    try {
+      await spotifyApi.refrain.playAndAddTrack(track, playlist);
+      webClient.chat.postMessage(
+        channelID,
+        `Now playing ${track.formattedTitle}, as requested by <@${userID}>`
       );
+    } catch (err) {
+      logger.error('Error playing track for /interactive play: ' + err);
+      webClient.chat.postMessage(channelID, utils.getErrorMessage(err));
+    }
   } else {
-    spotifyApi.refrain
-      .addAndStoreTrack(track, playlist)
-      .then(track => {
-        const message = `<@${userID}> added ${track.formattedTitle} to *${playlist.name}*`;
-        webClient.chat.postMessage(channelID, message);
-      })
-      .catch(err =>
-        utils.errorWrapper(err, errorMessage => {
-          const message =
-            errorMessage ||
-            `There was an error adding your track to *${playlist.name}*.`;
-
-          webClient.chat.postMessage(
-            channelID,
-            utils.formatResponse(userID, message)
-          );
-        })
+    try {
+      await spotifyApi.refrain.addAndStoreTrack(track, playlist);
+      webClient.chat.postMessage(
+        channelID,
+        `<@${userID}> added ${track.formattedTitle} to *${playlist.name}*`
       );
+    } catch (err) {
+      logger.error('Error queueing track for /interactive queue: ' + err);
+      webClient.chat.postMessage(channelID, utils.getErrorMessage(err));
+    }
   }
+
+  return 'Just a moment...';
 };
