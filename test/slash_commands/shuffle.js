@@ -30,7 +30,7 @@ describe('/shuffle endpoint', function () {
       .post('/shuffle')
       .send(body)
       .end((err, res) => {
-        chai.assert.equal(res.body.text, '<@bing.bong>: Shuffle is now on.');
+        chai.assert.equal(res.body.text, '<@U1AAAAAAA>: Shuffle is now on.');
         chai.assert.equal(res.body.response_type, 'in_channel');
         scope.done();
         done();
@@ -55,7 +55,7 @@ describe('/shuffle endpoint', function () {
       .post('/shuffle')
       .send(body)
       .end((err, res) => {
-        chai.assert.equal(res.body.text, '<@bing.bong>: Shuffle is now off.');
+        chai.assert.equal(res.body.text, '<@U1AAAAAAA>: Shuffle is now off.');
         chai.assert.equal(res.body.response_type, 'in_channel');
         scope.done();
         done();
@@ -80,7 +80,7 @@ describe('/shuffle endpoint', function () {
       .end((err, res) => {
         chai.assert.equal(
           res.body.text,
-          '<@bing.bong>: Please specify `on` or `off`.'
+          '<@U1AAAAAAA>: Please specify `on` or `off`.'
         );
         chai.assert.equal(res.body.response_type, 'in_channel');
         chai.assert.isFalse(scope.isDone());
@@ -103,7 +103,7 @@ describe('/shuffle endpoint', function () {
       .end((err, res) => {
         chai.assert.equal(
           res.body.text,
-          '<@bing.bong>: The jukebox is off!'
+          '<@U1AAAAAAA>: The jukebox is off!'
         );
         chai.assert.equal(res.body.response_type, 'in_channel');
         done();

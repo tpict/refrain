@@ -68,42 +68,22 @@ module.exports = {
     return new Promise(resolve => setTimeout(resolve, duration));
   },
 
-  // Handle common HTTP error responses
-  errorWrapper(err, callback = () => {}) {
-    console.error(err);
-
-    const responses = {
-      403: 'Spotify says that you don\'t have permission to do that!',
-      404: 'Spotify returned 404. Either a bad request was made, or, more likely, there\'s a problem with the Spotify API.',
-      500: 'Spotify had an internal server error. Don\'t shoot the messenger!',
-      502: 'The Spotify API is down. Don\'t shoot the messenger!',
-      503: 'The Spotify API is down. Don\'t shoot the messenger!'
+  slackAt(req, rawData) {
+    const formatted = {
+      response_type: 'in_channel'
     };
 
-    callback(responses[err.statusCode]);
-  },
-
-  inChannel(data) {
-    if (typeof data === 'string') {
-      data = { text: data };
+    if (typeof rawData === 'string') {
+      formatted.text = rawData;
+    } else {
+      Object.assign(formatted, rawData);
     }
 
-    data.response_type = 'in_channel';
-    return data;
-  },
+    const text = formatted.text;
+    const userID = typeof req == 'string' ? req : req.body.user_id;
+    formatted.text = `<@${userID}>: ${text}`;
 
-  respond(req, res, rawData) {
-    const data = this.inChannel(rawData);
-    const text = data.text;
-
-    const userName = typeof req == 'string' ? req : req.body.user_name;
-
-    data.text = this.formatResponse(userName, text);
-    res.send(data);
-  },
-
-  formatResponse(userName, text) {
-    return `<@${userName}>: ${text}`;
+    return formatted;
   },
 
   formatSong(trackName, artistName) {

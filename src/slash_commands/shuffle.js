@@ -1,29 +1,23 @@
 const User = require('../models/user');
-const utils = require('../utils');
+const { slackAt } = require('../utils');
 const { wrapper } = require('./permission_wrapper');
+const logger = require('../logger');
 
-module.exports = wrapper(async function shuffle(req, res) {
-  const text = req.body.text;
+module.exports = wrapper(async function shuffle(req) {
+  const text = req.body.text.toLowerCase();
   if (!['on', 'off'].includes(text)) {
-    utils.respond(req, res, 'Please specify `on` or `off`.');
-    return;
+    return slackAt(req, 'Please specify `on` or `off`.');
   }
 
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 
-  const state = text.toLowerCase() === 'on';
-  spotifyApi
+  const state = text === 'on';
+  return spotifyApi
     .setShuffle({ state })
-    .then(
-      () => utils.respond(req, res, `Shuffle is now ${state ? 'on' : 'off'}.`),
-      err =>
-        utils.errorWrapper(err, errorMessage =>
-          utils.respond(
-            req,
-            res,
-            errorMessage || 'An error occurred while setting shuffle state.'
-          )
-        )
-    );
+    .then(() => slackAt(req, `Shuffle is now ${text}.`))
+    .catch(err => {
+      logger.error(`Error setting shuffle ${text}: ${err}`);
+      throw err;
+    });
 });

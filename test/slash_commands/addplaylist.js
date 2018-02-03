@@ -36,7 +36,7 @@ describe('/addplaylist endpoint', function () {
       .end((err, res) => {
         chai.assert.equal(
           res.body.text,
-          '<@bing.bong>: Added your playlist *My playlist*.'
+          '<@U1AAAAAAA>: Added your playlist *My playlist*.'
         );
         chai.assert.equal(res.body.response_type, 'in_channel');
 

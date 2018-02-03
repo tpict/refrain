@@ -22,9 +22,10 @@ describe('/whichuser endpoint', function () {
         .post('/whichuser')
         .send(body)
         .end((err, res) => {
+          console.log(res);
           chai.assert.equal(
             res.body.text,
-            '<@bing.bong>: No authenticated users yet. Use `/spotifyauth` to get started.'
+            '<@U1AAAAAAA>: No authenticated users yet. Use `/spotifyauth` to get started.'
           );
           done();
         });
@@ -43,7 +44,7 @@ describe('/whichuser endpoint', function () {
       .end((err, res) => {
         chai.assert.equal(
           res.body.text,
-          '<@bing.bong>: The active user is <@U1AAAAAAA>'
+          '<@U1AAAAAAA>: The active user is <@U1AAAAAAA>'
         );
         done();
       });

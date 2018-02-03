@@ -4,13 +4,12 @@ let on = true;
 
 module.exports = {
   wrapper(callback) {
-    return (req, res) => {
+    return async req => {
       if (!on) {
-        utils.respond(req, res, 'The jukebox is off!', req);
-        return;
+        return utils.slackAt(req, 'The jukebox is off!', req);
       }
 
-      callback(req, res);
+      return callback(req);
     };
   },
 

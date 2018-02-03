@@ -6,3 +6,5 @@ node_modules
 .node-persist
 .nyc_output
 coverage
+combined.log
+error.log
