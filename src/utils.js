@@ -68,16 +68,21 @@ module.exports = {
     return new Promise(resolve => setTimeout(resolve, duration));
   },
 
-  slackAt(req, rawData) {
-    const formatted = {
-      response_type: 'in_channel'
-    };
+  inChannel(rawData) {
+    const formatted = {};
 
     if (typeof rawData === 'string') {
       formatted.text = rawData;
     } else {
       Object.assign(formatted, rawData);
     }
+
+    formatted.response_type = 'in_channel';
+    return formatted;
+  },
+
+  slackAt(req, rawData) {
+    const formatted = this.inChannel(rawData);
 
     const text = formatted.text;
     const userID = typeof req == 'string' ? req : req.body.user_id;

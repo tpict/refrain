@@ -2,8 +2,49 @@ const Playlist = require('../models/playlist');
 const User = require('../models/user');
 const utils = require('../utils');
 const { setOn, setOff } = require('./permission_wrapper');
+const logger = require('../logger');
 
-module.exports = async function refrain(req, res) {
+async function setOnAndPlay(spotifyApi, req) {
+  const playlist = await Playlist.getActive();
+
+  if (!playlist) {
+    setOn();
+    return utils.slackAt(
+      req,
+      'Switched on. Add a playlist with `/addplaylist` to get started.'
+    );
+  }
+
+  const playlistURI = playlist.uri;
+
+  try {
+    await spotifyApi.play({ context_uri: playlistURI });
+    setOn();
+    return utils.slackAt(
+      req,
+      'It begins...\nIf you can\'t hear anything, play any track in the Spotify client and try again.'
+    );
+  } catch (err) {
+    logger.error('Error playing music for /refrain: ' + err);
+    return err;
+  }
+}
+
+async function setOffAndPause(spotifyApi) {
+  setOff();
+
+  try {
+    await spotifyApi.pause();
+    return utils.inChannel(
+      '_If music be the food of love, play on._ - Shakespeare\nSwitching off.'
+    );
+  } catch (err) {
+    logger.error('Error pausing music for /refrain: ' + err);
+    return err;
+  }
+}
+
+module.exports = async function refrain(req) {
   const command = req.body.text.toLowerCase();
 
   const incomingUserID = req.body.user_id;
@@ -11,56 +52,12 @@ module.exports = async function refrain(req, res) {
   const spotifyApi = await activeUser.getSpotifyApi();
 
   if (activeUser.slackID != incomingUserID) {
-    return utils.respond(req, res, 'Only the active user may do that.');
+    return utils.slackAt(req, 'Only the active user may do that.');
   }
 
   if (command === 'on') {
-    const playlist = await Playlist.getActive();
-
-    if (!playlist) {
-      setOn();
-      utils.respond(
-        req,
-        res,
-        'Switched on. Add a playlist with `/addplaylist` to get started.'
-      );
-      return;
-    }
-
-    const playlistURI = playlist.uri;
-
-    spotifyApi.play({ context_uri: playlistURI }).then(
-      () => {
-        setOn();
-        utils.respond(
-          req,
-          res,
-          'It begins...\nIf you can\'t hear anything, play any track in the Spotify client and try again.'
-        );
-      },
-      err =>
-        utils.errorWrapper(err, errMessage =>
-          utils.respond(
-            req,
-            res,
-            errMessage || `There was an error playing *${playlist.name}*`
-          )
-        )
-    );
+    return setOnAndPlay(spotifyApi, req);
   } else if (command === 'off') {
-    setOff();
-    spotifyApi.pause().then(
-      () => {
-        res.send(
-          utils.inChannel(
-            '_If music be the food of love, play on._ - Shakespeare\nSwitching off.'
-          )
-        );
-      },
-      err =>
-        utils.errorWrapper(err, errMessage =>
-          utils.respond(req, res, errMessage || 'Couldn\'t stop playing!')
-        )
-    );
+    return setOffAndPause(spotifyApi);
   }
 };
