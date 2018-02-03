@@ -1,7 +1,5 @@
 // Callback endpoint for interactive Slack messages.
-const bodyParser = require('body-parser');
-
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
+const utils = require('../utils');
 
 const callbacks = {
   delete_track: require('./delete_track'),
@@ -11,12 +9,17 @@ const callbacks = {
 };
 
 module.exports = app => {
-  app.post('/interactive', urlencodedParser, (req, res) => {
+  app.post('/interactive', async (req, res) => {
     const payload = JSON.parse(req.body.payload);
     const callback = callbacks[payload.callback_id];
 
     if (callback) {
-      callback(payload, res);
+      try {
+        res.send(await callback(payload));
+      } catch (err) {
+        console.log(err);
+        res.send(utils.getErrorMessage(err.statusCode));
+      }
     } else {
       res.send('Looks like that feature hasn\'t been implemented yet!');
     }
