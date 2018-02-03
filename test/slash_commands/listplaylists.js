@@ -12,24 +12,21 @@ const Playlist = require('../../src/models/playlist');
 chai.use(chaiHttp);
 
 describe('/listplaylists endpoint', function () {
-  it('should tell the user if there are no playlists', function (done) {
+  it('should tell the user if there are no playlists', async function () {
     const body = utils.baseSlackRequest({
       command: '/listplaylists'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/listplaylists')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: There are no configured playlists. Try `/addplaylist` to get started.'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
+      .send(body);
 
-        done();
-      });
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: There are no configured playlists. Try `/addplaylist` to get started.'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
   });
 
   it('should list configured playlists', async function () {
@@ -82,19 +79,18 @@ describe('/listplaylists endpoint', function () {
       command: '/listplaylists'
     });
 
-    return chai
+    const res = await chai
       .request(app)
       .post('/listplaylists')
-      .send(body)
-      .then((res) => {
-        chai.assert.deepEqual(
-          res.body.attachments,
-          require('../fixtures/listplaylists_response.json').attachments
-        );
+      .send(body);
 
-        scope1.done();
-        scope2.done();
-        scope3.done();
-      });
+    chai.assert.deepEqual(
+      res.body.attachments,
+      require('../fixtures/listplaylists_response.json').attachments
+    );
+
+    scope1.done();
+    scope2.done();
+    scope3.done();
   });
 });
