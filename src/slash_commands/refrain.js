@@ -26,7 +26,7 @@ async function setOnAndPlay(spotifyApi, req) {
     );
   } catch (err) {
     logger.error('Error playing music for /refrain: ' + err);
-    return err;
+    throw err;
   }
 }
 
@@ -40,7 +40,7 @@ async function setOffAndPause(spotifyApi) {
     );
   } catch (err) {
     logger.error('Error pausing music for /refrain: ' + err);
-    return err;
+    throw err;
   }
 }
 

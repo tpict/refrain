@@ -12,6 +12,6 @@ module.exports = wrapper(async function playme(req) {
     return utils.slackAt(req, 'Now playing!');
   } catch (err) {
     logger.error('Error playing music for /playme: ' + err);
-    return err;
+    throw err;
   }
 });

@@ -12,6 +12,6 @@ module.exports = wrapper(async function pauseme(req) {
     return utils.slackAt(req, 'Paused!');
   } catch (err) {
     logger.error('Error pausing for /pauseme: ' + err);
-    return err;
+    throw err;
   }
 });

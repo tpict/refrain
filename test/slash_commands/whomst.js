@@ -17,7 +17,7 @@ describe('/whomst endpoint', async function () {
   beforeEach(async function () {
     const track = new Track({
       spotifyID: '0eGsygTp906u18L0Oimnem',
-      requestedBy: 'bing.bong',
+      requestedBy: 'U1AAAAAAA',
       artist: 'The Killers',
       name: 'Mr. Brightside'
     });
@@ -25,7 +25,7 @@ describe('/whomst endpoint', async function () {
 
     const track2 = new Track({
       spotifyID: '2x9SpqnPi8rlE9pjHBwmSC',
-      requestedBy: 'bing.bong',
+      requestedBy: 'U1AAAAAAA',
       artist: 'Talking Heads',
       name: 'Psycho Killer - 2005 Remastered Version'
     });
@@ -41,7 +41,7 @@ describe('/whomst endpoint', async function () {
     await playlist.save();
   });
 
-  it('should track who requested a track', function (done) {
+  it('should track who requested a track', async function () {
     const scope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')
       .reply(200, require('../fixtures/currently_playing.json'));
@@ -50,22 +50,20 @@ describe('/whomst endpoint', async function () {
       command: '/whomst'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/whomst')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: *Mr. Brightside* by *The Killers* was last requested by <@bing.bong>'
-        );
+      .send(body);
 
-        scope.done();
-        done();
-      });
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: *Mr. Brightside* by *The Killers* was last requested by <@U1AAAAAAA>'
+    );
+
+    scope.done();
   });
 
-  it('should tell the user if the track was added directly', function (done) {
+  it('should tell the user if the track was added directly', async function () {
     const scope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')
       .reply(200, require('../fixtures/currently_playing_2.json'));
@@ -74,22 +72,20 @@ describe('/whomst endpoint', async function () {
       command: '/whomst'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/whomst')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: *Psycho Killer - 2005 Remastered Version* by *Talking Heads* was added directly through Spotify :thumbsdown:'
-        );
+      .send(body);
 
-        scope.done();
-        done();
-      });
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: *Psycho Killer - 2005 Remastered Version* by *Talking Heads* was added directly through Spotify :thumbsdown:'
+    );
+
+    scope.done();
   });
 
-  it('should tell the user if no track is playing', function (done) {
+  it('should tell the user if no track is playing', async function () {
     const scope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')
       .reply(204);
@@ -98,39 +94,32 @@ describe('/whomst endpoint', async function () {
       command: '/whomst'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/whomst')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: Are you hearing things? If so, check that `/whichuser` matches the user signed in to Spotify.'
-        );
+      .send(body);
 
-        scope.done();
-        done();
-      });
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: Are you hearing things? If so, check that `/whichuser` matches the user signed in to Spotify.'
+    );
+
+    scope.done();
   });
 
-  it('should only work when the jukebox is on', function (done) {
+  it('should only work when the jukebox is on', async function () {
     permissionWrapper.setOff();
 
     const body = utils.baseSlackRequest({
       command: '/whomst'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/whomst')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: The jukebox is off!'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(res.body.text, '<@U1AAAAAAA>: The jukebox is off!');
+    chai.assert.equal(res.body.response_type, 'in_channel');
   });
 });
