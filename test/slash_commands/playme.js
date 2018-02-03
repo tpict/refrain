@@ -12,7 +12,7 @@ const permissionWrapper = require('../../src/slash_commands/permission_wrapper')
 chai.use(chaiHttp);
 
 describe('/playme endpoint', function () {
-  it('should begin music playback', function (done) {
+  it('should begin music playback', async function () {
     const scope = nock('https://api.spotify.com')
       .put('/v1/me/player/play')
       .reply(200);
@@ -21,35 +21,28 @@ describe('/playme endpoint', function () {
       command: '/playme'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/playme')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(res.body.text, '<@bing.bong>: Now playing!');
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        scope.done();
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(res.body.text, '<@U1AAAAAAA>: Now playing!');
+    chai.assert.equal(res.body.response_type, 'in_channel');
+    scope.done();
   });
 
-  it('should only work when the jukebox is on', function (done) {
+  it('should only work when the jukebox is on', async function () {
     permissionWrapper.setOff();
     const body = utils.baseSlackRequest({
       command: '/playme'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/playme')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: The jukebox is off!'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(res.body.text, '<@U1AAAAAAA>: The jukebox is off!');
+    chai.assert.equal(res.body.response_type, 'in_channel');
   });
 });
