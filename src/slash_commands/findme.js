@@ -1,31 +1,25 @@
 const User = require('../models/user');
 const utils = require('../utils');
 const { wrapper } = require('./permission_wrapper');
+const logger = require('../logger');
 
-module.exports = wrapper(async function findme(req, res) {
+module.exports = wrapper(async function findme(req) {
   const searchTerms = req.body.text;
   if (!searchTerms) {
-    utils.respond(req, res, 'Please provide a search query.');
-    return;
+    return utils.slackAt(req, 'Please provide a search query.');
   }
 
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 
-  spotifyApi.searchTracks(searchTerms, { limit: 3 }).then(
-    data => {
-      res.send({
+  try {
+    const data = await spotifyApi.searchTracks(searchTerms, { limit: 3 });
+    return {
         text: `You searched for "${searchTerms}":`,
         attachments: utils.getSearchAttachments(searchTerms, data)
-      });
-    },
-    err =>
-    utils.errorWrapper(err, errorMessage =>
-      utils.respond(
-        req,
-        res,
-        errorMessage || 'An error occured while performing the search.'
-      )
-    )
-  );
+    };
+  } catch (err) {
+    logger.error(`Error performing track search: ${err}`);
+    throw err;
+  }
 });

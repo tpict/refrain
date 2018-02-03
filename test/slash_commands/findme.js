@@ -12,7 +12,7 @@ const permissionWrapper = require('../../src/slash_commands/permission_wrapper')
 chai.use(chaiHttp);
 
 describe('/findme endpoint', function () {
-  it('should prompt the user to enter a search query', function (done) {
+  it('should prompt the user to enter a search query', async function () {
     const scope = nock('https://api.spotify.com')
       .get('/v1/search/')
       .query({ type: 'track', q: 'temporary secretary', limit: 3 })
@@ -22,22 +22,20 @@ describe('/findme endpoint', function () {
       command: '/findme'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/findme')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: Please provide a search query.'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        chai.assert.isFalse(scope.isDone());
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: Please provide a search query.'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
+    chai.assert.isFalse(scope.isDone());
   });
 
-  it('should display search results in an interactive menu', function (done) {
+  it('should display search results in an interactive menu', async function () {
     const scope = nock('https://api.spotify.com')
       .get('/v1/search/')
       .query({ type: 'track', q: 'temporary secretary', limit: 3 })
@@ -48,22 +46,20 @@ describe('/findme endpoint', function () {
       text: 'temporary secretary'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/findme')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.deepEqual(
-          res.body,
-          require('../fixtures/search_response.json')
-        );
+      .send(body);
 
-        scope.done();
-        done();
-      });
+    chai.assert.deepEqual(
+      res.body,
+      require('../fixtures/search_response.json')
+    );
+
+    scope.done();
   });
 
-  it('should hide the "find more" button on the last page', function (done) {
+  it('should hide the "find more" button on the last page', async function () {
     const response = require('../fixtures/search.json');
     response.tracks.next = null;
     const scope = nock('https://api.spotify.com')
@@ -76,37 +72,33 @@ describe('/findme endpoint', function () {
       text: 'temporary secretary'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/findme')
-      .send(body)
-      .end((err, res) => {
-        const expected = require('../fixtures/search_response.json');
-        expected.attachments.pop();
-        chai.assert.deepEqual(res.body, expected);
-        scope.done();
-        done();
-      });
+      .send(body);
+
+    const expected = require('../fixtures/search_response.json');
+    expected.attachments.pop();
+    chai.assert.deepEqual(res.body, expected);
+    scope.done();
   });
 
-  it('should only work when the jukebox is on', function (done) {
+  it('should only work when the jukebox is on', async function () {
     permissionWrapper.setOff();
     const body = utils.baseSlackRequest({
       command: '/findme',
       text: 'temporary secretary'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/findme')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: The jukebox is off!'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: The jukebox is off!'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
   });
 });
