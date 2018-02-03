@@ -1,46 +1,52 @@
 const User = require('../models/user');
 const Playlist = require('../models/playlist');
-const utils = require('../utils');
+const logger = require('../logger');
 
-async function removePlaylist(payload, res) {
+async function removePlaylist(payload) {
   const spotifyID = payload.actions[0].value;
   const playlist = await Playlist.findOne({ spotifyID });
-  await playlist.remove({});
-  res.send(`Removed configuration for *${playlist.name}*.`);
+
+  try {
+    await playlist.remove({});
+    return `Removed configuration for *${playlist.name}*.`;
+  } catch (err) {
+    logger.error(
+      'Error removing playlist for /interactive list playlists: ' + err
+    );
+    throw err;
+  }
 }
 
-async function playPlaylist(payload, res) {
+async function playPlaylist(payload) {
   const spotifyID = payload.actions[0].value;
   const playlist = await Playlist.findOne({ spotifyID });
 
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 
-  spotifyApi
-    .play({
+  try {
+    await spotifyApi.play({
       context_uri: playlist.uri
-    })
-    .then(
-      async () => {
-        await playlist.setActive();
+    });
+    await playlist.setActive();
 
-        res.send(
-          `Now playing from *${playlist.name}*! Commands will now act on this playlist.`
-        );
-      },
-      err =>
-        utils.errorWrapper(err, errorMessage =>
-          res.send(errorMessage || 'Looks like a misconfigured playlist.')
-        )
+    return `Now playing from *${
+      playlist.name
+    }*! Commands will now act on this playlist.`;
+  } catch (err) {
+    logger.error(
+      'Error playing playlist for /interactive list playlists: ' + err
     );
+    throw err;
+  }
 }
 
-module.exports = function list_playlists(payload, res) {
+module.exports = async function list_playlists(payload) {
   const action = payload.actions[0];
 
   if (action.name === 'remove') {
-    removePlaylist(payload, res);
+    return await removePlaylist(payload);
   } else {
-    playPlaylist(payload, res);
+    return await playPlaylist(payload);
   }
 };
