@@ -29,7 +29,10 @@ module.exports = app =>
   endpoints.forEach(({ name, handler }) =>
     app.post(name, async function (req, res) {
       const response = await handler(req).catch(
-        error => errors[error.statusCode] || genericError
+        error => {
+          console.log(error);
+          return errors[error.statusCode] || genericError;
+        }
       );
 
       res.send(response);
