@@ -12,7 +12,7 @@ const permissionWrapper = require('../../src/slash_commands/permission_wrapper')
 chai.use(chaiHttp);
 
 describe('/eradicate endpoint', function () {
-  it('should display an interactive confirmation message', function (done) {
+  it('should display an interactive confirmation message', async function () {
     const currentlyPlayingScope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')
       .reply(200, require('../fixtures/currently_playing.json'));
@@ -23,7 +23,7 @@ describe('/eradicate endpoint', function () {
 
     const expected = {
       text:
-        '<@bing.bong>: Whoa! Are you absolutely positive that you want to delete *Mr. Brightside* by *The Killers*?',
+        '<@U1AAAAAAA>: Whoa! Are you absolutely positive that you want to delete *Mr. Brightside* by *The Killers*?',
       attachments: [
         {
           fallback: 'Your device doesn\'t support this.',
@@ -50,18 +50,16 @@ describe('/eradicate endpoint', function () {
       response_type: 'in_channel'
     };
 
-    chai
+    const res = await chai
       .request(app)
       .post('/eradicate')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.deepEqual(res.body, expected);
-        currentlyPlayingScope.done();
-        done();
-      });
+      .send(body);
+
+    chai.assert.deepEqual(res.body, expected);
+    currentlyPlayingScope.done();
   });
 
-  it('should notify the user if no track is playing', function (done) {
+  it('should notify the user if no track is playing', async function () {
     const currentlyPlayingScope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')
       .reply(204);
@@ -70,38 +68,31 @@ describe('/eradicate endpoint', function () {
       command: '/eradicate'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/eradicate')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.'
-        );
-        currentlyPlayingScope.done();
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.'
+    );
+    currentlyPlayingScope.done();
   });
 
-  it('should only work when the jukebox is on', function (done) {
+  it('should only work when the jukebox is on', async function () {
     permissionWrapper.setOff();
 
     const body = utils.baseSlackRequest({
       command: '/eradicate'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/eradicate')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: The jukebox is off!'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(res.body.text, '<@U1AAAAAAA>: The jukebox is off!');
+    chai.assert.equal(res.body.response_type, 'in_channel');
   });
 });
