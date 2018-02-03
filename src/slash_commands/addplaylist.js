@@ -21,10 +21,10 @@ module.exports = async function addplaylist(req) {
         spotifyUserID,
         name
       });
-      return playlist.save().then(() => {
-        // if (!Playlist.getActive()) {
-        //   playlist.setActive();
-        // }
+      return playlist.save().then(async () => {
+        if (!await Playlist.getActive()) {
+          await playlist.setActive();
+        }
 
         return utils.slackAt(req, `Added your playlist *${name}*.`);
       });

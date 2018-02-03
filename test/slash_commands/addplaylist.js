@@ -23,42 +23,78 @@ describe('/addplaylist endpoint', function () {
       });
   });
 
-  it('should add requested playlist to storage', function (done) {
+  it('should add requested playlist to storage', async function () {
+    const existingPlaylist = new Playlist({
+      spotifyID: 'U1AAAAAAA',
+      spotifyUserID: 'P000000000000000000000',
+      name: 'Existing playlist',
+      active: true,
+    });
+    await existingPlaylist.save();
+
     const body = utils.baseSlackRequest({
       command: '/addplaylist',
       text: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/addplaylist')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@U1AAAAAAA>: Added your playlist *My playlist*.'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
+      .send(body);
 
-        Playlist.findOne(
-          {
-            spotifyID: 'P000000000000000000000'
-          },
-          function (err, playlist) {
-            chai.assert.include(playlist.toObject(), {
-              spotifyID: 'P000000000000000000000',
-              spotifyUserID: 'U1AAAAAAA',
-              name: 'My playlist'
-            });
+    scope.done();
 
-            scope.done();
-            done();
-          }
-        );
-      });
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: Added your playlist *My playlist*.'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
+
+    const playlist = await Playlist.findOne({
+      spotifyID: 'P000000000000000000000'
+    });
+    chai.assert.include(playlist.toObject(), {
+      spotifyID: 'P000000000000000000000',
+      spotifyUserID: 'U1AAAAAAA',
+      name: 'My playlist'
+    });
+
+    // The active playlist shouldn't be changed since one is already set
+    const activePlaylist = await Playlist.getActive();
+    chai.assert.isTrue(activePlaylist.equals(existingPlaylist));
   });
 
-  it('should not store invalid playlists', function (done) {
+  it('should make the first added playlist the active one', async function () {
+    const body = utils.baseSlackRequest({
+      command: '/addplaylist',
+      text: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+    });
+
+    const res = await chai
+      .request(app)
+      .post('/addplaylist')
+      .send(body);
+
+    scope.done();
+
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: Added your playlist *My playlist*.'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
+
+    const playlist = await Playlist.findOne({
+      spotifyID: 'P000000000000000000000'
+    });
+    chai.assert.include(playlist.toObject(), {
+      spotifyID: 'P000000000000000000000',
+      spotifyUserID: 'U1AAAAAAA',
+      name: 'My playlist',
+      active: true
+    });
+  });
+
+  it('should not store invalid playlists', async function () {
     scope = nock('https://api.spotify.com')
       .get('/v1/users/U1BBBBBBB/playlists/P000000000000000000000')
       .reply(404);
@@ -68,28 +104,22 @@ describe('/addplaylist endpoint', function () {
       text: 'myplaylist spotify:user:U1BBBBBBB:playlist:P000000000000000000000'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/addplaylist')
-      .send(body)
-      .end((err, res) => {
-        scope.done();
+      .send(body);
 
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: Couldn\'t find that playlist.'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
+    scope.done();
 
-        Playlist.findOne(
-          {
-            spotifyID: 'P000000000000000000000'
-          },
-          function (err, playlist) {
-            chai.assert.isNull(playlist);
-            done();
-          }
-        );
-      });
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: Couldn\'t find that playlist.'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
+
+    const playlist = await Playlist.findOne({
+      spotifyID: 'P000000000000000000000'
+    });
+    chai.assert.isNull(playlist);
   });
 });
