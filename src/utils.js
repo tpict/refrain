@@ -102,6 +102,7 @@ module.exports = {
   getErrorMessage(statusCode, custom) {
     const genericError = 'There was a problem handling your request.';
     const errors = {
+      401: 'Spotify authorisation failed. Try /spotifyauth again.',
       403: 'Spotify says that you don\'t have permission to do that!',
       404: 'Spotify returned 404. Either a bad request was made, or, more likely, there\'s a problem with the Spotify API.',
       500: 'Spotify had an internal server error. Don\'t shoot the messenger!',

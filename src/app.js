@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
 
+const logger = require('./logger');
+
 const app = function () {
   let app = express();
   app.use(bodyParser.json());
@@ -17,9 +19,10 @@ const app = function () {
   const uristring = process.env.MONGODB_URI;
   mongoose.connect(uristring, function (err) {
     if (err) {
-      console.log('Error connecting to ' + uristring + ': ' + err);
+      logger.info('Error connecting to ' + uristring + ': ' + err);
+      process.exit(1);
     } else {
-      console.log('Successfully connected to ' + uristring);
+      logger.info('Successfully connected to ' + uristring);
     }
   });
 
@@ -27,7 +30,7 @@ const app = function () {
 }();
 
 if (!module.parent) {
-  app.listen(4390, () => console.log('Refrain listening on port 4390!'));
+  app.listen(4390, () => logger.info('Refrain listening on port 4390!'));
 }
 
 module.exports = app;

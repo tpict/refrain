@@ -24,27 +24,37 @@ module.exports = async function find_track(payload) {
   });
 
   if (action.name === 'play') {
-    try {
-      await spotifyApi.refrain.playAndAddTrack(track, playlist);
-      webClient.chat.postMessage(
-        channelID,
-        `Now playing ${track.formattedTitle}, as requested by <@${userID}>`
-      );
-    } catch (err) {
-      logger.error('Error playing track for /interactive play: ' + err);
-      webClient.chat.postMessage(channelID, utils.getErrorMessage(err));
-    }
+    spotifyApi
+      .playAndAddTrack(track, playlist)
+      .then(() =>
+        webClient.chat.postMessage(
+          channelID,
+          `Now playing ${track.formattedTitle}, as requested by <@${userID}>`
+        )
+      )
+      .catch(err => {
+        logger.error('Error playing track for /interactive play: ' + err);
+        webClient.chat.postMessage(
+          channelID,
+          utils.getErrorMessage(err.statusCode)
+        );
+      });
   } else {
-    try {
-      await spotifyApi.refrain.addAndStoreTrack(track, playlist);
-      webClient.chat.postMessage(
-        channelID,
-        `<@${userID}> added ${track.formattedTitle} to *${playlist.name}*`
-      );
-    } catch (err) {
-      logger.error('Error queueing track for /interactive queue: ' + err);
-      webClient.chat.postMessage(channelID, utils.getErrorMessage(err));
-    }
+    spotifyApi
+      .addAndStoreTrack(track, playlist)
+      .then(() =>
+        webClient.chat.postMessage(
+          channelID,
+          `<@${userID}> added ${track.formattedTitle} to *${playlist.name}*`
+        )
+      )
+      .catch(err => {
+        logger.error('Error queueing track for /interactive queue: ' + err);
+        webClient.chat.postMessage(
+          channelID,
+          utils.getErrorMessage(err.statusCode)
+        );
+      });
   }
 
   return 'Just a moment...';

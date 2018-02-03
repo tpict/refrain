@@ -33,10 +33,7 @@ schema.methods.getSpotifyApi = async function () {
 
   const tokenExpiry = this.spotifyTokenExpiry;
   if (!tokenExpiry || moment() > moment(tokenExpiry)) {
-    const data = await spotifyApi
-      .refreshAccessToken()
-      .then(data => data, err => console.log(err));
-
+    const data = await spotifyApi.refreshAccessToken();
     spotifyApi.setAccessToken(data.body['access_token']);
 
     this.spotifyAccessToken = data.body['access_token'];
