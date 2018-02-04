@@ -1,3 +1,5 @@
+require('./setup');
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const nock = require('nock');
@@ -37,7 +39,7 @@ describe('Spotify authentication refresh', function () {
     sandbox.restore();
   });
 
-  it('should refresh the access token for users after expiry', function (done) {
+  it('should refresh the access token for users after expiry', async function () {
     const theFuture = moment('2049-02-01');
     sandbox.stub(moment, 'now').callsFake(function () {
       return theFuture;
@@ -48,44 +50,35 @@ describe('Spotify authentication refresh', function () {
       text: 'off'
     });
 
-    chai
+    await chai
       .request(app)
       .post('/shuffle')
-      .send(body)
-      .end(() => {
-        authScope.done();
-        shuffleScope.done();
-        done();
-      });
+      .send(body);
+
+    authScope.done();
+    shuffleScope.done();
   });
 
-  it('should refresh the access token for users with no set expiry', function (
-    done
-  ) {
-    User.getActive()
-      .then(user => {
-        user.spotifyTokenExpiry = undefined;
-        return user.save();
-      })
-      .then(() => {
-        const body = utils.baseSlackRequest({
-          command: '/shuffled',
-          text: 'off'
-        });
+  it('should refresh the access token for users with no set expiry', async function () {
+    const user = await User.getActive();
+    user.spotifyTokenExpiry = undefined;
+    await user.save();
 
-        chai
-          .request(app)
-          .post('/shuffle')
-          .send(body)
-          .end(() => {
-            authScope.done();
-            shuffleScope.done();
-            done();
-          });
-      });
+    const body = utils.baseSlackRequest({
+      command: '/shuffled',
+      text: 'off'
+    });
+
+    await chai
+      .request(app)
+      .post('/shuffle')
+      .send(body);
+
+    authScope.done();
+    shuffleScope.done();
   });
 
-  it('should skip refresh if access token is still valid', function (done) {
+  it('should skip refresh if access token is still valid', async function () {
     const theFuture = moment('2049-01-01');
     sandbox.stub(moment, 'now').callsFake(function () {
       return theFuture;
@@ -96,14 +89,12 @@ describe('Spotify authentication refresh', function () {
       text: 'off'
     });
 
-    chai
+    await chai
       .request(app)
       .post('/shuffle')
-      .send(body)
-      .end(() => {
-        chai.assert.isFalse(authScope.isDone());
-        shuffleScope.done();
-        done();
-      });
+      .send(body);
+
+    chai.assert.isFalse(authScope.isDone());
+    shuffleScope.done();
   });
 });

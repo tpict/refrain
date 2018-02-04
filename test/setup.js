@@ -54,3 +54,8 @@ beforeEach(async function () {
   await setDefaultUsers();
   await setDefaultPlaylists();
 });
+
+afterEach(async function () {
+  await User.remove({});
+  await Playlist.remove({});
+});
