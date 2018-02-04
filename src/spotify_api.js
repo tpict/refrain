@@ -1,6 +1,9 @@
 const { URL } = require('url');
 const SpotifyWebApi = require('spotify-web-api-node');
 
+const Playlist = require('./models/playlist');
+const Track = require('./models/track');
+
 function splitPlaylistURI(uri) {
   const splitURI = uri.split(':');
   return { userID: splitURI[2], playlistID: splitURI[4] };
@@ -99,6 +102,38 @@ const extended = api => ({
     return api.play({
       context_uri: playlist.uri,
       offset: { position: total }
+    });
+  },
+
+  // The following methods make the same requests as their vanilla
+  // counterparts, but accept and return Mongoose models.
+
+  // Returns null, the Track item in the database (uses active playlist
+  // context) or a new Track.
+  getMyCurrentPlayingTrack: async () => {
+    const res = await api.getMyCurrentPlayingTrack();
+    const trackData = res.body.item;
+
+    if (!trackData) {
+      return null;
+    }
+
+    const playlist = await Playlist.getActive();
+    await playlist
+      .populate({
+        path: 'tracks',
+        match: { spotifyID: trackData.id }
+      })
+      .execPopulate();
+
+    if (playlist.tracks.length > 0) {
+      return playlist.tracks[0];
+    }
+
+    return new Track({
+      spotifyID: trackData.id,
+      artist: trackData.artists[0].name,
+      title: trackData.name
     });
   }
 });

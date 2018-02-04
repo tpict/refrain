@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const SpotifyWebApi = require('../spotify_api');
 
 const schema = new mongoose.Schema({
-  slackID: String,
+  slackID: { type: String, unique: true },
   spotifyID: String,
   spotifyAccessToken: String,
   spotifyRefreshToken: String,

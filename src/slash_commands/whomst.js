@@ -8,16 +8,15 @@ module.exports = wrapper(async function whomst(req) {
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 
-  let data = {};
+  let track = null;
 
   try {
-    data = await spotifyApi.getMyCurrentPlayingTrack();
+    track = await spotifyApi.refrain.getMyCurrentPlayingTrack();
   } catch (err) {
     logger.error('Error getting current track for /whomst: ' + err);
     throw err;
   }
 
-  const track = data.body.item;
   if (!track) {
     return utils.slackAt(
       req,
@@ -25,31 +24,15 @@ module.exports = wrapper(async function whomst(req) {
     );
   }
 
-  const name = track.name;
-  const artist = track.artists[0].name;
-
-  const playlist = await Playlist.getActive();
-  await playlist
-    .populate({
-      path: 'tracks',
-      match: { spotifyID: track.id }
-    })
-    .execPopulate();
-
-  if (playlist.tracks.length) {
+  if (track.isNew) {
     return utils.slackAt(
       req,
-      `${utils.formatSong(name, artist)} was last requested by <@${
-        playlist.tracks[0].requestedBy
-      }>`
+      `${track.formattedTitle} was added directly through Spotify :thumbsdown:`
     );
   }
 
   return utils.slackAt(
     req,
-    `${utils.formatSong(
-      name,
-      artist
-    )} was added directly through Spotify :thumbsdown:`
+    `${track.formattedTitle} was last requested by <@${track.requestedBy}>`
   );
 });

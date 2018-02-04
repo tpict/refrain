@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-  spotifyID: String,
+  spotifyID: { type: String, unique: true },
   spotifyUserID: String,
   name: String,
   active: { type: Boolean, default: false },
