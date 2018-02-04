@@ -1,9 +1,8 @@
 const User = require('../models/user');
 const utils = require('../utils');
-const { wrapper } = require('./permission_wrapper');
 const logger = require('../logger');
 
-module.exports = wrapper(async function playme(req) {
+module.exports = async function playme(req) {
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 
@@ -14,4 +13,4 @@ module.exports = wrapper(async function playme(req) {
     logger.error('Error playing music for /playme: ' + err);
     throw err;
   }
-});
+};

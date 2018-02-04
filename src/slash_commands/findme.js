@@ -1,9 +1,8 @@
 const User = require('../models/user');
 const utils = require('../utils');
-const { wrapper } = require('./permission_wrapper');
 const logger = require('../logger');
 
-module.exports = wrapper(async function findme(req) {
+module.exports = async function findme(req) {
   const searchTerms = req.body.text;
   if (!searchTerms) {
     return utils.slackAt(req, 'Please provide a search query.');
@@ -22,4 +21,4 @@ module.exports = wrapper(async function findme(req) {
     logger.error(`Error performing track search: ${err}`);
     throw err;
   }
-});
+};

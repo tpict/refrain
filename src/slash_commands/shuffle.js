@@ -1,9 +1,8 @@
 const User = require('../models/user');
 const utils = require('../utils');
-const { wrapper } = require('./permission_wrapper');
 const logger = require('../logger');
 
-module.exports = wrapper(async function shuffle(req) {
+module.exports = async function shuffle(req) {
   const text = req.body.text.toLowerCase();
   if (!['on', 'off'].includes(text)) {
     return utils.slackAt(req, 'Please specify `on` or `off`.');
@@ -20,4 +19,4 @@ module.exports = wrapper(async function shuffle(req) {
       logger.error(`Error setting shuffle ${text}: ${err}`);
       throw err;
     });
-});
+};

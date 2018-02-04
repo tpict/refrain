@@ -1,16 +1,8 @@
 const Playlist = require('../models/playlist');
 const User = require('../models/user');
-const utils = require('../utils');
 const logger = require('../logger');
 
-module.exports = async function listplaylists(req) {
-  if ((await Playlist.count()) === 0) {
-    return utils.slackAt(
-      req,
-      'There are no configured playlists. Try `/addplaylist` to get started.'
-    );
-  }
-
+module.exports = async function listplaylists() {
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 

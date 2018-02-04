@@ -1,9 +1,8 @@
 const User = require('../models/user');
 const utils = require('../utils');
-const { wrapper } = require('./permission_wrapper');
 const logger = require('../logger');
 
-module.exports = wrapper(async function eradicate(req) {
+module.exports = async function eradicate(req) {
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 
@@ -56,4 +55,4 @@ module.exports = wrapper(async function eradicate(req) {
       }
     ]
   });
-});
+};

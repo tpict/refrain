@@ -1,6 +1,5 @@
 const User = require('../models/user');
 const utils = require('../utils');
-const { wrapper } = require('./permission_wrapper');
 const logger = require('../logger');
 
 async function performSkip(spotifyApi, req) {
@@ -42,7 +41,7 @@ async function performSkip(spotifyApi, req) {
   );
 }
 
-module.exports = wrapper(async function next(req) {
+module.exports = async function next(req) {
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 
@@ -60,4 +59,4 @@ module.exports = wrapper(async function next(req) {
 
   performSkip(spotifyApi, req);
   return utils.slackAt(req, skipMessage);
-});
+};
