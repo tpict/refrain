@@ -10,7 +10,7 @@ module.exports = async function playme(req) {
     await spotifyApi.play();
     return utils.slackAt(req, 'Now playing!');
   } catch (err) {
-    logger.error('Error playing music for /playme: ' + err);
+    logger.error('Error playing music for /playme: ' + err.stack);
     throw err;
   }
 };

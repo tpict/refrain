@@ -10,7 +10,7 @@ module.exports = async function pauseme(req) {
     await spotifyApi.pause();
     return utils.slackAt(req, 'Paused!');
   } catch (err) {
-    logger.error('Error pausing for /pauseme: ' + err);
+    logger.error('Error pausing for /pauseme: ' + err.stack);
     throw err;
   }
 };

@@ -16,7 +16,7 @@ module.exports = async function shuffle(req) {
     .setShuffle({ state })
     .then(() => utils.slackAt(req, `Shuffle is now ${text}.`))
     .catch(err => {
-      logger.error(`Error setting shuffle ${text}: ${err}`);
+      logger.error(`Error setting shuffle ${text}: ${err.stack}`);
       throw err;
     });
 };

@@ -23,12 +23,14 @@ module.exports = async function delete_track(payload) {
       [{ uri: track.uri }]
     );
   } catch (err) {
-    logger.error('Error deleting tracks for /interactive delete: ' + err);
+    logger.error('Error deleting tracks for /interactive delete: ' + err.stack);
     throw err;
   }
 
   spotifyApi.skipToNext().catch(err => {
-    logger.error('Error starting next track for /interactive delete: ' + err);
+    logger.error(
+      'Error starting next track for /interactive delete: ' + err.stack
+    );
     throw err;
   });
 

@@ -22,7 +22,9 @@ module.exports = async function find_track_more(payload) {
       attachments: utils.getSearchAttachments(query, data)
     };
   } catch (err) {
-    logger.error('Error searching tracks for /interactive find more: ' + err);
+    logger.error(
+      'Error searching tracks for /interactive find more: ' + err.stack
+    );
     throw err;
   }
 };

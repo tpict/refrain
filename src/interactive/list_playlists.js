@@ -11,7 +11,7 @@ async function removePlaylist(payload) {
     return `Removed configuration for *${playlist.name}*.`;
   } catch (err) {
     logger.error(
-      'Error removing playlist for /interactive list playlists: ' + err
+      'Error removing playlist for /interactive list playlists: ' + err.stack
     );
     throw err;
   }
@@ -35,7 +35,7 @@ async function playPlaylist(payload) {
     }*! Commands will now act on this playlist.`;
   } catch (err) {
     logger.error(
-      'Error playing playlist for /interactive list playlists: ' + err
+      'Error playing playlist for /interactive list playlists: ' + err.stack
     );
     throw err;
   }

@@ -33,7 +33,7 @@ module.exports = async function addplaylist(req) {
       if (err.statusCode === 404) {
         return utils.slackAt(req, 'Couldn\'t find that playlist.');
       } else {
-        logger.error(`Error retrieving playlist ${playlistURI}: ${err}`);
+        logger.error(`Error retrieving playlist ${playlistURI}: ${err.stack}`);
         throw err;
       }
     });

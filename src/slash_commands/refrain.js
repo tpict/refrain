@@ -25,7 +25,7 @@ async function setOnAndPlay(spotifyApi, req) {
       'It begins...\nIf you can\'t hear anything, play any track in the Spotify client and try again.'
     );
   } catch (err) {
-    logger.error('Error playing music for /refrain: ' + err);
+    logger.error('Error playing music for /refrain: ' + err.stack);
     throw err;
   }
 }
@@ -39,7 +39,7 @@ async function setOffAndPause(spotifyApi) {
       '_If music be the food of love, play on._ - Shakespeare\nSwitching off.'
     );
   } catch (err) {
-    logger.error('Error pausing music for /refrain: ' + err);
+    logger.error('Error pausing music for /refrain: ' + err.stack);
     throw err;
   }
 }

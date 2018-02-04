@@ -23,7 +23,6 @@ const wrapper = handler => async (req, res) => {
   try {
     res.send(await handler(req));
   } catch (err) {
-    logger.error(err);
     res.send(getErrorMessage(err.statusCode));
 
     // Easier debugging in testing

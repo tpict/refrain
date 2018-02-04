@@ -11,7 +11,7 @@ module.exports = async function eradicate(req) {
     data = await spotifyApi
       .getMyCurrentPlayingTrack();
   } catch (err) {
-    logger.error(`Error getting current track: ${err}`);
+    logger.error(`Error getting current track for /eradicate: ${err.stack}`);
     throw err;
   }
 
