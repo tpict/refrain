@@ -1,20 +1,40 @@
-module.exports = app => {
-  app.post('/refrain', require('./refrain'));
-  app.post('/commandeer', require('./commandeer'));
+const { getErrorMessage } = require('../utils');
+const logger = require('../logger');
+const { needsPower, needsActive, needsSetup } = require('./permission_wrapper');
 
-  app.post('/findme', require('./findme'));
+const endpoints = [
+  ['/addplaylist'],
+  ['/commandeer'],
+  ['/eradicate', needsPower, needsSetup],
+  ['/findme', needsPower, needsSetup],
+  ['/listplaylists', needsSetup],
+  ['/listusers', needsSetup],
+  ['/next', needsPower, needsSetup],
+  ['/pauseme', needsPower],
+  ['/playme', needsPower],
+  ['/refrain', needsActive],
+  ['/shuffle', needsPower],
+  ['/whichplaylist', needsSetup],
+  ['/whichuser', needsSetup],
+  ['/whomst', needsPower, needsSetup]
+];
 
-  app.post('/playme', require('./playme'));
-  app.post('/pauseme', require('./pauseme'));
-  app.post('/shuffle', require('./shuffle'));
-  app.post('/next', require('./next'));
-  app.post('/eradicate', require('./eradicate'));
+const wrapper = handler => async (req, res) => {
+  try {
+    res.send(await handler(req));
+  } catch (err) {
+    res.send(getErrorMessage(err.statusCode));
 
-  app.post('/addplaylist', require('./addplaylist'));
-  app.post('/whichplaylist', require('./whichplaylist'));
-  app.post('/listplaylists', require('./listplaylists'));
-
-  app.post('/whomst', require('./whomst'));
-  app.post('/whichuser', require('./whichuser'));
-  app.post('/listusers', require('./listusers'));
+    // Easier debugging in testing
+    if (process.env.NODE_ENV !== 'production') {
+      throw err;
+    }
+  }
 };
+
+module.exports = app =>
+  endpoints.forEach(endpointArgs => {
+    const name = endpointArgs[0];
+    endpointArgs.push(wrapper(require('.' + name)));
+    app.post.apply(app, endpointArgs);
+  });

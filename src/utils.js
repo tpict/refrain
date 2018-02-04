@@ -1,9 +1,5 @@
 const { URL } = require('url');
-const SpotifyWebApi = require('spotify-web-api-node');
 const WebClient = require('@slack/client').WebClient;
-const moment = require('moment');
-
-const store = require('./store');
 
 module.exports = {
   getSearchAttachments(query, data) {
@@ -68,59 +64,45 @@ module.exports = {
     return attachments;
   },
 
-  // Find the index of the given track in the given playlist.
-  // This is a work-around for a bug in the Spotify API that prevents specifying
-  // a playlist offset by URI.
-  // https://github.com/spotify/web-api/issues/630
-  async playlistContextOffset(playlist, track) {
-    const spotifyApi = await this.getSpotifyApi();
-    const { userID, playlistID } = this.splitPlaylistURI(playlist.uri);
-
-    let next = {};
-    let nextURL = true;
-    let found = false;
-
-    let index = 0;
-    let total = 0;
-
-    while (nextURL && !found) {
-      let tracks;
-      [tracks, total, nextURL] = await spotifyApi
-        .getPlaylistTracks(userID, playlistID, next)
-        .then(
-          data => [data.body.items, data.body.total, data.body.next],
-          err => console.error(err)
-        );
-
-      if (nextURL) {
-        const searchParams = new URL(nextURL).searchParams;
-        next.offset = searchParams.get('offset');
-        next.limit = searchParams.get('limit');
-      }
-
-      tracks.some(item => {
-        if (item.track.id === track.id) {
-          found = true;
-          return true;
-        }
-
-        index++;
-        return false;
-      });
-    }
-
-    return [index, total, found];
-  },
-
   sleep(duration) {
     return new Promise(resolve => setTimeout(resolve, duration));
   },
 
-  // Handle common HTTP error responses
-  errorWrapper(err, callback = () => {}) {
-    console.error(err);
+  inChannel(rawData) {
+    const formatted = {};
 
-    const responses = {
+    if (typeof rawData === 'string') {
+      formatted.text = rawData;
+    } else {
+      Object.assign(formatted, rawData);
+    }
+
+    formatted.response_type = 'in_channel';
+    return formatted;
+  },
+
+  slackAt(req, rawData) {
+    const formatted = this.inChannel(rawData);
+
+    const text = formatted.text;
+    const userID = typeof req == 'string' ? req : req.body.user_id;
+    formatted.text = `<@${userID}>: ${text}`;
+
+    return formatted;
+  },
+
+  formatSong(trackName, artistName) {
+    return `*${trackName}* by *${artistName}*`;
+  },
+
+  getWebClient() {
+    return new WebClient(process.env.SLACK_API_TOKEN);
+  },
+
+  getErrorMessage(statusCode, custom) {
+    const genericError = 'There was a problem handling your request.';
+    const errors = {
+      401: 'Spotify authorisation failed. Try /spotifyauth again.',
       403: 'Spotify says that you don\'t have permission to do that!',
       404: 'Spotify returned 404. Either a bad request was made, or, more likely, there\'s a problem with the Spotify API.',
       500: 'Spotify had an internal server error. Don\'t shoot the messenger!',
@@ -128,77 +110,6 @@ module.exports = {
       503: 'The Spotify API is down. Don\'t shoot the messenger!'
     };
 
-    callback(responses[err.statusCode]);
-  },
-
-  inChannel(data) {
-    if (typeof data === 'string') {
-      data = { text: data };
-    }
-
-    data.response_type = 'in_channel';
-    return data;
-  },
-
-  respond(req, res, rawData) {
-    const data = this.inChannel(rawData);
-    const text = data.text;
-
-    const userName = typeof req == 'string' ? req : req.body.user_name;
-
-    data.text = this.formatResponse(userName, text);
-    res.send(data);
-  },
-
-  formatResponse(userName, text) {
-    return `<@${userName}>: ${text}`;
-  },
-
-  formatSong(trackName, artistName) {
-    return `*${trackName}* by *${artistName}*`;
-  },
-
-  splitPlaylistURI(uri) {
-    const splitURI = uri.split(':');
-    return { userID: splitURI[2], playlistID: splitURI[4] };
-  },
-
-  async getSpotifyApi() {
-    const spotifyApi = new SpotifyWebApi({
-      clientId: process.env.SPOTIFY_CLIENT_ID,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-      redirectUri: process.env.SPOTIFY_REDIRECT_URI
-    });
-
-    const activeUser = store.getActiveUser();
-    const activeUserName = store.getActiveUserName();
-
-    const accessToken = activeUser.access_token;
-    const refreshToken = activeUser.refresh_token;
-
-    spotifyApi.setAccessToken(accessToken);
-    spotifyApi.setRefreshToken(refreshToken);
-
-    const tokenExpiry = activeUser.token_expiry;
-    if (!tokenExpiry || moment() > moment(tokenExpiry)) {
-      const data = await spotifyApi
-        .refreshAccessToken()
-        .then(data => data, err => console.log(err));
-
-      spotifyApi.setAccessToken(data.body['access_token']);
-
-      activeUser.access_token = data.body['access_token'];
-      activeUser.token_expiry = moment().add(
-        data.body['expires_in'],
-        'seconds'
-      );
-      store.setUser(activeUserName, activeUser);
-    }
-
-    return spotifyApi;
-  },
-
-  getWebClient() {
-    return new WebClient(process.env.SLACK_API_TOKEN);
+    return errors[statusCode] || custom || genericError;
   }
 };

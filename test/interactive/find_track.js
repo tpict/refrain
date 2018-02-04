@@ -1,97 +1,54 @@
+require('../setup');
+
 const nock = require('nock');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
-const queryString = require('query-string');
-const storage = require('node-persist');
-
-const utils = require('../utils');
 
 const app = require('../../src/app');
-const store = require('../../src/store');
-
-chai.use(chaiHttp);
+const Playlist = require('../../src/models/playlist');
 
 describe('/findme interactive callback', function () {
-  beforeEach(function () {
-    utils.setDefaultUsers();
-  });
-
-  afterEach(function () {
-    nock.cleanAll();
-    storage.clearSync();
-  });
-
-  it('should queue tracks', function (done) {
-    store.setActivePlaylist('myplaylist');
-    store.setPlaylists({
-      myplaylist: {
-        id: 'P000000000000000000000',
-        user_id: 'U1AAAAAAA',
-        tracks: {},
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
-      }
-    });
-
+  it('should queue tracks', async function () {
     const addToPlaylistScope = nock('https://api.spotify.com')
       .post('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
       .reply(200);
 
-    nock('https://slack.com')
-      .post('/api/chat.postMessage', () => true)
-      .reply(200, (uri, requestBody) => {
-        addToPlaylistScope.done();
-        const storedTracks = store.getActivePlaylist().tracks;
-        chai.assert.deepEqual(storedTracks['6sxosT7KMFP9OQL3DdD6Qy'], {
-          requester: 'tom.picton',
-          artist: 'Jme',
-          name: 'Test Me'
-        });
+    const webScope = nock('https://slack.com')
+      .post('/api/chat.postMessage', {
+        text: '<@U1AAAAAAA> added *Test Me* by *Jme* to *My playlist*',
+        channel: 'D1AAAAAAA'
+      })
+      .reply(200);
 
-        const parsedBody = queryString.parse(requestBody);
-        chai.assert.equal(
-          parsedBody.text,
-          '<@tom.picton> added *Test Me* by *Jme* to *My playlist*'
-        );
-        chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
-
-        done();
-      });
-
-    const body = require('../fixtures/findme_queue.json');
-
-    chai
+    const res = await chai
       .request(app)
       .post('/interactive')
-      .send(body)
-      .end((err, res) => chai.assert.equal(res.text, 'Just a moment...'));
+      .send(require('../fixtures/findme_queue.json'));
+
+    chai.assert.equal(res.text, 'Just a moment...');
+
+    await new Promise(resolve =>
+      webScope.on('replied', async () => {
+        addToPlaylistScope.done();
+        const activePlaylist = await Playlist.getActive();
+        await activePlaylist.populate('tracks').execPopulate();
+        const storedTracks = activePlaylist.tracks;
+
+        chai.assert.include(storedTracks[2].toObject(), {
+          spotifyID: '6sxosT7KMFP9OQL3DdD6Qy',
+          requestedBy: 'U1AAAAAAA',
+          artist: 'Jme',
+          title: 'Test Me'
+        });
+
+        resolve();
+      })
+    );
   });
 
-  it('should play tracks that are already in the playlist immediately', function (
-    done
-  ) {
-    store.setActivePlaylist('myplaylist');
-    store.setPlaylists({
-      myplaylist: {
-        id: 'P000000000000000000000',
-        user_id: 'U1AAAAAAA',
-        tracks: {},
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
-      }
-    });
-
+  it('should play tracks that are already in the playlist immediately', async function () {
     const getTracksScope = nock('https://api.spotify.com')
       .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
-      .reply(200, require('../fixtures/playlist_tracks.json'));
-
-    const getTracksScope2 = nock('https://api.spotify.com')
-      .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
-      .query({
-        offset: 3,
-        limit: 3
-      })
-      .reply(200, require('../fixtures/playlist_tracks_2.json'));
+      .reply(200, require('../fixtures/playlist_tracks_3.json'));
 
     const addToPlaylistScope = nock('https://api.spotify.com')
       .post('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
@@ -101,40 +58,38 @@ describe('/findme interactive callback', function () {
       .put(
         '/v1/me/player/play',
         data =>
-        data.context_uri ==
-        'spotify:user:U1AAAAAAA:playlist:P000000000000000000000' &&
-        data.offset.position == 4
+          data.context_uri ==
+            'spotify:user:U1AAAAAAA:playlist:P000000000000000000000' &&
+          data.offset.position == 1
       )
       .reply(200);
 
-    nock('https://slack.com')
-      .post('/api/chat.postMessage', () => true)
-      .reply(200, (uri, requestBody) => {
+    const webScope = nock('https://slack.com')
+      .post('/api/chat.postMessage', {
+        text: 'Now playing *Psycho Killer - 2005 Remastered Version* by *Talking Heads*, as requested by <@U1AAAAAAA>',
+        channel: 'D1AAAAAAA'
+      })
+      .reply(200);
+
+    const res = await chai
+      .request(app)
+      .post('/interactive')
+      .send(require('../fixtures/findme_play.json'));
+
+    chai.assert.equal(res.text, 'Just a moment...');
+
+    await new Promise(resolve =>
+      webScope.on('replied', async () => {
         getTracksScope.done();
-        getTracksScope2.done();
         chai.assert.isFalse(addToPlaylistScope.isDone());
         playScope.done();
 
-        const storedTracks = store.getActivePlaylist().tracks;
-        chai.assert.equal(Object.keys(storedTracks).length, 0);
+        const activePlaylist = await Playlist.getActive();
+        await activePlaylist.populate('tracks').execPopulate();
+        chai.assert.equal(activePlaylist.tracks.length, 2);
 
-        const parsedBody = queryString.parse(requestBody);
-        chai.assert.equal(
-          parsedBody.text,
-          'Now playing *Test Me* by *Jme*, as requested by <@tom.picton>'
-        );
-        chai.assert.equal(parsedBody.channel, 'D1AAAAAAA');
-
-        done();
-      });
-
-    const body = require('../fixtures/findme_play.json');
-
-    chai
-      .request(app)
-      .post('/interactive')
-      .send(body)
-      .end((err, res) => chai.assert.equal(res.text, 'Just a moment...'));
+        resolve();
+      })
+    );
   });
-
 });

@@ -1,25 +1,15 @@
+require('../setup');
+
 const nock = require('nock');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
 const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
 
-chai.use(chaiHttp);
-
 describe('/shuffle endpoint', function () {
-  beforeEach(function () {
-    utils.setDefaultUsers();
-  });
-
-  afterEach(function () {
-    nock.cleanAll();
-    permissionWrapper.setOn();
-  });
-
-  it('should respond to "/shuffled on"', function (done) {
+  it('should respond to "/shuffled on"', async function () {
     const scope = nock('https://api.spotify.com')
       .put('/v1/me/player/shuffle')
       .query({
@@ -32,19 +22,17 @@ describe('/shuffle endpoint', function () {
       text: 'on'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/shuffle')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(res.body.text, '<@bing.bong>: Shuffle is now on.');
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        scope.done();
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(res.body.text, '<@U1AAAAAAA>: Shuffle is now on.');
+    chai.assert.equal(res.body.response_type, 'in_channel');
+    scope.done();
   });
 
-  it('should respond to "/shuffled off"', function (done) {
+  it('should respond to "/shuffled off"', async function () {
     const scope = nock('https://api.spotify.com')
       .put('/v1/me/player/shuffle')
       .query({
@@ -57,19 +45,17 @@ describe('/shuffle endpoint', function () {
       text: 'off'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/shuffle')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(res.body.text, '<@bing.bong>: Shuffle is now off.');
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        scope.done();
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(res.body.text, '<@U1AAAAAAA>: Shuffle is now off.');
+    chai.assert.equal(res.body.response_type, 'in_channel');
+    scope.done();
   });
 
-  it('should respond to invalid parameters', function (done) {
+  it('should respond to invalid parameters', async function () {
     const scope = nock('https://api.spotify.com')
       .put('/v1/me/player/shuffle')
       .query(true)
@@ -80,22 +66,20 @@ describe('/shuffle endpoint', function () {
       text: 'hello world'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/shuffle')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: Please specify `on` or `off`.'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        chai.assert.isFalse(scope.isDone());
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: Please specify `on` or `off`.'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
+    chai.assert.isFalse(scope.isDone());
   });
 
-  it('should only work when the jukebox is on', function (done) {
+  it('should only work when the jukebox is on', async function () {
     permissionWrapper.setOff();
 
     const body = utils.baseSlackRequest({
@@ -103,17 +87,15 @@ describe('/shuffle endpoint', function () {
       text: 'hello world'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/shuffle')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: The jukebox is off!'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: The jukebox is off!'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
   });
 });

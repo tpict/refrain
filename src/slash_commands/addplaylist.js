@@ -1,43 +1,40 @@
-const store = require('../store');
+const Playlist = require('../models/playlist');
+const User = require('../models/user');
 const utils = require('../utils');
+const logger = require('../logger');
 
-module.exports = async function addplaylist(req, res) {
+module.exports = async function addplaylist(req) {
   const playlistURI = req.body.text;
   const splitURI = playlistURI.split(':');
-  const userID = splitURI[2];
-  const playlistID = splitURI[4];
+  const spotifyUserID = splitURI[2];
+  const spotifyID = splitURI[4];
 
-  const spotifyApi = await utils.getSpotifyApi();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
 
-  spotifyApi.getPlaylist(userID, playlistID).then(
-    data => {
+  return spotifyApi
+    .getPlaylist(spotifyUserID, spotifyID)
+    .then(data => {
       const name = data.body.name;
-
-      const playlists = store.getPlaylists();
-      playlists[playlistID] = {
-        id: playlistID,
-        user_id: utils.splitPlaylistURI(data.body.uri).userID,
-        tracks: {},
-        uri: data.body.uri,
+      const playlist = new Playlist({
+        spotifyID,
+        spotifyUserID,
         name
-      };
-      store.setPlaylists(playlists);
+      });
+      return playlist.save().then(async () => {
+        if (!await Playlist.getActive()) {
+          await playlist.setActive();
+        }
 
-      if (!store.getActivePlaylist()) {
-        store.setActivePlaylist(playlistID);
+        return utils.slackAt(req, `Added your playlist *${name}*.`);
+      });
+    })
+    .catch(err => {
+      if (err.statusCode === 404) {
+        return utils.slackAt(req, 'Couldn\'t find that playlist.');
+      } else {
+        logger.error(`Error retrieving playlist ${playlistURI}: ${err.stack}`);
+        throw err;
       }
-
-      utils.respond(req, res, `Added your playlist *${name}*.`);
-    },
-    err => {
-      const error404 = 'Couldn\'t find that playlist.';
-      utils.errorWrapper(err, errorMessage =>
-        utils.respond(
-          req,
-          res,
-          err.statusCode == 404 ? error404 : errorMessage || error404
-        )
-      );
-    }
-  );
+    });
 };

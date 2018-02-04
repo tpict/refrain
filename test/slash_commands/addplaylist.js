@@ -1,96 +1,118 @@
-const nock = require('nock');
+require('../setup');
+
 const chai = require('chai');
-const chaiHttp = require('chai-http');
-const storage = require('node-persist');
+const nock = require('nock');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
-const store = require('../../src/store');
-
-chai.use(chaiHttp);
+const Playlist = require('../../src/models/playlist');
 
 describe('/addplaylist endpoint', function () {
-  var scope;
+  let scope;
 
-  beforeEach(function () {
-    utils.setDefaultUsers();
-
+  beforeEach(async function () {
     scope = nock('https://api.spotify.com')
-      .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000')
+      .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000001')
       .reply(200, {
         name: 'My playlist',
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000001'
       });
   });
 
-  afterEach(function () {
-    nock.cleanAll();
-    storage.clearSync();
-  });
+  it('should add requested playlist to storage', async function () {
+    const existingPlaylist = await Playlist.getActive();
 
-  it('should add requested playlist to storage', function (done) {
     const body = utils.baseSlackRequest({
       command: '/addplaylist',
-      text:
-      'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+      text: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000001'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/addplaylist')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: Added your playlist *My playlist*.'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
+      .send(body);
 
-        const playlists = store.getPlaylists();
-        const playlist = playlists['P000000000000000000000'];
+    scope.done();
 
-        chai.assert.deepEqual(playlist, {
-          id: 'P000000000000000000000',
-          user_id: 'U1AAAAAAA',
-          tracks: {},
-          uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-          name: 'My playlist'
-        });
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: Added your playlist *My playlist*.'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
 
-        scope.done();
-        done();
-      });
+    const playlist = await Playlist.findOne({
+      spotifyID: 'P000000000000000000001'
+    });
+    chai.assert.include(playlist.toObject(), {
+      spotifyID: 'P000000000000000000001',
+      spotifyUserID: 'U1AAAAAAA',
+      name: 'My playlist'
+    });
+
+    // The active playlist shouldn't be changed since one is already set
+    const activePlaylist = await Playlist.getActive();
+    chai.assert.isTrue(activePlaylist.equals(existingPlaylist));
   });
 
-  it('should not store invalid playlists', function (done) {
+  it('should make the first added playlist the active one', async function () {
+    await Playlist.remove({});
+
+    const body = utils.baseSlackRequest({
+      command: '/addplaylist',
+      text: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000001'
+    });
+
+    const res = await chai
+      .request(app)
+      .post('/addplaylist')
+      .send(body);
+
+    scope.done();
+
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: Added your playlist *My playlist*.'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
+
+    const playlist = await Playlist.findOne({
+      spotifyID: 'P000000000000000000001'
+    });
+    chai.assert.include(playlist.toObject(), {
+      spotifyID: 'P000000000000000000001',
+      spotifyUserID: 'U1AAAAAAA',
+      name: 'My playlist',
+      active: true
+    });
+  });
+
+  it('should not store invalid playlists', async function () {
     scope = nock('https://api.spotify.com')
-      .get('/v1/users/U1BBBBBBB/playlists/P000000000000000000000')
+      .get('/v1/users/U1BBBBBBB/playlists/P000000000000000000001')
       .reply(404);
 
     const body = utils.baseSlackRequest({
       command: '/addplaylist',
-      text:
-      'myplaylist spotify:user:U1BBBBBBB:playlist:P000000000000000000000'
+      text: 'myplaylist spotify:user:U1BBBBBBB:playlist:P000000000000000000001'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/addplaylist')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: Couldn\'t find that playlist.'
-        );
-        chai.assert.equal(res.body.response_type, 'in_channel');
+      .send(body);
 
-        const playlists = store.getPlaylists();
-        const playlist = playlists['myplaylist'];
-        chai.assert.isUndefined(playlist);
+    scope.done();
 
-        scope.done();
-        done();
-      });
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: Couldn\'t find that playlist.'
+    );
+    chai.assert.equal(res.body.response_type, 'in_channel');
+
+    const playlist = await Playlist.findOne({
+      spotifyID: 'P000000000000000000001'
+    });
+    chai.assert.isNull(playlist);
   });
 });

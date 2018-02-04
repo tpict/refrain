@@ -1,15 +1,16 @@
+const User = require('../models/user');
 const utils = require('../utils');
-const { wrapper } = require('./permission_wrapper');
+const logger = require('../logger');
 
-module.exports = wrapper(async function pauseme(req, res) {
-  const spotifyApi = await utils.getSpotifyApi();
-  spotifyApi
-    .pause()
-    .then(
-      () => utils.respond(req, res, 'Paused!'),
-      err =>
-        utils.errorWrapper(err, errorMessage =>
-          utils.respond(req, res, errorMessage || 'Couldn\'t pause!')
-        )
-    );
-});
+module.exports = async function pauseme(req) {
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
+
+  try {
+    await spotifyApi.pause();
+    return utils.slackAt(req, 'Paused!');
+  } catch (err) {
+    logger.error('Error pausing for /pauseme: ' + err.stack);
+    throw err;
+  }
+};

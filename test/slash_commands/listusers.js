@@ -1,74 +1,51 @@
-const nock = require('nock');
+require('../setup');
+
 const chai = require('chai');
-const chaiHttp = require('chai-http');
-const storage = require('node-persist');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
-const store = require('../../src/store');
-
-chai.use(chaiHttp);
+const User = require('../../src/models/user');
 
 describe('/listusers endpoint', function () {
-  beforeEach(function () {
-    utils.setDefaultUsers();
-  });
-
-  afterEach(function () {
-    nock.cleanAll();
-    storage.clearSync();
-  });
-
-  it('should list authenticated users', function (done) {
-    store.setUsers({
-      'bing.bong': {
-        id: 'myID',
-        access_token: 'myAccessToken',
-        refresh_token: 'myRefreshToken'
-      },
-      'another.user': {
-        id: 'anotherID',
-        access_token: 'anotherAccessToken',
-        refresh_token: 'anotherRefreshToken'
-      }
+  it('should list authenticated users', async function () {
+    const newUser = new User({
+      slackID: 'U1BBBBBBB',
+      spotifyAccessToken: 'anotherAccessToken',
+      spotifyRefreshToken: 'anotherRefreshToken'
     });
 
     const body = utils.baseSlackRequest({
       command: '/listusers'
     });
 
-    chai
+    await newUser.save();
+    const res = await chai
       .request(app)
       .post('/listusers')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: Authenticated users:\nbing.bong\nanother.user'
-        );
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(
+      res.body.text,
+      'Authenticated users:\n<@U1AAAAAAA>\n<@U1BBBBBBB>'
+    );
   });
 
-  it('should prompt use of /spotifyauth in new workspaces', function (done) {
-    store.setUsers(null);
-    store.setActiveUser(null);
+  it('should prompt use of /spotifyauth in new workspaces', async function () {
+    await User.remove({});
 
     const body = utils.baseSlackRequest({
       command: '/listusers'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/listusers')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: No users have been authenticated yet! Try `/spotifyauth` to register yourself.'
-        );
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: No users have been authenticated yet! Try `/spotifyauth` to register yourself.'
+    );
   });
 });

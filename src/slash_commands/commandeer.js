@@ -1,19 +1,16 @@
-const store = require('../store');
 const utils = require('../utils');
+const User = require('../models/user');
 
-module.exports = function commandeer(req, res) {
-  const userName = req.body.user_name;
-  const user = store.getUsers()[userName];
-  if (!user) {
-    utils.respond(
-      req,
-      res,
-      'You\'re not authenticated with Spotify. Try `/spotifyauth` if you\'d like to get set up',
-      req
-    );
-    return;
+module.exports = async function commandeer(req) {
+  const userID = req.body.user_id;
+  const user = await User.findOne({ slackID: userID });
+
+  let message = 'You\'re not authenticated with Spotify. Try `/spotifyauth` if you\'d like to get set up.';
+
+  if (user) {
+    message = 'You are now the active user!';
+    user.setActive();
   }
 
-  store.setActiveUser(userName);
-  utils.respond(req, res, 'You are now the active user!');
+  return utils.slackAt(req, message);
 };

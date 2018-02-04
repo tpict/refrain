@@ -1,0 +1,71 @@
+{
+  "text": "You searched for \"temporary secretary\":",
+  "attachments": [{
+    "fallback": "Search result: Artist: Paul McCartney\nAlbum: Twin Freaks",
+    "callback_id": "find_track",
+    "title": "Temporary Secretary - 04 Summer Tour Remix",
+    "text": "Artist: Paul McCartney\nAlbum: Twin Freaks",
+    "thumb_url": "https://i.scdn.co/image/d484d0f0c14bbcca47b42c764d7ad7c7a52b4106",
+    "color": "good",
+    "actions": [{
+      "name": "play",
+      "text": "Play now",
+      "type": "button",
+      "value": "{\"id\":\"3mNUmdPiJ7ok4gzqVMgdIV\",\"uri\":\"spotify:track:3mNUmdPiJ7ok4gzqVMgdIV\",\"name\":\"Temporary Secretary - 04 Summer Tour Remix\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB\"},\"href\":\"https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB\",\"id\":\"4STHEaNw4mPZ2tzheohgXB\",\"name\":\"Paul McCartney\",\"type\":\"artist\",\"uri\":\"spotify:artist:4STHEaNw4mPZ2tzheohgXB\"}]}"
+    }, {
+      "name": "queue",
+      "text": "Queue",
+      "type": "button",
+      "value": "{\"id\":\"3mNUmdPiJ7ok4gzqVMgdIV\",\"uri\":\"spotify:track:3mNUmdPiJ7ok4gzqVMgdIV\",\"name\":\"Temporary Secretary - 04 Summer Tour Remix\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB\"},\"href\":\"https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB\",\"id\":\"4STHEaNw4mPZ2tzheohgXB\",\"name\":\"Paul McCartney\",\"type\":\"artist\",\"uri\":\"spotify:artist:4STHEaNw4mPZ2tzheohgXB\"}]}"
+    }]
+  }, {
+    "fallback": "Search result: Artist: Los Fancy Free\nAlbum: Out of Place",
+    "callback_id": "find_track",
+    "title": "Temporary Secretary",
+    "text": "Artist: Los Fancy Free\nAlbum: Out of Place",
+    "thumb_url": "https://i.scdn.co/image/bf1e80325d096a34ba5f8b261e46d76d8f18bf51",
+    "color": "good",
+    "actions": [{
+        "name": "play",
+        "text": "Play now",
+        "type": "button",
+        "value": "{\"id\":\"2DnnTktppiAhWrldQiyocX\",\"uri\":\"spotify:track:2DnnTktppiAhWrldQiyocX\",\"name\":\"Temporary Secretary\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/2fEk73iGQuzvW93I9Tp1bt\"},\"href\":\"https://api.spotify.com/v1/artists/2fEk73iGQuzvW93I9Tp1bt\",\"id\":\"2fEk73iGQuzvW93I9Tp1bt\",\"name\":\"Los Fancy Free\",\"type\":\"artist\",\"uri\":\"spotify:artist:2fEk73iGQuzvW93I9Tp1bt\"}]}"
+      },
+      {
+        "name": "queue",
+        "text": "Queue",
+        "type": "button",
+        "value": "{\"id\":\"2DnnTktppiAhWrldQiyocX\",\"uri\":\"spotify:track:2DnnTktppiAhWrldQiyocX\",\"name\":\"Temporary Secretary\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/2fEk73iGQuzvW93I9Tp1bt\"},\"href\":\"https://api.spotify.com/v1/artists/2fEk73iGQuzvW93I9Tp1bt\",\"id\":\"2fEk73iGQuzvW93I9Tp1bt\",\"name\":\"Los Fancy Free\",\"type\":\"artist\",\"uri\":\"spotify:artist:2fEk73iGQuzvW93I9Tp1bt\"}]}"
+      }
+    ]
+  }, {
+    "fallback": "Search result: Artist: Donny Who Loved Bowling\nAlbum: Butcher Covers",
+    "callback_id": "find_track",
+    "title": "Temporary Secretary",
+    "text": "Artist: Donny Who Loved Bowling\nAlbum: Butcher Covers",
+    "thumb_url": "https://i.scdn.co/image/987f43ac022f79ec99e0bfb5c62f48b7631fe4a3",
+    "color": "good",
+    "actions": [{
+        "name": "play",
+        "text": "Play now",
+        "type": "button",
+        "value": "{\"id\":\"0T9jyQHRxE3xZrit5YBn58\",\"uri\":\"spotify:track:0T9jyQHRxE3xZrit5YBn58\",\"name\":\"Temporary Secretary\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/3KS7yOf3AYBl9uTNymvbnI\"},\"href\":\"https://api.spotify.com/v1/artists/3KS7yOf3AYBl9uTNymvbnI\",\"id\":\"3KS7yOf3AYBl9uTNymvbnI\",\"name\":\"Donny Who Loved Bowling\",\"type\":\"artist\",\"uri\":\"spotify:artist:3KS7yOf3AYBl9uTNymvbnI\"}]}"
+      },
+      {
+        "name": "queue",
+        "text": "Queue",
+        "type": "button",
+        "value": "{\"id\":\"0T9jyQHRxE3xZrit5YBn58\",\"uri\":\"spotify:track:0T9jyQHRxE3xZrit5YBn58\",\"name\":\"Temporary Secretary\",\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/3KS7yOf3AYBl9uTNymvbnI\"},\"href\":\"https://api.spotify.com/v1/artists/3KS7yOf3AYBl9uTNymvbnI\",\"id\":\"3KS7yOf3AYBl9uTNymvbnI\",\"name\":\"Donny Who Loved Bowling\",\"type\":\"artist\",\"uri\":\"spotify:artist:3KS7yOf3AYBl9uTNymvbnI\"}]}"
+      }
+    ]
+  }, {
+    "fallback": "load more",
+    "callback_id": "find_track_more",
+    "actions": [{
+      "name": "load_more",
+      "text": "Load more",
+      "type": "button",
+      "value": "{\"offset\":\"6\",\"limit\":\"3\",\"query\":\"temporary secretary\"}"
+    }]
+  }]
+}

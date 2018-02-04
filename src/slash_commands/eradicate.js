@@ -1,36 +1,29 @@
+const User = require('../models/user');
 const utils = require('../utils');
-const { wrapper } = require('./permission_wrapper');
+const logger = require('../logger');
 
-module.exports = wrapper(async function eradicate(req, res) {
-  const spotifyApi = await utils.getSpotifyApi();
+module.exports = async function eradicate(req) {
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
 
-  const data = await spotifyApi
-    .getMyCurrentPlayingTrack()
-    .then(data => data)
-    .catch(err =>
-      utils.errorWrapper(err, errorMessage =>
-        utils.respond(
-          req,
-          res,
-          errorMessage || 'Is something playing? Spotify doesn\'t think so!'
-        )
-      )
-    );
-
-  const track = data.body.item;
-  if (!track) {
-    utils.respond(
-      req,
-      res,
-      'Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.'
-    );
-    return;
+  let data;
+  try {
+    data = await spotifyApi
+      .getMyCurrentPlayingTrack();
+  } catch (err) {
+    logger.error(`Error getting current track for /eradicate: ${err.stack}`);
+    throw err;
   }
 
+  if (data.statusCode === 204) {
+    return utils.slackAt(req, 'Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.');
+  }
+
+  const track = data.body.item;
   const name = track.name;
   const artist = track.artists[0].name;
 
-  utils.respond(req, res, {
+  return utils.slackAt(req, {
     text: `Whoa! Are you absolutely positive that you want to delete ${utils.formatSong(
       name,
       artist
@@ -62,4 +55,4 @@ module.exports = wrapper(async function eradicate(req, res) {
       }
     ]
   });
-});
+};

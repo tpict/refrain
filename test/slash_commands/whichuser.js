@@ -1,67 +1,43 @@
-const nock = require('nock');
+require('../setup');
+
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
-const store = require('../../src/store');
-
-chai.use(chaiHttp);
+const User = require('../../src/models/user');
 
 describe('/whichuser endpoint', function () {
-  beforeEach(function () {
-    utils.setDefaultUsers();
-  });
-
-  afterEach(function () {
-    nock.cleanAll();
-  });
-
-  it('should prompt new users to use /spotifyauth', function (done) {
-    store.setActiveUser(null);
-
+  it('should prompt new users to use /spotifyauth', async function () {
+    await User.remove({});
     const body = utils.baseSlackRequest({
       command: '/whichuser'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/whichuser')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: No authenticated users yet. Use `/spotifyauth` to get started.'
-        );
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: No users have been authenticated yet! Try `/spotifyauth` to register yourself.'
+    );
   });
 
-  it('should return the active user', function (done) {
-    store.setUsers({
-      'bing.bong': {
-        id: 'myID',
-        access_token: 'myAccessToken',
-        refresh_token: 'myRefreshToken'
-      }
-    });
-    store.setActiveUser('bing.bong');
-
+  it('should return the active user', async function () {
     const body = utils.baseSlackRequest({
       command: '/whichuser'
     });
 
-    chai
+    const res = await chai
       .request(app)
       .post('/whichuser')
-      .send(body)
-      .end((err, res) => {
-        chai.assert.equal(
-          res.body.text,
-          '<@bing.bong>: The active user is <@bing.bong>'
-        );
-        done();
-      });
+      .send(body);
+
+    chai.assert.equal(
+      res.body.text,
+      '<@U1AAAAAAA>: The active user is <@U1AAAAAAA>'
+    );
   });
 });

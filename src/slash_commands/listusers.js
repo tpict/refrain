@@ -1,14 +1,9 @@
-const store = require('../store');
-const utils = require('../utils');
+const User = require('../models/user');
 
-module.exports = function listusers(req, res) {
-  const userNames = Object.keys(store.getUsers());
-  const formattedUserNames = userNames.join('\n');
-  let message = `Authenticated users:\n${formattedUserNames}`;
-  if (userNames.length === 0) {
-    message =
-      'No users have been authenticated yet! Try `/spotifyauth` to register yourself.';
-  }
-
-  utils.respond(req, res, message);
+module.exports = async function listusers() {
+  const userIDList = await User.find({}).select('-_id slackID');
+  const formattedUserIDList = userIDList
+    .map(obj => `<@${obj.slackID}>`)
+    .join('\n');
+  return { text: `Authenticated users:\n${formattedUserIDList}` };
 };

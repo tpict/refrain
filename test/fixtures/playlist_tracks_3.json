@@ -1,0 +1,165 @@
+{
+  "href": "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1/playlists/0QvaHrrqRZ3SEetkDzYAo9/tracks?offset=0&limit=100",
+  "items": [{
+      "added_at": "2018-01-25T20:29:09Z",
+      "added_by": {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/q6hu6khb0c4an06hrsmkn6tc1"
+        },
+        "href": "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1",
+        "id": "q6hu6khb0c4an06hrsmkn6tc1",
+        "type": "user",
+        "uri": "spotify:user:q6hu6khb0c4an06hrsmkn6tc1"
+      },
+      "is_local": false,
+      "track": {
+        "album": {
+          "album_type": "album",
+          "artists": [{
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/2x9SpqnPi8rlE9pjHBwmSC"
+            },
+            "href": "https://api.spotify.com/v1/artists/2x9SpqnPi8rlE9pjHBwmSC",
+            "id": "2x9SpqnPi8rlE9pjHBwmSC",
+            "name": "Talking Heads",
+            "type": "artist",
+            "uri": "spotify:artist:2x9SpqnPi8rlE9pjHBwmSC"
+          }],
+          "available_markets": ["AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY"],
+          "external_urls": {
+            "spotify": "https://open.spotify.com/album/4sLCQxMRfn3gAHrBNZtbTH"
+          },
+          "href": "https://api.spotify.com/v1/albums/4sLCQxMRfn3gAHrBNZtbTH",
+          "id": "4sLCQxMRfn3gAHrBNZtbTH",
+          "images": [{
+            "height": 640,
+            "url": "https://i.scdn.co/image/901ba00d8aa95df110217d0d8b90c0a4ea03906a",
+            "width": 640
+          }, {
+            "height": 300,
+            "url": "https://i.scdn.co/image/a3ef29dcbffa6e6141295a58a5446f8ee671edd9",
+            "width": 300
+          }, {
+            "height": 64,
+            "url": "https://i.scdn.co/image/f20fdab87b28bbf3289ec471f041e9d74b474f17",
+            "width": 64
+          }],
+          "name": "Speaking In Tongues (Deluxe Version)",
+          "type": "album",
+          "uri": "spotify:album:4sLCQxMRfn3gAHrBNZtbTH"
+        },
+        "artists": [{
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/2x9SpqnPi8rlE9pjHBwmSC"
+          },
+          "href": "https://api.spotify.com/v1/artists/2x9SpqnPi8rlE9pjHBwmSC",
+          "id": "2x9SpqnPi8rlE9pjHBwmSC",
+          "name": "Talking Heads",
+          "type": "artist",
+          "uri": "spotify:artist:2x9SpqnPi8rlE9pjHBwmSC"
+        }],
+        "available_markets": ["AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY"],
+        "disc_number": 1,
+        "duration_ms": 296146,
+        "explicit": false,
+        "external_ids": {
+          "isrc": "USWB10502911"
+        },
+        "external_urls": {
+          "spotify": "https://open.spotify.com/track/6aBUnkXuCEQQHAlTokv9or"
+        },
+        "href": "https://api.spotify.com/v1/tracks/6aBUnkXuCEQQHAlTokv9or",
+        "id": "6aBUnkXuCEQQHAlTokv9or",
+        "name": "This Must Be The Place (Naive Melody) - 2005 Remastered Version",
+        "popularity": 71,
+        "preview_url": "https://p.scdn.co/mp3-preview/1d52cb06bd5ac8489028930cb8d87a4d74b5b535?cid=8897482848704f2a8f8d7c79726a70d4",
+        "track_number": 9,
+        "type": "track",
+        "uri": "spotify:track:6aBUnkXuCEQQHAlTokv9or"
+      }
+    },
+    {
+      "added_at": "2017-12-14T20:24:24Z",
+      "added_by": {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/q6hu6khb0c4an06hrsmkn6tc1"
+        },
+        "href": "https://api.spotify.com/v1/users/q6hu6khb0c4an06hrsmkn6tc1",
+        "id": "q6hu6khb0c4an06hrsmkn6tc1",
+        "type": "user",
+        "uri": "spotify:user:q6hu6khb0c4an06hrsmkn6tc1"
+      },
+      "is_local": false,
+      "track": {
+        "album": {
+          "album_type": "album",
+          "artists": [{
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/2x9SpqnPi8rlE9pjHBwmSC"
+            },
+            "href": "https://api.spotify.com/v1/artists/2x9SpqnPi8rlE9pjHBwmSC",
+            "id": "2x9SpqnPi8rlE9pjHBwmSC",
+            "name": "Talking Heads",
+            "type": "artist",
+            "uri": "spotify:artist:2x9SpqnPi8rlE9pjHBwmSC"
+          }],
+          "available_markets": ["AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY"],
+          "external_urls": {
+            "spotify": "https://open.spotify.com/album/5eqcF7pWzHgWpGdEmHgeSN"
+          },
+          "href": "https://api.spotify.com/v1/albums/5eqcF7pWzHgWpGdEmHgeSN",
+          "id": "5eqcF7pWzHgWpGdEmHgeSN",
+          "images": [{
+            "height": 570,
+            "url": "https://i.scdn.co/image/fd1612e7ec4758f79d86ee08de6c983e191190ab",
+            "width": 640
+          }, {
+            "height": 267,
+            "url": "https://i.scdn.co/image/5f2315732c4c73d70798d5649c504260a86040a5",
+            "width": 300
+          }, {
+            "height": 57,
+            "url": "https://i.scdn.co/image/a0ba4bff71b44ceb883889a8de187a45b389c140",
+            "width": 64
+          }],
+          "name": "Talking Heads 77 (Deluxe Version)",
+          "type": "album",
+          "uri": "spotify:album:5eqcF7pWzHgWpGdEmHgeSN"
+        },
+        "artists": [{
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/2x9SpqnPi8rlE9pjHBwmSC"
+          },
+          "href": "https://api.spotify.com/v1/artists/2x9SpqnPi8rlE9pjHBwmSC",
+          "id": "2x9SpqnPi8rlE9pjHBwmSC",
+          "name": "Talking Heads",
+          "type": "artist",
+          "uri": "spotify:artist:2x9SpqnPi8rlE9pjHBwmSC"
+        }],
+        "available_markets": ["AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY"],
+        "disc_number": 1,
+        "duration_ms": 261413,
+        "explicit": false,
+        "external_ids": {
+          "isrc": "USWB10502860"
+        },
+        "external_urls": {
+          "spotify": "https://open.spotify.com/track/1i6N76fftMZhijOzFQ5ZtL"
+        },
+        "href": "https://api.spotify.com/v1/tracks/1i6N76fftMZhijOzFQ5ZtL",
+        "id": "1i6N76fftMZhijOzFQ5ZtL",
+        "name": "Psycho Killer - 2005 Remastered Version",
+        "popularity": 74,
+        "preview_url": "https://p.scdn.co/mp3-preview/38771ff6fac4da1cc99f3ffb6ecdbbf537e60f6e?cid=8897482848704f2a8f8d7c79726a70d4",
+        "track_number": 10,
+        "type": "track",
+        "uri": "spotify:track:1i6N76fftMZhijOzFQ5ZtL"
+      }
+    }
+  ],
+  "limit": 100,
+  "next": null,
+  "offset": 0,
+  "previous": null,
+  "total": 2
+}

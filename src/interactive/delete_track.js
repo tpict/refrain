@@ -1,51 +1,41 @@
-const store = require('../store');
+const User = require('../models/user');
+const Playlist = require('../models/playlist');
 const utils = require('../utils');
+const logger = require('../logger');
 
-module.exports = async function delete_track(payload, res) {
+module.exports = async function delete_track(payload) {
   const action = payload.actions[0];
 
   if (action.name === 'cancel') {
-    res.send({ text: 'Crisis averted.' });
-    return;
+    return { text: 'Crisis averted.' };
   }
 
   const track = JSON.parse(action.value);
   const formattedSong = utils.formatSong(track.name, track.artist);
-  const playlist = store.getActivePlaylist();
+  const playlist = await Playlist.getActive();
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
 
-  const spotifyApi = await utils.getSpotifyApi();
-
-  spotifyApi
-    .removeTracksFromPlaylist(playlist.user_id, playlist.id, [
-      { uri: track.uri }
-    ])
-    .then(
-      () => {
-        utils.respond(
-          payload.user.name,
-          res,
-          `That bad? Let's not listen to ${formattedSong} again. :bomb:`
-        );
-        return spotifyApi.skipToNext();
-      },
-      err => {
-        console.log(err);
-        utils.respond(
-          track.user_name,
-          res,
-          `Spotify doesn't want to delete ${formattedSong}. Godspeed.`
-        );
-      }
-    )
-    .then(
-      () => {},
-      err =>
-      utils.errorWrapper(err, errorMessage =>
-        utils.respond(
-          payload.user_name,
-          res,
-          errorMessage || 'Couldn\'t start the next track.'
-        )
-      )
+  try {
+    spotifyApi.removeTracksFromPlaylist(
+      playlist.spotifyUserID,
+      playlist.spotifyID,
+      [{ uri: track.uri }]
     );
+  } catch (err) {
+    logger.error('Error deleting tracks for /interactive delete: ' + err.stack);
+    throw err;
+  }
+
+  spotifyApi.skipToNext().catch(err => {
+    logger.error(
+      'Error starting next track for /interactive delete: ' + err.stack
+    );
+    throw err;
+  });
+
+  return utils.slackAt(
+    payload.user.id,
+    `That bad? Let's not listen to ${formattedSong} again. :bomb:`
+  );
 };

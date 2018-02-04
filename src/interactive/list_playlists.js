@@ -1,45 +1,52 @@
-const store = require('../store');
-const utils = require('../utils');
+const User = require('../models/user');
+const Playlist = require('../models/playlist');
+const logger = require('../logger');
 
-function removePlaylist(payload, res) {
-  const playlistID = payload.actions[0].value;
-  const playlists = store.getPlaylists();
-  const playlist = playlists[playlistID];
-  delete playlists[playlistID];
-  store.setPlaylists(playlists);
-  res.send(`Removed configuration for *${playlist.name}*.`);
-}
+async function removePlaylist(payload) {
+  const spotifyID = payload.actions[0].value;
+  const playlist = await Playlist.findOne({ spotifyID });
 
-async function playPlaylist(payload, res) {
-  const action = payload.actions[0];
-  const spotifyApi = await utils.getSpotifyApi();
-  const playlist = store.getPlaylists()[action.value];
-
-  spotifyApi
-    .play({
-      context_uri: playlist.uri
-    })
-    .then(
-      () => {
-        store.setActivePlaylist(action.value);
-
-        res.send(
-          `Now playing from *${playlist.name}*! Commands will now act on this playlist.`
-        );
-      },
-      err =>
-        utils.errorWrapper(err, errorMessage =>
-          res.send(errorMessage || 'Looks like a misconfigured playlist.')
-        )
+  try {
+    await playlist.remove({});
+    return `Removed configuration for *${playlist.name}*.`;
+  } catch (err) {
+    logger.error(
+      'Error removing playlist for /interactive list playlists: ' + err.stack
     );
+    throw err;
+  }
 }
 
-module.exports = function list_playlists(payload, res) {
+async function playPlaylist(payload) {
+  const spotifyID = payload.actions[0].value;
+  const playlist = await Playlist.findOne({ spotifyID });
+
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
+
+  try {
+    await spotifyApi.play({
+      context_uri: playlist.uri
+    });
+    await playlist.setActive();
+
+    return `Now playing from *${
+      playlist.name
+    }*! Commands will now act on this playlist.`;
+  } catch (err) {
+    logger.error(
+      'Error playing playlist for /interactive list playlists: ' + err.stack
+    );
+    throw err;
+  }
+}
+
+module.exports = async function list_playlists(payload) {
   const action = payload.actions[0];
 
   if (action.name === 'remove') {
-    removePlaylist(payload, res);
+    return await removePlaylist(payload);
   } else {
-    playPlaylist(payload, res);
+    return await playPlaylist(payload);
   }
 };

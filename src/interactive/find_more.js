@@ -1,6 +1,8 @@
+const User = require('../models/user');
 const utils = require('../utils');
+const logger = require('../logger');
 
-module.exports = async function find_track_more(payload, res) {
+module.exports = async function find_track_more(payload) {
   const action = payload.actions[0];
   const data = JSON.parse(action.value);
 
@@ -10,20 +12,19 @@ module.exports = async function find_track_more(payload, res) {
     limit: data.limit
   };
 
-  const spotifyApi = await utils.getSpotifyApi();
-  spotifyApi.searchTracks(query, options).then(
-    data => {
-      res.send({
-        text: `You searched for "${query}":`,
-        attachments: utils.getSearchAttachments(query, data)
-      });
-    },
-    err =>
-      utils.errorWrapper(err, errorMessage =>
-        res.send(
-          errorMessage || 'An error occured while performing the search.'
-        )
-      )
-  );
-  return;
+  const activeUser = await User.getActive();
+  const spotifyApi = await activeUser.getSpotifyApi();
+
+  try {
+    const data = await spotifyApi.searchTracks(query, options);
+    return {
+      text: `You searched for "${query}":`,
+      attachments: utils.getSearchAttachments(query, data)
+    };
+  } catch (err) {
+    logger.error(
+      'Error searching tracks for /interactive find more: ' + err.stack
+    );
+    throw err;
+  }
 };
