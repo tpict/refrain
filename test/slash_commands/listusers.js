@@ -27,7 +27,7 @@ describe('/listusers endpoint', function () {
 
     chai.assert.equal(
       res.body.text,
-      '<@U1AAAAAAA>: Authenticated users:\nU1AAAAAAA\nU1BBBBBBB'
+      'Authenticated users:\n<@U1AAAAAAA>\n<@U1BBBBBBB>'
     );
   });
 

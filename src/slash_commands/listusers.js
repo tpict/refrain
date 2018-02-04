@@ -1,8 +1,9 @@
 const User = require('../models/user');
-const utils = require('../utils');
 
-module.exports = async function listusers(req) {
+module.exports = async function listusers() {
   const userIDList = await User.find({}).select('-_id slackID');
-  const formattedUserIDList = userIDList.map(obj => obj.slackID).join('\n');
-  return utils.slackAt(req, `Authenticated users:\n${formattedUserIDList}`);
+  const formattedUserIDList = userIDList
+    .map(obj => `<@${obj.slackID}>`)
+    .join('\n');
+  return { text: `Authenticated users:\n${formattedUserIDList}` };
 };
