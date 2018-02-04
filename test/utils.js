@@ -12,11 +12,10 @@ module.exports = {
         command: '',
         text: '',
         response_url:
-        'https://hooks.slack.com/commands/T0AAAAAAA/123456789000/AAAAAAAAAAAAAAAAAAAAAAAA',
+          'https://hooks.slack.com/commands/T0AAAAAAA/123456789000/AAAAAAAAAAAAAAAAAAAAAAAA',
         trigger_id: '123456789000.1234567890.abcdeff123aaa1111111111111111111'
       },
       fields
     );
-  },
-
+  }
 };

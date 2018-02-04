@@ -14,8 +14,8 @@ module.exports = async function findme(req) {
   try {
     const data = await spotifyApi.searchTracks(searchTerms, { limit: 3 });
     return {
-        text: `You searched for "${searchTerms}":`,
-        attachments: utils.getSearchAttachments(searchTerms, data)
+      text: `You searched for "${searchTerms}":`,
+      attachments: utils.getSearchAttachments(searchTerms, data)
     };
   } catch (err) {
     logger.error(`Error performing track search: ${err.stack}`);

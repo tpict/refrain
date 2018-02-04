@@ -1,3 +1,6 @@
+// From https://api.slack.com/tutorials/tunneling-with-ngrok
+// This isn't actually used since Refrain is self-hosted for now
+
 const request = require('request');
 
 module.exports = function (app) {

@@ -1,5 +1,4 @@
 const { getErrorMessage } = require('../utils');
-const logger = require('../logger');
 const { needsPower, needsActive, needsSetup } = require('./permission_wrapper');
 
 const endpoints = [

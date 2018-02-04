@@ -92,10 +92,7 @@ describe('/findme endpoint', function () {
       .post('/findme')
       .send(body);
 
-    chai.assert.equal(
-      res.body.text,
-      '<@U1AAAAAAA>: The jukebox is off!'
-    );
+    chai.assert.equal(res.body.text, '<@U1AAAAAAA>: The jukebox is off!');
     chai.assert.equal(res.body.response_type, 'in_channel');
   });
 });

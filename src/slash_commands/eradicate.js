@@ -8,15 +8,17 @@ module.exports = async function eradicate(req) {
 
   let data;
   try {
-    data = await spotifyApi
-      .getMyCurrentPlayingTrack();
+    data = await spotifyApi.getMyCurrentPlayingTrack();
   } catch (err) {
     logger.error(`Error getting current track for /eradicate: ${err.stack}`);
     throw err;
   }
 
   if (data.statusCode === 204) {
-    return utils.slackAt(req, 'Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.');
+    return utils.slackAt(
+      req,
+      'Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.'
+    );
   }
 
   const track = data.body.item;

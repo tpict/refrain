@@ -26,11 +26,9 @@ const extended = api => ({
 
     while (nextURL && !found) {
       let tracks;
-      [tracks, total, nextURL] = await api.getPlaylistTracks(
-        userID,
-        playlistID,
-        next
-      ).then(data => [data.body.items, data.body.total, data.body.next]);
+      [tracks, total, nextURL] = await api
+        .getPlaylistTracks(userID, playlistID, next)
+        .then(data => [data.body.items, data.body.total, data.body.next]);
 
       if (nextURL) {
         const searchParams = new URL(nextURL).searchParams;
@@ -54,11 +52,10 @@ const extended = api => ({
 
   // Add a track to the given playlist and store it in the database.
   addAndStoreTrack: async (track, playlist) => {
-    return api.addTracksToPlaylist(
-      playlist.spotifyUserID,
-      playlist.spotifyID,
-      [track.uri]
-    )
+    return api
+      .addTracksToPlaylist(playlist.spotifyUserID, playlist.spotifyID, [
+        track.uri
+      ])
       .then(() => {
         return track.save();
       })

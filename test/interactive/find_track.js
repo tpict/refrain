@@ -66,7 +66,8 @@ describe('/findme interactive callback', function () {
 
     const webScope = nock('https://slack.com')
       .post('/api/chat.postMessage', {
-        text: 'Now playing *Psycho Killer - 2005 Remastered Version* by *Talking Heads*, as requested by <@U1AAAAAAA>',
+        text:
+          'Now playing *Psycho Killer - 2005 Remastered Version* by *Talking Heads*, as requested by <@U1AAAAAAA>',
         channel: 'D1AAAAAAA'
       })
       .reply(200);

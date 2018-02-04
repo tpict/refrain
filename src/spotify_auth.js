@@ -42,9 +42,7 @@ module.exports = app => {
 
     const authURL = spotifyApi.createAuthorizeURL(scope, state);
 
-    res.send(
-      `Click this link to authenticate with Spotify: ${authURL}`
-    );
+    res.send(`Click this link to authenticate with Spotify: ${authURL}`);
   });
 
   // Redirect endpoint for Spotify authentication.
@@ -86,7 +84,9 @@ module.exports = app => {
     await user.save();
 
     res.send(
-      `${state.name} is now authenticated with Spotify! You can close this tab now.`
+      `${
+        state.name
+      } is now authenticated with Spotify! You can close this tab now.`
     );
   });
 };

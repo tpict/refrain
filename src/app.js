@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 
 const logger = require('./logger');
 
-const app = function () {
+const app = (function () {
   let app = express();
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
@@ -27,7 +27,7 @@ const app = function () {
   });
 
   return app;
-}();
+})();
 
 if (!module.parent) {
   app.listen(4390, () => logger.info('Refrain listening on port 4390!'));
