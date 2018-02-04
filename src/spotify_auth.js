@@ -43,7 +43,7 @@ module.exports = app => {
     const authURL = spotifyApi.createAuthorizeURL(scope, state);
 
     res.send(
-      `Click this link to authenticate with Spotify: ${authURL}\n\n*Note*: in order to fetch your Spotify ID you will become the active user. Before clicking, you may want to check the active user with \`/whichuser\` and ask them to take over with \`/commandeer\` once you're authenticated.`
+      `Click this link to authenticate with Spotify: ${authURL}`
     );
   });
 
@@ -75,20 +75,18 @@ module.exports = app => {
     spotifyApi.setAccessToken(accessToken);
     spotifyApi.setRefreshToken(refreshToken);
 
-    spotifyApi.getMe().then(
-      async data => {
-        user.spotifyID = data.body.id;
-        user.spotifyAccessToken = accessToken;
-        user.spotifyRefreshToken = refreshToken;
-        user.spotifyTokenExpiry = moment().add(expiresIn, 'seconds');
-        user.active = true;
-        await user.save();
+    const userData = await spotifyApi.getMe();
+    const activeUser = await User.getActive();
 
-        res.send(
-          `${state.name} is now authenticated with Spotify! They are now the active user. You can close this tab now.`
-        );
-      },
-      err => res.send(err)
+    user.spotifyID = userData.body.id;
+    user.spotifyAccessToken = accessToken;
+    user.spotifyRefreshToken = refreshToken;
+    user.spotifyTokenExpiry = moment().add(expiresIn, 'seconds');
+    user.active = !activeUser;
+    await user.save();
+
+    res.send(
+      `${state.name} is now authenticated with Spotify! You can close this tab now.`
     );
   });
 };
