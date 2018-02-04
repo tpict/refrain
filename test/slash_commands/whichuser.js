@@ -21,7 +21,7 @@ describe('/whichuser endpoint', function () {
 
     chai.assert.equal(
       res.body.text,
-      '<@U1AAAAAAA>: No authenticated users yet. Use `/spotifyauth` to get started.'
+      '<@U1AAAAAAA>: No users have been authenticated yet! Try `/spotifyauth` to register yourself.'
     );
   });
 

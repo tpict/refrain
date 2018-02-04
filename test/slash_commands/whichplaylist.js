@@ -22,7 +22,7 @@ describe('/whichplaylist endpoint', function () {
 
     chai.assert.equal(
       res.body.text,
-      '<@U1AAAAAAA>: There is no active playlist!'
+      '<@U1AAAAAAA>: There are no configured playlists. Try `/addplaylist` to get started.'
     );
     chai.assert.equal(res.body.response_type, 'in_channel');
   });
