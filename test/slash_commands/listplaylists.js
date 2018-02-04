@@ -13,6 +13,8 @@ chai.use(chaiHttp);
 
 describe('/listplaylists endpoint', function () {
   it('should tell the user if there are no playlists', async function () {
+    await Playlist.remove({});
+
     const body = utils.baseSlackRequest({
       command: '/listplaylists'
     });
@@ -31,12 +33,6 @@ describe('/listplaylists endpoint', function () {
 
   it('should list configured playlists', async function () {
     await Playlist.insertMany([
-      {
-        spotifyID: 'P000000000000000000000',
-        spotifyUserID: 'U1AAAAAAA',
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000',
-        name: 'My playlist'
-      },
       {
         spotifyID: 'P000000000000000000001',
         spotifyUserID: 'U1BBBBBBB',

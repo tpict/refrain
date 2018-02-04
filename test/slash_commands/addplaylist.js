@@ -12,29 +12,23 @@ const Playlist = require('../../src/models/playlist');
 chai.use(chaiHttp);
 
 describe('/addplaylist endpoint', function () {
-  var scope;
+  let scope;
 
   beforeEach(async function () {
     scope = nock('https://api.spotify.com')
-      .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000')
+      .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000001')
       .reply(200, {
         name: 'My playlist',
-        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+        uri: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000001'
       });
   });
 
   it('should add requested playlist to storage', async function () {
-    const existingPlaylist = new Playlist({
-      spotifyID: 'U1AAAAAAA',
-      spotifyUserID: 'P000000000000000000000',
-      name: 'Existing playlist',
-      active: true,
-    });
-    await existingPlaylist.save();
+    const existingPlaylist = await Playlist.getActive();
 
     const body = utils.baseSlackRequest({
       command: '/addplaylist',
-      text: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+      text: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000001'
     });
 
     const res = await chai
@@ -51,10 +45,10 @@ describe('/addplaylist endpoint', function () {
     chai.assert.equal(res.body.response_type, 'in_channel');
 
     const playlist = await Playlist.findOne({
-      spotifyID: 'P000000000000000000000'
+      spotifyID: 'P000000000000000000001'
     });
     chai.assert.include(playlist.toObject(), {
-      spotifyID: 'P000000000000000000000',
+      spotifyID: 'P000000000000000000001',
       spotifyUserID: 'U1AAAAAAA',
       name: 'My playlist'
     });
@@ -65,9 +59,11 @@ describe('/addplaylist endpoint', function () {
   });
 
   it('should make the first added playlist the active one', async function () {
+    await Playlist.remove({});
+
     const body = utils.baseSlackRequest({
       command: '/addplaylist',
-      text: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000000'
+      text: 'spotify:user:U1AAAAAAA:playlist:P000000000000000000001'
     });
 
     const res = await chai
@@ -84,10 +80,10 @@ describe('/addplaylist endpoint', function () {
     chai.assert.equal(res.body.response_type, 'in_channel');
 
     const playlist = await Playlist.findOne({
-      spotifyID: 'P000000000000000000000'
+      spotifyID: 'P000000000000000000001'
     });
     chai.assert.include(playlist.toObject(), {
-      spotifyID: 'P000000000000000000000',
+      spotifyID: 'P000000000000000000001',
       spotifyUserID: 'U1AAAAAAA',
       name: 'My playlist',
       active: true
@@ -96,12 +92,12 @@ describe('/addplaylist endpoint', function () {
 
   it('should not store invalid playlists', async function () {
     scope = nock('https://api.spotify.com')
-      .get('/v1/users/U1BBBBBBB/playlists/P000000000000000000000')
+      .get('/v1/users/U1BBBBBBB/playlists/P000000000000000000001')
       .reply(404);
 
     const body = utils.baseSlackRequest({
       command: '/addplaylist',
-      text: 'myplaylist spotify:user:U1BBBBBBB:playlist:P000000000000000000000'
+      text: 'myplaylist spotify:user:U1BBBBBBB:playlist:P000000000000000000001'
     });
 
     const res = await chai
@@ -118,7 +114,7 @@ describe('/addplaylist endpoint', function () {
     chai.assert.equal(res.body.response_type, 'in_channel');
 
     const playlist = await Playlist.findOne({
-      spotifyID: 'P000000000000000000000'
+      spotifyID: 'P000000000000000000001'
     });
     chai.assert.isNull(playlist);
   });

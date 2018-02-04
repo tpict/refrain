@@ -5,30 +5,10 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 const app = require('../../src/app');
-const Playlist = require('../../src/models/playlist');
-const Track = require('../../src/models/track');
 
 chai.use(chaiHttp);
 
 describe('/eradicate interactive callback', function () {
-  beforeEach(async function () {
-    const track = new Track({
-      requestedBy: 'U1AAAAAAA',
-      artist: 'Jme',
-      title: 'Test Me'
-    });
-    await track.save();
-
-    const playlist = new Playlist({
-      spotifyID: 'P000000000000000000000',
-      spotifyUserID: 'U1AAAAAAA',
-      tracks: [track._id],
-      name: 'My playlist',
-      active: true
-    });
-    await playlist.save();
-  });
-
   it('should delete tracks', function (done) {
     const removeTrackScope = nock('https://api.spotify.com')
       .delete('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')

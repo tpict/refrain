@@ -12,6 +12,8 @@ chai.use(chaiHttp);
 
 describe('/whichplaylist endpoint', function () {
   it('should tell the user if no playlist is active', async function () {
+    await Playlist.remove({});
+
     const body = utils.baseSlackRequest({
       command: '/whichplaylist'
     });
@@ -29,14 +31,6 @@ describe('/whichplaylist endpoint', function () {
   });
 
   it('should tell the user which playlist is active', async function () {
-    const playlist = new Playlist({
-      spotifyID: 'P000000000000000000000',
-      spotifyUserID: 'U1AAAAAAA',
-      name: 'My playlist',
-      active: true
-    });
-
-    await playlist.save();
     const body = utils.baseSlackRequest({
       command: '/whichplaylist'
     });

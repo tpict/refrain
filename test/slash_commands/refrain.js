@@ -77,7 +77,7 @@ describe('/refrain endpoint', function () {
 
     chai.assert.equal(
       res.body.text,
-      '<@U1AAAAAAA>: Switched on. Add a playlist with `/addplaylist` to get started.'
+      '<@U1AAAAAAA>: It begins...\nIf you can\'t hear anything, play any track in the Spotify client and try again.'
     );
   });
 

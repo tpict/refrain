@@ -8,39 +8,10 @@ const utils = require('../utils');
 
 const app = require('../../src/app');
 const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
-const Playlist = require('../../src/models/playlist');
-const Track = require('../../src/models/track');
 
 chai.use(chaiHttp);
 
 describe('/whomst endpoint', async function () {
-  beforeEach(async function () {
-    const track = new Track({
-      spotifyID: '0eGsygTp906u18L0Oimnem',
-      requestedBy: 'U1AAAAAAA',
-      artist: 'The Killers',
-      name: 'Mr. Brightside'
-    });
-    await track.save();
-
-    const track2 = new Track({
-      spotifyID: '2x9SpqnPi8rlE9pjHBwmSC',
-      requestedBy: 'U1AAAAAAA',
-      artist: 'Talking Heads',
-      name: 'Psycho Killer - 2005 Remastered Version'
-    });
-    await track2.save();
-
-    const playlist = new Playlist({
-      spotifyID: 'P000000000000000000000',
-      spotifyUserID: 'U1AAAAAAA',
-      tracks: [track._id, track2._id],
-      name: 'My playlist',
-      active: true
-    });
-    await playlist.save();
-  });
-
   it('should track who requested a track', async function () {
     const scope = nock('https://api.spotify.com')
       .get('/v1/me/player/currently-playing')

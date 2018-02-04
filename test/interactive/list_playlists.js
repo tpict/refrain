@@ -13,12 +13,6 @@ describe('/listplaylists interactive callback', function () {
   beforeEach(async function () {
     await Playlist.insertMany([
       {
-        spotifyID: 'P000000000000000000000',
-        spotifyUserID: 'U1AAAAAAA',
-        name: 'My playlist',
-        active: true
-      },
-      {
         spotifyID: 'P000000000000000000001',
         spotifyUserID: 'U1AAAAAAA',
         name: 'My other playlist'

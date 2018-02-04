@@ -22,14 +22,6 @@ describe('/findme interactive callback', function () {
       })
       .reply(200);
 
-    const playlist = new Playlist({
-      spotifyID: 'P000000000000000000000',
-      spotifyUserID: 'U1AAAAAAA',
-      name: 'My playlist',
-      active: true
-    });
-
-    await playlist.save();
     const res = await chai
       .request(app)
       .post('/interactive')
@@ -44,7 +36,7 @@ describe('/findme interactive callback', function () {
         await activePlaylist.populate('tracks').execPopulate();
         const storedTracks = activePlaylist.tracks;
 
-        chai.assert.include(storedTracks[0].toObject(), {
+        chai.assert.include(storedTracks[2].toObject(), {
           spotifyID: '6sxosT7KMFP9OQL3DdD6Qy',
           requestedBy: 'U1AAAAAAA',
           artist: 'Jme',
@@ -59,15 +51,7 @@ describe('/findme interactive callback', function () {
   it('should play tracks that are already in the playlist immediately', async function () {
     const getTracksScope = nock('https://api.spotify.com')
       .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
-      .reply(200, require('../fixtures/playlist_tracks.json'));
-
-    const getTracksScope2 = nock('https://api.spotify.com')
-      .get('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
-      .query({
-        offset: 3,
-        limit: 3
-      })
-      .reply(200, require('../fixtures/playlist_tracks_2.json'));
+      .reply(200, require('../fixtures/playlist_tracks_3.json'));
 
     const addToPlaylistScope = nock('https://api.spotify.com')
       .post('/v1/users/U1AAAAAAA/playlists/P000000000000000000000/tracks')
@@ -79,24 +63,16 @@ describe('/findme interactive callback', function () {
         data =>
           data.context_uri ==
             'spotify:user:U1AAAAAAA:playlist:P000000000000000000000' &&
-          data.offset.position == 4
+          data.offset.position == 1
       )
       .reply(200);
 
     const webScope = nock('https://slack.com')
       .post('/api/chat.postMessage', {
-        text: 'Now playing *Test Me* by *Jme*, as requested by <@U1AAAAAAA>',
+        text: 'Now playing *Psycho Killer - 2005 Remastered Version* by *Talking Heads*, as requested by <@U1AAAAAAA>',
         channel: 'D1AAAAAAA'
       })
       .reply(200);
-
-    const playlist = new Playlist({
-      spotifyID: 'P000000000000000000000',
-      spotifyUserID: 'U1AAAAAAA',
-      name: 'My playlist',
-      active: true
-    });
-    await playlist.save();
 
     const res = await chai
       .request(app)
@@ -108,13 +84,12 @@ describe('/findme interactive callback', function () {
     await new Promise(resolve =>
       webScope.on('replied', async () => {
         getTracksScope.done();
-        getTracksScope2.done();
         chai.assert.isFalse(addToPlaylistScope.isDone());
         playScope.done();
 
         const activePlaylist = await Playlist.getActive();
         await activePlaylist.populate('tracks').execPopulate();
-        chai.assert.equal(activePlaylist.tracks.length, 0);
+        chai.assert.equal(activePlaylist.tracks.length, 2);
 
         resolve();
       })
