@@ -6,96 +6,108 @@ function splitPlaylistURI(uri) {
   return { userID: splitURI[2], playlistID: splitURI[4] };
 }
 
-// Find the index of the given track in the given playlist.
-// This is a work-around for a bug in the Spotify API that prevents specifying
-// a playlist offset by URI.
-// https://github.com/spotify/web-api/issues/630
-SpotifyWebApi.prototype.getPlaylistOffset = async function (track, playlist) {
-  const { userID, playlistID } = splitPlaylistURI(playlist.uri);
+const extended = api => ({
+  // Find the index of the given track in the given playlist.
+  // This is a work-around for a bug in the Spotify API that prevents specifying
+  // a playlist offset by URI.
+  // https://github.com/spotify/web-api/issues/630
+  getPlaylistOffset: async (track, playlist) => {
+    const { userID, playlistID } = splitPlaylistURI(playlist.uri);
 
-  let next = {};
-  let nextURL = true;
-  let found = false;
+    let next = {};
+    let nextURL = true;
+    let found = false;
 
-  let index = 0;
-  let total = 0;
+    let index = 0;
+    let total = 0;
 
-  while (nextURL && !found) {
-    let tracks;
-    [tracks, total, nextURL] = await this.getPlaylistTracks(
-      userID,
-      playlistID,
-      next
-    ).then(
-      data => [data.body.items, data.body.total, data.body.next]
-    );
+    while (nextURL && !found) {
+      let tracks;
+      [tracks, total, nextURL] = await api.getPlaylistTracks(
+        userID,
+        playlistID,
+        next
+      ).then(data => [data.body.items, data.body.total, data.body.next]);
 
-    if (nextURL) {
-      const searchParams = new URL(nextURL).searchParams;
-      next.offset = searchParams.get('offset');
-      next.limit = searchParams.get('limit');
-    }
-
-    tracks.some(item => {
-      if (item.track.id === track.spotifyID) {
-        found = true;
-        return true;
+      if (nextURL) {
+        const searchParams = new URL(nextURL).searchParams;
+        next.offset = searchParams.get('offset');
+        next.limit = searchParams.get('limit');
       }
 
-      index++;
-      return false;
-    });
-  }
+      tracks.some(item => {
+        if (item.track.id === track.spotifyID) {
+          found = true;
+          return true;
+        }
 
-  return [index, total, found];
-};
+        index++;
+        return false;
+      });
+    }
 
-// Add a track to the given playlist and store it in the database.
-SpotifyWebApi.prototype.addAndStoreTrack = async function (track, playlist) {
-  return this.addTracksToPlaylist(playlist.spotifyUserID, playlist.spotifyID, [
-    track.uri
-  ])
-    .then(() => {
-      return track.save();
-    })
-    .then(async track => {
-      playlist.tracks.push(track._id);
-      await playlist.save();
-      return track;
-    });
-};
+    return [index, total, found];
+  },
 
-// Play a track in the context of a playlist.
-SpotifyWebApi.prototype.playTrackInPlaylistContext = async function (track, playlist) {
-  const [offset, total, found] = await this.getPlaylistOffset(
-    track,
-    playlist
-  );
+  // Add a track to the given playlist and store it in the database.
+  addAndStoreTrack: async (track, playlist) => {
+    return api.addTracksToPlaylist(
+      playlist.spotifyUserID,
+      playlist.spotifyID,
+      [track.uri]
+    )
+      .then(() => {
+        return track.save();
+      })
+      .then(async track => {
+        playlist.tracks.push(track._id);
+        await playlist.save();
+        return track;
+      });
+  },
 
-  if (found) {
-    await this.play({
+  // Play a track in the context of a playlist.
+  playTrackInPlaylistContext: async (track, playlist) => {
+    const [offset, total, found] = await api.refrain.getPlaylistOffset(
+      track,
+      playlist
+    );
+
+    if (found) {
+      await api.play({
+        context_uri: playlist.uri,
+        offset: { position: offset }
+      });
+    }
+
+    return [found, total];
+  },
+
+  // Play a track in the context of a playlist, adding it to the playlist and
+  // and database if it's new.
+  playAndAddTrack: async (track, playlist) => {
+    const [found, total] = await api.refrain.playTrackInPlaylistContext(
+      track,
+      playlist
+    );
+
+    if (found) {
+      return;
+    }
+
+    await api.refrain.addAndStoreTrack(track, playlist);
+    return api.play({
       context_uri: playlist.uri,
-      offset: { position: offset }
+      offset: { position: total }
     });
   }
+});
 
-  return [found, total];
-};
+function ExtendedApi(credentials) {
+  this._credentials = credentials || {};
+  this.refrain = extended(this);
+}
 
-// Play a track in the context of a playlist, adding it to the playlist and
-// and database if it's new.
-SpotifyWebApi.prototype.playAndAddTrack = async function (track, playlist) {
-  const [found, total] = await this.playTrackInPlaylistContext(
-    track,
-    playlist
-  );
+ExtendedApi.prototype = SpotifyWebApi.prototype;
 
-  if (found) {
-    return;
-  }
-
-  await this.addAndStoreTrack(track, playlist);
-  return this.play({ context_uri: playlist.uri, offset: { position: total } });
-};
-
-module.exports = SpotifyWebApi;
+module.exports = ExtendedApi;

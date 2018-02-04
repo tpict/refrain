@@ -17,8 +17,12 @@ module.exports = app => {
       try {
         res.send(await callback(payload));
       } catch (err) {
-        console.log(err);
         res.send(utils.getErrorMessage(err.statusCode));
+
+        // Easier debugging in testing
+        if (process.env.NODE_ENV !== 'production') {
+          throw err;
+        }
       }
     } else {
       res.send('Looks like that feature hasn\'t been implemented yet!');

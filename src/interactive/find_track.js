@@ -24,7 +24,7 @@ module.exports = async function find_track(payload) {
   });
 
   if (action.name === 'play') {
-    spotifyApi
+    spotifyApi.refrain
       .playAndAddTrack(track, playlist)
       .then(() =>
         webClient.chat.postMessage(
@@ -38,9 +38,10 @@ module.exports = async function find_track(payload) {
           channelID,
           utils.getErrorMessage(err.statusCode)
         );
+        throw err;
       });
   } else {
-    spotifyApi
+    spotifyApi.refrain
       .addAndStoreTrack(track, playlist)
       .then(() =>
         webClient.chat.postMessage(
@@ -54,6 +55,7 @@ module.exports = async function find_track(payload) {
           channelID,
           utils.getErrorMessage(err.statusCode)
         );
+        throw err;
       });
   }
 

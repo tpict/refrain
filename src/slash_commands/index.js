@@ -1,4 +1,5 @@
 const { getErrorMessage } = require('../utils');
+const logger = require('../logger');
 
 const endpoints = [
   { name: '/addplaylist', handler: require('./addplaylist') },
@@ -20,13 +21,16 @@ const endpoints = [
 module.exports = app =>
   endpoints.forEach(({ name, handler }) =>
     app.post(name, async function (req, res) {
-      const response = await handler(req).catch(
-        error => {
-          console.log(error);
-          return getErrorMessage(error.statusCode);
-        }
-      );
+      try {
+        res.send(await handler(req));
+      } catch (err) {
+        logger.error(err);
+        res.send(getErrorMessage(err.statusCode));
 
-      res.send(response);
+        // Easier debugging in testing
+        if (process.env.NODE_ENV !== 'production') {
+          throw err;
+        }
+      }
     })
   );
