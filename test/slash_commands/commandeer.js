@@ -1,13 +1,10 @@
 require('../setup');
 
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
-
-chai.use(chaiHttp);
 
 describe('/commandeer endpoint', function () {
   it('should reject unauthenticated users', async function () {

@@ -1,7 +1,6 @@
 require('./setup');
 
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 const nock = require('nock');
 const sinon = require('sinon');
 const moment = require('moment');
@@ -11,7 +10,6 @@ const utils = require('./utils');
 const app = require('../src/app');
 const User = require('../src/models/user');
 
-chai.use(chaiHttp);
 const sandbox = sinon.sandbox.create();
 
 describe('Spotify authentication refresh', function () {

@@ -1,0 +1,203 @@
+{
+  "tracks" : {
+    "href" : "https://api.spotify.com/v1/search?query=temporary+secretary&type=track&market=GB&offset=3&limit=3",
+    "items" : [ {
+      "album" : {
+        "album_type" : "album",
+        "artists" : [ {
+          "external_urls" : {
+            "spotify" : "https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB"
+          },
+          "href" : "https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB",
+          "id" : "4STHEaNw4mPZ2tzheohgXB",
+          "name" : "Paul McCartney",
+          "type" : "artist",
+          "uri" : "spotify:artist:4STHEaNw4mPZ2tzheohgXB"
+        } ],
+        "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY" ],
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/album/07ZmDCsg6az2VaOIPCBGMY"
+        },
+        "href" : "https://api.spotify.com/v1/albums/07ZmDCsg6az2VaOIPCBGMY",
+        "id" : "07ZmDCsg6az2VaOIPCBGMY",
+        "images" : [ {
+          "height" : 640,
+          "url" : "https://i.scdn.co/image/b81db46d0b8ada3f46e9d245b7b31f1789403ce8",
+          "width" : 640
+        }, {
+          "height" : 300,
+          "url" : "https://i.scdn.co/image/d484d0f0c14bbcca47b42c764d7ad7c7a52b4106",
+          "width" : 300
+        }, {
+          "height" : 64,
+          "url" : "https://i.scdn.co/image/a74cb5baa3a3c22d61c7e23e84e5b19c773eaada",
+          "width" : 64
+        } ],
+        "name" : "Twin Freaks",
+        "type" : "album",
+        "uri" : "spotify:album:07ZmDCsg6az2VaOIPCBGMY"
+      },
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/4STHEaNw4mPZ2tzheohgXB"
+        },
+        "href" : "https://api.spotify.com/v1/artists/4STHEaNw4mPZ2tzheohgXB",
+        "id" : "4STHEaNw4mPZ2tzheohgXB",
+        "name" : "Paul McCartney",
+        "type" : "artist",
+        "uri" : "spotify:artist:4STHEaNw4mPZ2tzheohgXB"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 254133,
+      "explicit" : false,
+      "external_ids" : {
+        "isrc" : "GBCCS0501455"
+      },
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/3mNUmdPiJ7ok4gzqVMgdIV"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/3mNUmdPiJ7ok4gzqVMgdIV",
+      "id" : "3mNUmdPiJ7ok4gzqVMgdIV",
+      "name" : "Temporary Secretary - 04 Summer Tour Remix",
+      "popularity" : 11,
+      "preview_url" : null,
+      "track_number" : 6,
+      "type" : "track",
+      "uri" : "spotify:track:3mNUmdPiJ7ok4gzqVMgdIV"
+    }, {
+      "album" : {
+        "album_type" : "album",
+        "artists" : [ {
+          "external_urls" : {
+            "spotify" : "https://open.spotify.com/artist/2fEk73iGQuzvW93I9Tp1bt"
+          },
+          "href" : "https://api.spotify.com/v1/artists/2fEk73iGQuzvW93I9Tp1bt",
+          "id" : "2fEk73iGQuzvW93I9Tp1bt",
+          "name" : "Los Fancy Free",
+          "type" : "artist",
+          "uri" : "spotify:artist:2fEk73iGQuzvW93I9Tp1bt"
+        } ],
+        "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY" ],
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/album/4FW4QtvN7lDWxiKAjWIe7k"
+        },
+        "href" : "https://api.spotify.com/v1/albums/4FW4QtvN7lDWxiKAjWIe7k",
+        "id" : "4FW4QtvN7lDWxiKAjWIe7k",
+        "images" : [ {
+          "height" : 640,
+          "url" : "https://i.scdn.co/image/f26057cc2caef930cf8323685727f71f688c2808",
+          "width" : 640
+        }, {
+          "height" : 300,
+          "url" : "https://i.scdn.co/image/bf1e80325d096a34ba5f8b261e46d76d8f18bf51",
+          "width" : 300
+        }, {
+          "height" : 64,
+          "url" : "https://i.scdn.co/image/e70fe18038e90e544fbdabd0ffdacaa377cabe96",
+          "width" : 64
+        } ],
+        "name" : "Out of Place",
+        "type" : "album",
+        "uri" : "spotify:album:4FW4QtvN7lDWxiKAjWIe7k"
+      },
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/2fEk73iGQuzvW93I9Tp1bt"
+        },
+        "href" : "https://api.spotify.com/v1/artists/2fEk73iGQuzvW93I9Tp1bt",
+        "id" : "2fEk73iGQuzvW93I9Tp1bt",
+        "name" : "Los Fancy Free",
+        "type" : "artist",
+        "uri" : "spotify:artist:2fEk73iGQuzvW93I9Tp1bt"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 292973,
+      "explicit" : false,
+      "external_ids" : {
+        "isrc" : "MXF740700133"
+      },
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/2DnnTktppiAhWrldQiyocX"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/2DnnTktppiAhWrldQiyocX",
+      "id" : "2DnnTktppiAhWrldQiyocX",
+      "name" : "Temporary Secretary",
+      "popularity" : 20,
+      "preview_url" : "https://p.scdn.co/mp3-preview/e14b5b22d5018d33d01ae5b46e931c65e7387c82?cid=8897482848704f2a8f8d7c79726a70d4",
+      "track_number" : 8,
+      "type" : "track",
+      "uri" : "spotify:track:2DnnTktppiAhWrldQiyocX"
+    }, {
+      "album" : {
+        "album_type" : "album",
+        "artists" : [ {
+          "external_urls" : {
+            "spotify" : "https://open.spotify.com/artist/3KS7yOf3AYBl9uTNymvbnI"
+          },
+          "href" : "https://api.spotify.com/v1/artists/3KS7yOf3AYBl9uTNymvbnI",
+          "id" : "3KS7yOf3AYBl9uTNymvbnI",
+          "name" : "Donny Who Loved Bowling",
+          "type" : "artist",
+          "uri" : "spotify:artist:3KS7yOf3AYBl9uTNymvbnI"
+        } ],
+        "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY" ],
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/album/42hnXWzsjqbwDG1BG0VAEv"
+        },
+        "href" : "https://api.spotify.com/v1/albums/42hnXWzsjqbwDG1BG0VAEv",
+        "id" : "42hnXWzsjqbwDG1BG0VAEv",
+        "images" : [ {
+          "height" : 640,
+          "url" : "https://i.scdn.co/image/3d2a13cc2e2c83faf2f0a902b4051de9b3ca7e34",
+          "width" : 640
+        }, {
+          "height" : 300,
+          "url" : "https://i.scdn.co/image/987f43ac022f79ec99e0bfb5c62f48b7631fe4a3",
+          "width" : 300
+        }, {
+          "height" : 64,
+          "url" : "https://i.scdn.co/image/92e3a7887eaf1cb9bddce394d3830976cbb0cef0",
+          "width" : 64
+        } ],
+        "name" : "Butcher Covers",
+        "type" : "album",
+        "uri" : "spotify:album:42hnXWzsjqbwDG1BG0VAEv"
+      },
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/3KS7yOf3AYBl9uTNymvbnI"
+        },
+        "href" : "https://api.spotify.com/v1/artists/3KS7yOf3AYBl9uTNymvbnI",
+        "id" : "3KS7yOf3AYBl9uTNymvbnI",
+        "name" : "Donny Who Loved Bowling",
+        "type" : "artist",
+        "uri" : "spotify:artist:3KS7yOf3AYBl9uTNymvbnI"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TH", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 182160,
+      "explicit" : false,
+      "external_ids" : {
+        "isrc" : "usl4q0879641"
+      },
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/0T9jyQHRxE3xZrit5YBn58"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/0T9jyQHRxE3xZrit5YBn58",
+      "id" : "0T9jyQHRxE3xZrit5YBn58",
+      "name" : "Temporary Secretary",
+      "popularity" : 0,
+      "preview_url" : "https://p.scdn.co/mp3-preview/dbbdc4ab908a5b266100bd6774628ba3fd435067?cid=8897482848704f2a8f8d7c79726a70d4",
+      "track_number" : 4,
+      "type" : "track",
+      "uri" : "spotify:track:0T9jyQHRxE3xZrit5YBn58"
+    } ],
+    "limit" : 3,
+    "next" : "https://api.spotify.com/v1/search?query=temporary+secretary&type=track&market=GB&offset=6&limit=3",
+    "offset" : 3,
+    "previous" : "https://api.spotify.com/v1/search?query=temporary+secretary&type=track&market=GB&offset=0&limit=3",
+    "total" : 13
+  }
+}

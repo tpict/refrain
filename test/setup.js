@@ -1,9 +1,13 @@
 const nock = require('nock');
+const chai = require('chai');
+const chaiHttp = require('chai-http');
 
 const Playlist = require('../src/models/playlist');
 const Track = require('../src/models/track');
 const User = require('../src/models/user');
 const permissionWrapper = require('../src/slash_commands/permission_wrapper');
+
+chai.use(chaiHttp);
 
 async function setDefaultUsers(callback) {
   await User.remove({});

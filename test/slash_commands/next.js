@@ -2,14 +2,11 @@ require('../setup');
 
 const nock = require('nock');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
 const permissionWrapper = require('../../src/slash_commands/permission_wrapper');
-
-chai.use(chaiHttp);
 
 describe('/next endpoint', function () {
   it('should skip tracks as requested', async function () {

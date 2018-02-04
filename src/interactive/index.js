@@ -4,7 +4,7 @@ const utils = require('../utils');
 const callbacks = {
   delete_track: require('./delete_track'),
   find_track: require('./find_track'),
-  find_more: require('./find_more'),
+  find_track_more: require('./find_more'),
   list_playlists: require('./list_playlists')
 };
 

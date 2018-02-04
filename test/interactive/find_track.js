@@ -2,12 +2,9 @@ require('../setup');
 
 const nock = require('nock');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 
 const app = require('../../src/app');
 const Playlist = require('../../src/models/playlist');
-
-chai.use(chaiHttp);
 
 describe('/findme interactive callback', function () {
   it('should queue tracks', async function () {

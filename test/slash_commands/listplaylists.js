@@ -2,14 +2,11 @@ require('../setup');
 
 const nock = require('nock');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
 const Playlist = require('../../src/models/playlist');
-
-chai.use(chaiHttp);
 
 describe('/listplaylists endpoint', function () {
   it('should tell the user if there are no playlists', async function () {

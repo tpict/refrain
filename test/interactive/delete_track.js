@@ -2,11 +2,8 @@ require('../setup');
 
 const nock = require('nock');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 
 const app = require('../../src/app');
-
-chai.use(chaiHttp);
 
 describe('/eradicate interactive callback', function () {
   it('should delete tracks', function (done) {

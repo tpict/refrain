@@ -1,15 +1,12 @@
 require('../setup');
 
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 const nock = require('nock');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
 const Playlist = require('../../src/models/playlist');
-
-chai.use(chaiHttp);
 
 describe('/addplaylist endpoint', function () {
   let scope;

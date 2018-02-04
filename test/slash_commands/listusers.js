@@ -1,14 +1,11 @@
 require('../setup');
 
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 
 const utils = require('../utils');
 
 const app = require('../../src/app');
 const User = require('../../src/models/user');
-
-chai.use(chaiHttp);
 
 describe('/listusers endpoint', function () {
   it('should list authenticated users', async function () {
