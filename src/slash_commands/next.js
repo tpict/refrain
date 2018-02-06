@@ -8,7 +8,9 @@ async function performSkip(spotifyApi, req) {
   try {
     await spotifyApi.skipToNext();
   } catch (err) {
-    logger.error('Error skipping current track for /next: ' + err.stack);
+    logger.error(
+      'Error skipping current track for /next: ' + (err.stack || err)
+    );
     return webClient.chat.postMessage(
       req.body.channel_id,
       utils.getErrorMessage(err.statusCode)
@@ -22,7 +24,7 @@ async function performSkip(spotifyApi, req) {
     track = await spotifyApi.refrain.getMyCurrentPlayingTrack();
   } catch (err) {
     logger.error(
-      'Error getting current track post-skip for /next: ' + err.stack
+      'Error getting current track post-skip for /next: ' + (err.stack || err)
     );
     return webClient.chat.postMessage(
       req.body.channel_id,
@@ -56,7 +58,9 @@ module.exports = async function next(req) {
     const skippedArtist = trackData.body.item.artists[0].name;
     skipMessage = `Skipping ${utils.formatSong(skippedName, skippedArtist)}...`;
   } catch (err) {
-    logger.error('Error getting current track for /next: ' + err.stack);
+    logger.error(
+      'Error getting current track for /next: ' + (err.stack || err)
+    );
   }
 
   performSkip(spotifyApi, req);

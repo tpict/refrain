@@ -22,7 +22,9 @@ module.exports = async function listplaylists() {
   try {
     responseList = await Promise.all(requests);
   } catch (err) {
-    logger.error(`Error retrieving tracks for /listplaylists: ${err.stack}`);
+    logger.error(
+      `Error retrieving tracks for /listplaylists: ${err.stack || err}`
+    );
     throw err;
   }
 

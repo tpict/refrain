@@ -18,7 +18,7 @@ module.exports = async function findme(req) {
       attachments: utils.getSearchAttachments(searchTerms, data)
     };
   } catch (err) {
-    logger.error(`Error performing track search: ${err.stack}`);
+    logger.error(`Error performing track search: ${err.stack || err}`);
     throw err;
   }
 };

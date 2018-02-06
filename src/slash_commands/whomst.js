@@ -11,7 +11,9 @@ module.exports = async function whomst(req) {
   try {
     track = await spotifyApi.refrain.getMyCurrentPlayingTrack();
   } catch (err) {
-    logger.error('Error getting current track for /whomst: ' + err.stack);
+    logger.error(
+      'Error getting current track for /whomst: ' + (err.stack || err)
+    );
     throw err;
   }
 

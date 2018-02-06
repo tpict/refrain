@@ -15,17 +15,20 @@ schema.pre('save', function (next) {
   let err;
 
   const query = this.constructor.find({ _id: { $ne: this._id } });
-  query.then(result => {
-    if (result.length === 0 && !this.active) {
-      err = new Error('The only playlist must be active.');
-    }
+  query
+    .then(result => {
+      if (result.length === 0 && !this.active) {
+        err = new Error('The only playlist must be active.');
+      }
 
-    return query.find({ active: true });
-  }).then(result => {
-    if (result.length  > 0 && this.active) {
-      err = new Error('Only one playlist may be active at a time.');
-    }
-  }).then(() => next(err));
+      return query.find({ active: true });
+    })
+    .then(result => {
+      if (result.length > 0 && this.active) {
+        err = new Error('Only one playlist may be active at a time.');
+      }
+    })
+    .then(() => next(err));
 });
 
 schema.pre('remove', function (next) {

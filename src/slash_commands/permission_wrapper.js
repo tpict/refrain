@@ -5,6 +5,26 @@ const User = require('../models/user');
 
 let on = true;
 
+async function hasUsers() {
+  if ((await User.count({})) === 0) {
+    throw 'No users have been authenticated yet! Try `/spotifyauth` to register yourself.';
+  }
+}
+
+async function hasPlaylists() {
+  if ((await Playlist.count({})) === 0) {
+    throw 'There are no configured playlists. Try `/addplaylist` to get started.';
+  }
+}
+
+// This shouldn't be necessary but is useful for testing.
+async function hasActivePlaylist() {
+  if (process.env.NODE_ENV !== 'production' && !await Playlist.getActive()) {
+    logger.error('No active playlist found. Please report this.');
+    throw 'For some reason, there\'s no active playlist. Try starting one with `/listplaylists.`';
+  }
+}
+
 module.exports = {
   needsPower(req, res, next) {
     if (on) {
@@ -24,35 +44,12 @@ module.exports = {
   },
 
   async needsSetup(req, res, next) {
-    if ((await User.count({})) === 0) {
-      return res.send(
-        utils.slackAt(
-          req,
-          'No users have been authenticated yet! Try `/spotifyauth` to register yourself.'
-        )
-      );
+    try {
+      await Promise.all([hasUsers(), hasPlaylists(), hasActivePlaylist()]);
+      next();
+    } catch (err) {
+      res.send(utils.slackAt(req, err));
     }
-
-    if ((await Playlist.count({})) === 0) {
-      return res.send(
-        utils.slackAt(
-          req,
-          'There are no configured playlists. Try `/addplaylist` to get started.'
-        )
-      );
-    }
-
-    if (!await Playlist.getActive()) {
-      logger.error('No active playlist found. Please report this.');
-      return res.send(
-        utils.slackAt(
-          req,
-          'For some reason, there\'s no active playlist. Try starting one with `/listplaylists.`'
-        )
-      );
-    }
-
-    next();
   },
 
   setOn() {

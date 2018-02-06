@@ -33,7 +33,9 @@ module.exports = async function find_track(payload) {
         )
       )
       .catch(err => {
-        logger.error('Error playing track for /interactive play: ' + err.stack);
+        logger.error(
+          'Error playing track for /interactive play: ' + (err.stack || err)
+        );
         webClient.chat.postMessage(
           channelID,
           utils.getErrorMessage(err.statusCode)
@@ -51,7 +53,7 @@ module.exports = async function find_track(payload) {
       )
       .catch(err => {
         logger.error(
-          'Error queueing track for /interactive queue: ' + err.stack
+          'Error queueing track for /interactive queue: ' + (err.stack || err)
         );
         webClient.chat.postMessage(
           channelID,
