@@ -32,7 +32,8 @@ describe('/eradicate endpoint', function () {
               text: 'Do it.',
               type: 'button',
               style: 'danger',
-              value: '0eGsygTp906u18L0Oimnem'
+              value:
+                '{"spotifyID":"0eGsygTp906u18L0Oimnem","title":"Mr. Brightside","artist":"The Killers"}'
             },
             {
               name: 'cancel',

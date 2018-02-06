@@ -8,7 +8,7 @@ module.exports = async function eradicate(req) {
 
   let track;
   try {
-    track = await spotifyApi.refrain.getMyCurrentPlayingTrack(false);
+    track = await spotifyApi.refrain.getMyCurrentPlayingTrack();
   } catch (err) {
     logger.error(
       `Error getting current track for /eradicate: ${err.stack || err}`
@@ -36,7 +36,11 @@ module.exports = async function eradicate(req) {
             text: 'Do it.',
             type: 'button',
             style: 'danger',
-            value: track.spotifyID,
+            value: JSON.stringify({
+              spotifyID: track.spotifyID,
+              title: track.title,
+              artist: track.artist
+            })
           },
           {
             name: 'cancel',

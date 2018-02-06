@@ -1,5 +1,6 @@
-const User = require('../models/user');
 const Playlist = require('../models/playlist');
+const Track = require('../models/track');
+const User = require('../models/user');
 const utils = require('../utils');
 const logger = require('../logger');
 
@@ -10,17 +11,15 @@ module.exports = async function delete_track(payload) {
     return { text: 'Crisis averted.' };
   }
 
+  const trackData = JSON.parse(action.value);
+  const track = new Track(trackData);
+
   let playlist;
-  let track;
   let spotifyApi;
 
   await Promise.all([
     new Promise(async resolve => {
       playlist = await Playlist.getActive();
-      await playlist
-        .populate({ path: 'tracks', match: { spotifyID: action.value } })
-        .execPopulate();
-      track = playlist.tracks[0];
       resolve();
     }),
     new Promise(async resolve => {
