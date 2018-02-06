@@ -12,29 +12,28 @@ module.exports = async function addplaylist(req) {
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 
-  return spotifyApi
-    .getPlaylist(spotifyUserID, spotifyID)
-    .then(data => {
-      const name = data.body.name;
-      const playlist = new Playlist({
-        spotifyID,
-        spotifyUserID,
-        name
-      });
-      return playlist.save().then(async () => {
-        if (!await Playlist.getActive()) {
-          await playlist.setActive();
-        }
+  let playlistData;
+  try {
+    playlistData = await spotifyApi.getPlaylist(spotifyUserID, spotifyID);
+  } catch (err) {
+    if (err.statusCode === 404) {
+      return utils.slackAt(req, 'Couldn\'t find that playlist.');
+    } else {
+      logger.error(
+        `Error retrieving playlist ${playlistURI}: ${err.stack || err}`
+      );
+      throw err;
+    }
+  }
 
-        return utils.slackAt(req, `Added your playlist *${name}*.`);
-      });
-    })
-    .catch(err => {
-      if (err.statusCode === 404) {
-        return utils.slackAt(req, 'Couldn\'t find that playlist.');
-      } else {
-        logger.error(`Error retrieving playlist ${playlistURI}: ${err.stack}`);
-        throw err;
-      }
-    });
+  const name = playlistData.body.name;
+  const playlist = new Playlist({
+    active: !await Playlist.getActive(),
+    spotifyID,
+    spotifyUserID,
+    name
+  });
+
+  await playlist.save();
+  return utils.slackAt(req, `Added your playlist *${name}*.`);
 };

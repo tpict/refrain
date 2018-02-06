@@ -20,7 +20,7 @@ describe('/addplaylist endpoint', function () {
       });
   });
 
-  it('should add requested playlist to storage', async function () {
+  it('should save the requested playlist', async function () {
     const existingPlaylist = await Playlist.getActive();
 
     const body = utils.baseSlackRequest({
