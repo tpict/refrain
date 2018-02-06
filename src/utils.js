@@ -91,10 +91,6 @@ module.exports = {
     return formatted;
   },
 
-  formatSong(trackName, artistName) {
-    return `*${trackName}* by *${artistName}*`;
-  },
-
   getWebClient() {
     return new WebClient(process.env.SLACK_API_TOKEN);
   },

@@ -10,11 +10,25 @@ module.exports = async function delete_track(payload) {
     return { text: 'Crisis averted.' };
   }
 
-  const track = JSON.parse(action.value);
-  const formattedSong = utils.formatSong(track.name, track.artist);
-  const playlist = await Playlist.getActive();
-  const activeUser = await User.getActive();
-  const spotifyApi = await activeUser.getSpotifyApi();
+  let playlist;
+  let track;
+  let spotifyApi;
+
+  await Promise.all([
+    new Promise(async resolve => {
+      playlist = await Playlist.getActive();
+      await playlist
+        .populate({ path: 'tracks', match: { spotifyID: action.value } })
+        .execPopulate();
+      track = playlist.tracks[0];
+      resolve();
+    }),
+    new Promise(async resolve => {
+      const activeUser = await User.getActive();
+      spotifyApi = await activeUser.getSpotifyApi();
+      resolve();
+    })
+  ]);
 
   try {
     spotifyApi.removeTracksFromPlaylist(
@@ -38,6 +52,6 @@ module.exports = async function delete_track(payload) {
 
   return utils.slackAt(
     payload.user.id,
-    `That bad? Let's not listen to ${formattedSong} again. :bomb:`
+    `That bad? Let's not listen to ${track.formattedTitle} again. :bomb:`
   );
 };

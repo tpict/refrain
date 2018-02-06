@@ -106,8 +106,9 @@ const extended = api => ({
   // counterparts, but accept and return Mongoose models.
 
   // Returns null, the Track item in the database (uses active playlist
-  // context) or a new Track.
-  getMyCurrentPlayingTrack: async () => {
+  // context) or a new Track. The lookup parameter defines whether or not to
+  // look up the track in the database.
+  getMyCurrentPlayingTrack: async (lookup = true) => {
     const res = await api.getMyCurrentPlayingTrack();
     const trackData = res.body.item;
 
@@ -115,16 +116,18 @@ const extended = api => ({
       return null;
     }
 
-    const playlist = await Playlist.getActive();
-    await playlist
-      .populate({
-        path: 'tracks',
-        match: { spotifyID: trackData.id }
-      })
-      .execPopulate();
+    if (lookup) {
+      const playlist = await Playlist.getActive();
+      await playlist
+        .populate({
+          path: 'tracks',
+          match: { spotifyID: trackData.id }
+        })
+        .execPopulate();
 
-    if (playlist.tracks.length > 0) {
-      return playlist.tracks[0];
+      if (playlist.tracks.length > 0) {
+        return playlist.tracks[0];
+      }
     }
 
     return new Track({

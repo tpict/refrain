@@ -24,7 +24,7 @@ describe('/eradicate interactive callback', function () {
       .end((err, res) => {
         chai.assert.equal(
           res.body.text,
-          '<@U1AAAAAAA>: That bad? Let\'s not listen to *Test Me* by *Jme* again. :bomb:'
+          '<@U1AAAAAAA>: That bad? Let\'s not listen to *Mr. Brightside* by *The Killers* again. :bomb:'
         );
         removeTrackScope.done();
         nextTrackScope.done();

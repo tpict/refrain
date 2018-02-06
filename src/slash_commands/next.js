@@ -49,14 +49,12 @@ module.exports = async function next(req) {
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 
-  let trackData = {};
+  let track;
   let skipMessage = 'Skipping...';
 
   try {
-    trackData = await spotifyApi.getMyCurrentPlayingTrack();
-    const skippedName = trackData.body.item.name;
-    const skippedArtist = trackData.body.item.artists[0].name;
-    skipMessage = `Skipping ${utils.formatSong(skippedName, skippedArtist)}...`;
+    track = await spotifyApi.refrain.getMyCurrentPlayingTrack(false);
+    skipMessage = `Skipping ${track.formattedTitle}...`;
   } catch (err) {
     logger.error(
       'Error getting current track for /next: ' + (err.stack || err)

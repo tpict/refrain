@@ -6,9 +6,9 @@ module.exports = async function eradicate(req) {
   const activeUser = await User.getActive();
   const spotifyApi = await activeUser.getSpotifyApi();
 
-  let data;
+  let track;
   try {
-    data = await spotifyApi.getMyCurrentPlayingTrack();
+    track = await spotifyApi.refrain.getMyCurrentPlayingTrack(false);
   } catch (err) {
     logger.error(
       `Error getting current track for /eradicate: ${err.stack || err}`
@@ -16,22 +16,15 @@ module.exports = async function eradicate(req) {
     throw err;
   }
 
-  if (data.statusCode === 204) {
+  if (!track) {
     return utils.slackAt(
       req,
       'Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.'
     );
   }
 
-  const track = data.body.item;
-  const name = track.name;
-  const artist = track.artists[0].name;
-
   return utils.slackAt(req, {
-    text: `Whoa! Are you absolutely positive that you want to delete ${utils.formatSong(
-      name,
-      artist
-    )}?`,
+    text: `Whoa! Are you absolutely positive that you want to delete ${track.formattedTitle}?`,
     attachments: [
       {
         fallback: 'Your device doesn\'t support this.',
@@ -43,11 +36,7 @@ module.exports = async function eradicate(req) {
             text: 'Do it.',
             type: 'button',
             style: 'danger',
-            value: JSON.stringify({
-              uri: track.uri,
-              name,
-              artist
-            })
+            value: track.spotifyID,
           },
           {
             name: 'cancel',
