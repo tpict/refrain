@@ -16,7 +16,7 @@ describe('/commandeer endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/commandeer')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
@@ -32,7 +32,7 @@ describe('/commandeer endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/commandeer')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(

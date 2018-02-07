@@ -17,29 +17,24 @@ async function hasPlaylists() {
 }
 
 module.exports = {
-  needsPower(req, res, next) {
-    if (on) {
-      next();
-    } else {
-      res.send(utils.slackAt(req, 'The jukebox is off!'));
+  needsPower(req) {
+    if (!on) {
+      return utils.slackAt(req, 'The jukebox is off!');
     }
   },
 
-  async needsActive(req, res, next) {
+  async needsActive(req) {
     const activeUser = await User.getActive();
-    if (req.body.user_id === activeUser.slackID) {
-      next();
-    } else {
-      res.send(utils.slackAt(req, 'Only the active user may do that.'));
+    if (req.body.user_id !== activeUser.slackID) {
+      return utils.slackAt(req, 'Only the active user may do that.');
     }
   },
 
-  async needsSetup(req, res, next) {
+  async needsSetup(req) {
     try {
       await Promise.all([hasUsers(), hasPlaylists()]);
-      next();
     } catch (err) {
-      res.send(utils.slackAt(req, err));
+      return utils.slackAt(req, err);
     }
   },
 

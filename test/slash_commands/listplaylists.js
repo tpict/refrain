@@ -18,7 +18,7 @@ describe('/listplaylists endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/listplaylists')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
@@ -74,7 +74,7 @@ describe('/listplaylists endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/listplaylists')
+      .post('/command')
       .send(body);
 
     chai.assert.deepEqual(

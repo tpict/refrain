@@ -35,7 +35,7 @@ async function performSkip(spotifyApi, req) {
   if (!track) {
     return webClient.chat.postMessage(
       req.body.channel_id,
-      'Out of music! You might need to use `/playplaylist`.'
+      'Out of music! You might need to use `/listplaylists`.'
     );
   }
 

@@ -36,7 +36,7 @@ describe('/next endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/next')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
@@ -63,7 +63,7 @@ describe('/next endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/next')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(res.body.text, '<@U1AAAAAAA>: The jukebox is off!');

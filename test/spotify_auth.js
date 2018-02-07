@@ -50,7 +50,7 @@ describe('Spotify authentication refresh', function () {
 
     await chai
       .request(app)
-      .post('/shuffle')
+      .post('/command')
       .send(body);
 
     authScope.done();
@@ -69,7 +69,7 @@ describe('Spotify authentication refresh', function () {
 
     await chai
       .request(app)
-      .post('/shuffle')
+      .post('/command')
       .send(body);
 
     authScope.done();
@@ -89,7 +89,7 @@ describe('Spotify authentication refresh', function () {
 
     await chai
       .request(app)
-      .post('/shuffle')
+      .post('/command')
       .send(body);
 
     chai.assert.isFalse(authScope.isDone());

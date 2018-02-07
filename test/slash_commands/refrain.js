@@ -33,7 +33,7 @@ describe('/refrain endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/refrain')
+      .post('/command')
       .send(refrainBody);
 
     chai.assert.equal(
@@ -45,7 +45,7 @@ describe('/refrain endpoint', function () {
 
     const shuffleRes = await chai
       .request(app)
-      .post('/shuffle')
+      .post('/command')
       .send(shuffleBody);
 
     chai.assert.equal(
@@ -69,7 +69,7 @@ describe('/refrain endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/refrain')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
@@ -94,7 +94,7 @@ describe('/refrain endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/refrain')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(

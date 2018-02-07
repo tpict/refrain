@@ -49,7 +49,7 @@ describe('/eradicate endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/eradicate')
+      .post('/command')
       .send(body);
 
     chai.assert.deepEqual(res.body, expected);
@@ -67,12 +67,12 @@ describe('/eradicate endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/eradicate')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
       res.body.text,
-      '<@U1AAAAAAA>: Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.'
+      '<@U1AAAAAAA>: Are you hearing things? If so, you might want to use `/listplaylists` to try and re-sync things.'
     );
     currentlyPlayingScope.done();
   });
@@ -86,7 +86,7 @@ describe('/eradicate endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/eradicate')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(res.body.text, '<@U1AAAAAAA>: The jukebox is off!');

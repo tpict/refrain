@@ -20,7 +20,7 @@ describe('/pauseme endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/pauseme')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(res.body.text, '<@U1AAAAAAA>: Paused!');
@@ -37,7 +37,7 @@ describe('/pauseme endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/pauseme')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(res.body.text, '<@U1AAAAAAA>: The jukebox is off!');

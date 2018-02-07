@@ -21,7 +21,7 @@ describe('/findme endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/findme')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
@@ -45,7 +45,7 @@ describe('/findme endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/findme')
+      .post('/command')
       .send(body);
 
     chai.assert.deepEqual(
@@ -71,7 +71,7 @@ describe('/findme endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/findme')
+      .post('/command')
       .send(body);
 
     const expected = require('../fixtures/search_response.json');
@@ -89,7 +89,7 @@ describe('/findme endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/findme')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(res.body.text, '<@U1AAAAAAA>: The jukebox is off!');

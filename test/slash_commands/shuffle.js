@@ -24,7 +24,7 @@ describe('/shuffle endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/shuffle')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(res.body.text, '<@U1AAAAAAA>: Shuffle is now on.');
@@ -47,7 +47,7 @@ describe('/shuffle endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/shuffle')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(res.body.text, '<@U1AAAAAAA>: Shuffle is now off.');
@@ -68,7 +68,7 @@ describe('/shuffle endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/shuffle')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
@@ -89,7 +89,7 @@ describe('/shuffle endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/shuffle')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(res.body.text, '<@U1AAAAAAA>: The jukebox is off!');

@@ -22,7 +22,7 @@ describe('/listusers endpoint', function () {
     await newUser.save();
     const res = await chai
       .request(app)
-      .post('/listusers')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
@@ -40,7 +40,7 @@ describe('/listusers endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/listusers')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(

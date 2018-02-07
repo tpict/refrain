@@ -30,7 +30,7 @@ describe('/addplaylist endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/addplaylist')
+      .post('/command')
       .send(body);
 
     scope.done();
@@ -65,7 +65,7 @@ describe('/addplaylist endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/addplaylist')
+      .post('/command')
       .send(body);
 
     scope.done();
@@ -99,7 +99,7 @@ describe('/addplaylist endpoint', function () {
 
     const res = await chai
       .request(app)
-      .post('/addplaylist')
+      .post('/command')
       .send(body);
 
     scope.done();

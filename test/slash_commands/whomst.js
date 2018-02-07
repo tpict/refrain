@@ -20,7 +20,7 @@ describe('/whomst endpoint', async function () {
 
     const res = await chai
       .request(app)
-      .post('/whomst')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
@@ -42,7 +42,7 @@ describe('/whomst endpoint', async function () {
 
     const res = await chai
       .request(app)
-      .post('/whomst')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
@@ -64,7 +64,7 @@ describe('/whomst endpoint', async function () {
 
     const res = await chai
       .request(app)
-      .post('/whomst')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(
@@ -84,7 +84,7 @@ describe('/whomst endpoint', async function () {
 
     const res = await chai
       .request(app)
-      .post('/whomst')
+      .post('/command')
       .send(body);
 
     chai.assert.equal(res.body.text, '<@U1AAAAAAA>: The jukebox is off!');

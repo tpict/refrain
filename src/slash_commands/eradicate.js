@@ -19,7 +19,7 @@ module.exports = async function eradicate(req) {
   if (!track) {
     return utils.slackAt(
       req,
-      'Are you hearing things? If so, you might want to use `/playplaylist` to try and re-sync things.'
+      'Are you hearing things? If so, you might want to use `/listplaylists` to try and re-sync things.'
     );
   }
 
