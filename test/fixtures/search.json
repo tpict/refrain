@@ -84,19 +84,7 @@
         },
         "href": "https://api.spotify.com/v1/albums/4fojQC00PuvzE209WTbAIS",
         "id": "4fojQC00PuvzE209WTbAIS",
-        "images": [{
-          "height": 640,
-          "url": "https://i.scdn.co/image/48703f83585e59fd5906271a4fc4b69be8a1ea99",
-          "width": 640
-        }, {
-          "height": 300,
-          "url": "https://i.scdn.co/image/dc904fcc72675df0dbac3e443312e48b7cdb7c5e",
-          "width": 300
-        }, {
-          "height": 64,
-          "url": "https://i.scdn.co/image/7419f314495b844575619b9ba46365403ce13d94",
-          "width": 64
-        }],
+        "images": [],
         "name": "Ed Rec 100",
         "type": "album",
         "uri": "spotify:album:4fojQC00PuvzE209WTbAIS"

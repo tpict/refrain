@@ -10,7 +10,7 @@ module.exports = {
         callback_id: 'find_track',
         title: item.name,
         text,
-        thumb_url: item.album.images[1].url,
+        thumb_url: item.album.images.length ? item.album.images[1].url : '',
         color: 'good',
         actions: [
           {

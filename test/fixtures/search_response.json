@@ -23,7 +23,7 @@
     "callback_id": "find_track",
     "title": "Temporary Secretary",
     "text": "Artist: Riton\nAlbum: Ed Rec 100",
-    "thumb_url": "https://i.scdn.co/image/dc904fcc72675df0dbac3e443312e48b7cdb7c5e",
+    "thumb_url": "",
     "color": "good",
     "actions": [{
         "name": "play",
