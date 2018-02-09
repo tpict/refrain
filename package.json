@@ -24,10 +24,10 @@
     "uuid": "^3.2.1",
     "winston": "next"
   },
-  "name": "pebbledj",
-  "version": "1.0.0",
+  "name": "refrain",
+  "version": "0.2.2",
   "private": true,
-  "description": "Pebble DJ",
+  "description": "Refrain: collaborative playlists in Slack",
   "main": "app.js",
   "devDependencies": {},
   "scripts": {
