@@ -12,7 +12,7 @@ const app = (function () {
   app.use(bodyParser.urlencoded({ extended: false }));
 
   require('./slack_auth')(app);
-  require('./spotify_auth')(app);
+  require('./spotify_callback').endpoint(app);
   require('./slash_commands/index')(app);
   require('./interactive/index')(app);
 

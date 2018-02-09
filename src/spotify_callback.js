@@ -1,54 +1,20 @@
-const uuidv4 = require('uuid/v4');
 const moment = require('moment');
 const SpotifyWebApi = require('spotify-web-api-node');
 
 const User = require('./models/user');
 
-const states = {};
+const authStates = {};
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
   redirectUri: process.env.SPOTIFY_REDIRECT_URI
 });
 
-module.exports = app => {
-  // Send a message with a Spotify authentication link. The state is used later
-  // in the callback endpoint to match the tokens to the Slack user that
-  // requested authentication.
-  app.post('/spotifyauth', async function (req, res) {
-    const slackID = req.body.user_id;
-    let user = await User.findOne({ slackID });
-
-    if (!user) {
-      user = new User({ slackID });
-      await user.save();
-    }
-
-    const state = uuidv4();
-    states[state] = {
-      id: user._id,
-      name: req.body.user_name
-    };
-
-    const scope = [
-      'playlist-read-private',
-      'playlist-read-collaborative',
-      'playlist-modify-public',
-      'playlist-modify-private',
-      'user-read-playback-state',
-      'user-modify-playback-state',
-      'user-read-currently-playing'
-    ];
-
-    const authURL = spotifyApi.createAuthorizeURL(scope, state);
-
-    res.send(`Click this link to authenticate with Spotify: ${authURL}`);
-  });
-
-  // Redirect endpoint for Spotify authentication.
+// Redirect endpoint for Spotify authentication.
+const endpoint = app =>
   app.get('/callback', async function (req, res) {
     const code = req.query.code;
-    const state = states[req.query.state];
+    const state = authStates[req.query.state];
 
     const _id = state.id;
     const user = await User.findOne({ _id });
@@ -89,4 +55,8 @@ module.exports = app => {
       } is now authenticated with Spotify! You can close this tab now.`
     );
   });
+
+module.exports = {
+  authStates,
+  endpoint
 };

@@ -13,6 +13,7 @@ const commands = {
   '/playme': [needsPower, require('./playme')],
   '/refrain': [needsActive, require('./refrain')],
   '/shuffled': [needsPower, require('./shuffle')],
+  '/spotifyauth': [require('./spotifyauth')],
   '/whichplaylist': [needsSetup, require('./whichplaylist')],
   '/whichuser': [needsSetup, require('./whichuser')],
   '/whomst': [needsPower, needsSetup, require('./whomst')]
