@@ -15,7 +15,7 @@ worse.
 | `/addplaylist [Spotify URI]`          | No             | Add given playlist                          |
 | `/commandeer`                         | No             | Become active user                          |
 | `/eradicate`                          | Yes            | Remove playing track from active playlist   |
-| `/findme`                             | Yes            | Search for music                            |
+| `/findme [track, artist, album]`      | Yes            | Search for music                            |
 | `/listplaylists`                      | No             | Show your playlists                         |
 | `/listusers`                          | No             | Show authenticated users                    |
 | `/next`                               | Yes            | Skip track                                  |
@@ -27,6 +27,9 @@ worse.
 | `/whichplaylist`                      | No             | Show active playlist                        |
 | `/whichuser`                          | No             | Show active user                            |
 | `/whomst`                             | Yes            | Show current track info                     |
+
+The command names have been chosen to avoid conflicts with the Jukebot slash
+commands so that you can trial them side-by-side.
 
 
 ## Prerequisites
@@ -52,8 +55,7 @@ You will need:
    of the page, then copy your OAuth access token and add it to your `.env`
    like so: `SLACK_API_TOKEN=xoxp-...`.
 4. In *Slash Commands*, add each of the commands in the table above. The
-   request URL is `http://your.server.domain/command` for all of them **except
-   `/spotifyauth`**, which is at `http://your.server.domain/spotifyauth`.
+   request URL is `http://your.server.domain/command` for all of them.
 5. In *Interactive Components*, click *Enable Interactive Components* and put
    `http://your.server.domain/interactive` in the *Request URL* field, then
    click the big green button.
@@ -72,6 +74,7 @@ You will need:
   into another playlist, as this causes the most API errors
 - Alias all slash commands to /refrain to reduce the tedium of setup
 - Volume control
+- Handle Spotify API timeouts
 
 
 ## Acknowledgements
